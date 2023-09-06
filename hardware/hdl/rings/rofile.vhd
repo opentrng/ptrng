@@ -27,13 +27,13 @@ begin
 
 	stimulus: process
 		variable inline: line;
-		variable period: time;
+		variable period: integer;
 	begin
 		file_open(fin, PATH,  read_mode);
 		while not endfile(fin) and enable = '1' loop
 			readline(fin, inline);
 			read(inline, period);
-			wait for period;
+			wait for period * 1fs;
 			if enable = '1' then
 				ring <= not ring;
 			else

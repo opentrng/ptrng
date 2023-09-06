@@ -47,18 +47,18 @@ $ python generate_ro.py 500e6 10e6 > ro.txt
 Here is an example of the generated file:
 
 ```
-1999658.014603534 fs
-1998880.439116977 fs
-1983733.780831122 fs
-2001320.589540029 fs
-1995537.788148419 fs
-2002511.456849104 fs
-2003033.658974332 fs
-2012407.884590927 fs
-2012336.076581339 fs
+1999658 fs
+1998880 fs
+1983733 fs
+2001320 fs
+1995537 fs
+2002511 fs
+2003033 fs
+2012407 fs
+2012336 fs
 ...
-2002883.082279683 fs
-1999630.388911650 fs
+2002883 fs
+1999630 fs
 ```
 
 Optionnaly, Allan variance coefficients a1, a2 and noise facors f1, f2 can be specified for thermal and flicker noises.
