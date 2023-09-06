@@ -27,7 +27,7 @@ begin
 	port map (
 		ro1 => ro1,
 		ro2 => ro2,
-		div => std_logic_vector(to_unsigned(6, 32)),
+		div => std_logic_vector(to_unsigned(1000, 32)),
 		clk => ero_clk,
 		data => ero_data
 	);

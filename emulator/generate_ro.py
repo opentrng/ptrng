@@ -33,4 +33,4 @@ serie = T*np.ones(N) + thermal*np.sqrt(a1*T/f1) + flicker*np.sqrt(a2*(T**2)/(f2*
 
 # Output periods at femtosecond
 for sample in serie:
-	print("{:.9f} fs".format(sample*1e15))
+	print("{:.0f} fs".format(sample*1e15))
