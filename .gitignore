@@ -1,0 +1,10 @@
+emulator/*.txt
+hardware/sim/*.txt
+hardware/sim/*.ini
+hardware/sim/*.mpf
+hardware/sim/*.mti
+hardware/sim/*.wlf
+hardware/sim/transcript
+hardware/sim/work
+.ucdprod*
+.venv
