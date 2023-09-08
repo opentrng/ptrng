@@ -25,26 +25,30 @@ architecture sim of rofile is
 
 begin
 
+	-- Read period duration in each line of the input file, create the ringo output by inversion of the clock each half period
 	stimulus: process
 		variable inline: line;
-		variable period: integer;
+		variable fullperiod: integer;
+		variable halfperiod: integer;
 	begin
 		file_open(fin, PATH,  read_mode);
-		while not endfile(fin) and enable = '1' loop
-			readline(fin, inline);
-			read(inline, period);
-			wait for period * 1fs;
+		while not endfile(fin) loop
 			if enable = '1' then
+				readline(fin, inline);
+				read(inline, fullperiod);
+				halfperiod := fullperiod / 2;
+				wait for halfperiod * 1fs;
 				ring <= not ring;
-			else
-				ring <= '0';
+				wait for (fullperiod-halfperiod) * 1fs;
+				ring <= not ring;
 			end if;
 		end loop;
 		file_close(fin);
-		report "RO " & PATH & " STIMULUS DONE!";
+		report "STIMULUS DONE! " & PATH & " reached end-of-file";
 		wait;
 	end process;
 
+	-- Take the ringo signal out of the block ;)
 	osc <= ring;
 
 end architecture;

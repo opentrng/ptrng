@@ -28,15 +28,24 @@ architecture pow2 of divider is
 
 begin
 
+	-- Resynchronize the input signal to 'original' clock
 	process (original)
 	begin
 		if rising_edge(original) then
 			metastable <= factor;
 			stable <= metastable;
+		end if;
+	end process;
+
+	-- Counter
+	process (original)
+	begin
+		if rising_edge(original) then
 			counter <= counter + 1;
 		end if;
 	end process;
 
+	-- Extract one bit from the counter to obtain the divided clock
 	divided <= original when stable = 0 else counter(conv_integer(stable-1));
 
 end architecture;
@@ -51,11 +60,19 @@ architecture linear of divider is
 
 begin
 
+	-- Resynchronize the input signal to 'original' clock
 	process (original)
 	begin
 		if rising_edge(original) then
 			resync <= factor;
 			stable <= resync;
+		end if;
+	end process;
+
+	-- Reshape a new clock based on counter values ('1111' when counter<factor/2 '0000' when counter>factor/2)
+	process (original)
+	begin
+		if rising_edge(original) then
 			if counter < stable-1 then
 				counter <= counter + 1;
 				if counter > stable(MAX_WIDTH-1 downto 1)-1 then
@@ -70,6 +87,7 @@ begin
 		end if;
 	end process;
 
+	-- Select the rehaped clock if the divided is a least 2, else the original signal
 	divided <= '0' when stable = 0 else original when stable = 1 else counter(0) when stable = 2 else reshaped;
 
 end architecture;

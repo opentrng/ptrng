@@ -27,6 +27,7 @@ architecture rtl of ero is
 
 begin
 
+	-- Takes RO2 through the clock divider
 	divider: entity work.divider(linear)
 	generic map (
 		MAX_WIDTH => 32
@@ -37,6 +38,7 @@ begin
 		divided => ro2_div
 	);
 
+	-- Sample RO1 with RO2/div
 	process (ro2_div)
 	begin
 		if rising_edge(ro2_div) then
@@ -47,6 +49,7 @@ begin
 		end if;
 	end process;
 
+	-- Output data is syncrhonized with this clock
 	clk <= ro2_div;
 
 end architecture;
