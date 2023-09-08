@@ -5,9 +5,9 @@ Welcome to **OpenTRNG**! This project is dedicated to delivering the community o
 1. [Emulate noisy ring oscillators](#emulate-noisy-ring-oscillators)
 2. [Simulate entropy source architectures](#simulate-entropy-source-architectures)
 3. TODO Execute True Random Number Generators on FPGA
-4. TODO Analyze and evaluate their outcomes
+4. [Analyze and evaluate their outcomes](#analyze-and-evaluate-outputs)
 
-## Available reference entropy sources
+## Available entropy sources
 
 As of now, **OpenTRNG** includes the following reference architectures:
 
@@ -27,7 +27,7 @@ The repository structure contains:
 
 ### Python
 
-Create a virtual environment `$ python3 -m venv .venv` activate the venv `$ .ven/bin/activate` and install required packages `$ pip install numpy colorednoise`.
+Create a virtual environment `$ python3 -m venv .venv` activate the venv `$ .ven/bin/activate` and install required packages `$ pip install numpy matplotlib colorednoise`.
 
 ### HDL simulator
 
@@ -104,11 +104,23 @@ If you make modifications to the VHDL sources, you have the option to compile th
 
 Important Note: For adequate phase noise accuracy in the ring oscillators, it is imperative to conduct VHDL simulation at a resolution of femtoseconds (fs).
 
+# Analyze and evaluate outputs
+
+All analyze and evaluation tools are available in the `analyze` directory.
+
+## Allan variance
+
+You can compute the Allan Variance using data from a ring oscillator, whether it's obtained from measurements or emulation. The Python script `allan_variance.py` can plot of plotting the normalized Allan Variance versus samples accumulation. For instance, you can use the following command to plot the Allan Variance of an emulated ring oscillator:
+
+```
+$ python allan_variance.py ../emulator/ro1.txt allanvar_ro1.png
+```
+
 # Howtos and receipes
 
 ## How to generate 10M bits with ERO
 
-Assume we want to generate 1e7 bits with an ERO running at 500MHz and a division factor of 1000. Output rate will be at 500kbit/s, so we need 1e7 x 1000 = 1e10 periods of rings (ouch!).
+Assume we want to generate 1e7 bits with an ERO running at 500MHz and a division factor of 1000. Output rate will be at 500kbit/s, so we need 1e7 x 1000 = 1e10 periods of rings (80GB each, ouch!).
 
 
 ```
@@ -125,10 +137,11 @@ make compile
 make run TESTBENCH=ero_tb DURATION=20s
 ```
 
+Please note that for long time series, the emulator requires a significant amount of RAM. In such cases, it is advisable to split the generation process into smaller segments and concatenate them.
+
 # Disclaimer
 
 The **OpenTRNG** project is made available solely for educational purposes. It shall not be deployed "as is" in real-world applications, compliance with verification and certification standards is not guaranteed. Please be aware that any misuse or unintended application of this project is beyond the responsibility of CEA.
-
 
 If you plan to integrate a True Random Number Generator (TRNG) into a product, you can hire our expertise. Feel free to reach us using the following links for further information.
 
