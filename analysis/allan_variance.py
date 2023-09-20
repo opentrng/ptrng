@@ -6,7 +6,7 @@ import sys
 # Test command line arguments
 if len(sys.argv)!=3:
 	print("Usage: python {:s} <data> <plot>".format(sys.argv[0]))
-	print("Generate a normalized Allan Variance <plot> for a ring oscillator. The <data> input file should contain one sample per period value at each line. Available plot file extensions are (png, jpg, pdf, svg).")
+	print("Generate a normalized Allan Variance <plot> for a ring oscillator. The <data> input file should contain one sample per period value at each line.")
 	quit()
 
 # Get parameters

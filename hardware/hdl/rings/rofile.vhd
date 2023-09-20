@@ -37,9 +37,9 @@ begin
 				readline(fin, inline);
 				read(inline, fullperiod);
 				halfperiod := fullperiod / 2;
-				wait for halfperiod * 1fs;
+				wait for halfperiod * 1 fs;
 				ring <= not ring;
-				wait for (fullperiod-halfperiod) * 1fs;
+				wait for (fullperiod-halfperiod) * 1 fs;
 				ring <= not ring;
 			end if;
 		end loop;

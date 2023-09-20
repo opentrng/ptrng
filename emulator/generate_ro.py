@@ -4,14 +4,14 @@ import sys
 
 # Test command line arguments
 if len(sys.argv)!=3 and len(sys.argv)!=7:
-	print("Usage: python {:s} <Fc> <N> [<a1> <a2> <f1> <f2>]".format(sys.argv[0]))
+	print("Usage: python {:s} <N> <Fc> [<a1> <a2> <f1> <f2>]".format(sys.argv[0]))
 	print("Generates a time serie of <N> cycles from an emulated noisy RO at average frequency <Fc>. Optionnaly Allan variance coefficients <ai> and noise facors <fi> can be specified for thermal (1) and flicker (2) noises. The script returns one period per line.")
 	print("Example: '{:s} 500e6 10e3' will generate 10k cycles of a RO operating at 500MHz".format(sys.argv[0]))
 	quit()
 
 # Parameters
-Fc = float(sys.argv[1])
-N = int(float(sys.argv[2]))
+N = int(float(sys.argv[1]))
+Fc = float(sys.argv[2])
 T = 1 / Fc
 if len(sys.argv)==7:
 	a1 = float(sys.argv[3])

@@ -1,10 +1,11 @@
-emulator/*.txt
-hardware/sim/*.txt
+data/*
 hardware/sim/*.ini
 hardware/sim/*.mpf
 hardware/sim/*.mti
 hardware/sim/*.wlf
 hardware/sim/transcript
 hardware/sim/work
+*.pyc
 .ucdprod*
 .venv
+Thumbs.db
