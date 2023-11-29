@@ -34,15 +34,15 @@ def mcv(samples):
 	return entropy
 
 # The Markov Estimate (only works on bit series)
-def markov(samples):
-	values, counts = np.unique(samples, return_counts=True)
+def markov(bits):
+	values, counts = np.unique(bits, return_counts=True)
 	assert np.array_equal(values, np.array([0, 1]))==True
-	P0 = counts[0] / samples.size
-	P1 = counts[1] / samples.size
+	P0 = counts[0] / bits.size
+	P1 = counts[1] / bits.size
 	P = np.zeros((2, 2))
-	for i in range(1, samples.size):
-		P[samples[i-1], samples[i]] += 1
-	P /= samples.size/2
+	for i in range(1, bits.size):
+		P[bits[i-1], bits[i]] += 1
+	P /= bits.size/2
 	probabilities = np.array([
 		P0*P[0,0]**127,
 		P0*P[0,1]**64*P[1,0]**63,
@@ -53,10 +53,35 @@ def markov(samples):
 		])
 	return min(-math.log2(np.max(probabilities))/128, 1)
 
+# The T8 estimator (only works on bit series), credits B. Colombier (https://gitlab.com/BColombier/ais-31-statistical-tests)
+def t8(bits):
+	L = 8
+	Q = 2560
+	K = 256000
+	if len(bits) < (Q+K)*L:
+		raise ValueError("Not enough data to perform entropy estimation")
+	byte_sequence = np.packbits(bits[:(Q+K)*L])
+	last_pos = np.zeros(256, dtype='uint32')
+	g_vals = np.ones(256000, dtype='float64')
+	T = 0.0
+	for index, byte in enumerate(byte_sequence):
+		if last_pos[byte] != 0:
+			gap = index-last_pos[byte]
+			if gap > len(g_vals):
+				raise ValueError("No precomputed g_val for this gap, you should increase the size of the g_vals array (currently {})".format(len(g_vals)))
+			if index >= Q:
+				if g_vals[gap] == 1:
+					g_vals[gap] = (1/np.log(2))*np.sum([1/i for i in range(1, gap)])
+				T += g_vals[gap]
+		last_pos[byte] = index
+	if index+1 != (Q+K):
+		raise ValueError("Not enough data to perform entropy estimation")
+	return T/K
+
 # Get command line arguments
 parser = argparse.ArgumentParser(description="Compute the entropy for a binary file.")
 parser.add_argument("file", type=str, help="data input file (binary)")
-parser.add_argument("estimator", type=str, choices=['shannon', 'mcv', 'markov'], help="entropy estimator")
+parser.add_argument("estimator", type=str, choices=['shannon', 'mcv', 'markov', 't8'], help="entropy estimator")
 parser.add_argument("-b", dest="n", type=int, default=1, help="estimate with N bits samples")
 args=parser.parse_args()
 
@@ -64,19 +89,23 @@ args=parser.parse_args()
 if args.estimator=="markov" and args.n>1:
 	print("ERROR: cannot compute Markov estimator on n>1 bit words")
 	exit(-1)
+if args.estimator=="t8" and args.n!=8:
+	print("ERROR: can compute T8 estimator on 8 bit words only")
+	exit(-1)
 
 # Load the data file and unpack bytes to bits
 data = np.fromfile(args.file, dtype='uint8')
 bits = np.unpackbits(data)
-words = to_words(bits, args.n)
 
 # Compute estimators
 if args.estimator=="shannon":
-	entropy = shannon(words)
+	entropy = shannon(to_words(bits, args.n))
 if args.estimator=="mcv":
-	entropy = mcv(words)
+	entropy = mcv(to_words(bits, args.n))
 if args.estimator=="markov":
 	entropy = markov(bits)
+if args.estimator=="t8":
+	entropy = t8(bits)
 
 # Output
 print("Entropy computed with {:s} estimator on {:d} bits samples: {:.12f}".format(args.estimator, args.n, entropy))

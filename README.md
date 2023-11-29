@@ -11,10 +11,7 @@ Welcome to **OpenTRNG**! This project is dedicated to delivering the community o
 
 The **OpenTRNG** project implements reference implementations for entropy sources and TRNG as found in the scientific litterature, the source code is made available for accademic purposes only. As compliance with verification and certification standards cannot be guarantee, it shall not be deployed "as is" in a product. Please be aware that any misuse or unintended application of this project is beyond the responsibility of CEA.
 
-If you plan to integrate a True Random Number Generator (TRNG) into a product, feel free to contact us using the following links for further information:
-
-* [CEA-Leti](https://www.leti-cea.com/cea-tech/leti/english/Pages/Applied-Research/Facilities/cyber-security-platform.aspx)
-* [CEA](https://www.cea.fr/english)
+If you plan to integrate a True Random Number Generator (TRNG) into a product, feel free to contact us using the following links for further information: [CEA](https://www.cea.fr/english)-[Leti](https://www.leti-cea.com/cea-tech/leti/english/Pages/Applied-Research/Facilities/cyber-security-platform.aspx)
 
 ## Available entropy sources
 
@@ -148,15 +145,16 @@ The provided example illustrates the generation of a COSO distribution plot usin
 
 Entropy estimators take binary files as input. The script `tobinary.py` can be used to convert ERO, MURO and COSO text output files to binary. This script takes one integer value (0, 1, or n) per line, extracts the less significant bit (LSB) and pack successive bits to bytes.
 
-You can estimate entropy of the generated binary streams with the script `entropyestimator.py` and different estimators:
-* Shannon entropy
-* Most Common Value (from NIST SP800-90B)
-* Markov (from NIST SP800-90B)
+You can estimate entropy of the generated binary streams with the script `entropy.py` and different estimators:
+* Shannon entropy ([Wikipedia](https://en.wikipedia.org/wiki/Entropy_(information_theory)))
+* Most Common Value (from [NIST SP800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final))
+* Markov (from [NIST SP800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final))
+* T8 from [BSI AIS 20/31](https://www.bsi.bund.de/dok/randomnumbergenerators) test procedure B
 
-Each estimator can be computed for different samples size from 1 to 32 bits.
+Estimators can be computed for different samples size from 1 to 32 bits.
 
 ```
-$ python analysis/entropyestimator.py data/ero_tb.bin mcv -b 8
+$ python analysis/entropy.py data/ero_tb.bin mcv -b 8
 ```
 
 The provided example computes the MCV estimator on 8 bits samples read from the `ero_tb.bin` binary file.
