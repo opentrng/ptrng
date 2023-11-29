@@ -3,7 +3,7 @@
 Welcome to **OpenTRNG**! This project is dedicated to delivering the community open-source implementations of reference entropy sources based on ring oscillators. Through **OpenTRNG**, you have the capability to:
 
 1. [Emulate noisy ring oscillators](#emulate-noisy-ring-oscillators)
-2. [Simulate entropy source architectures](#simulate-entropy-source-architectures)
+2. [Simulate RAW entropy source architectures](#simulate-raw-entropy-source-architectures)
 3. TODO Execute True Random Number Generators on FPGA
 4. [Analyze and evaluate their outcomes](#analyze-and-evaluate-outputs)
 
@@ -37,7 +37,7 @@ The repository structure contains:
 
 ### Python
 
-Create a virtual environment `$ python3 -m venv .venv` activate the venv `$ .ven/bin/activate` and install required packages `$ pip install numpy matplotlib colorednoise`.
+Create a virtual environment `$ python3 -m venv .venv` activate the venv `$ .ven/bin/activate` and install required packages `$ pip install -r requirements.txt`.
 
 ### HDL simulator
 
@@ -45,38 +45,38 @@ You can perform VHDL simulation for **OpenTRNG** using Mentor QuestaSim (Modelsi
 
 # Emulate noisy ring oscillators
 
-The emulator has the capability to produce time series data for ring oscillators, incorporating phase noise. Each consecutive value represents the absolute timing of the rising edge of the RO signal. The phase noise encompasses both thermal (white) and flicker noise (colored).
+The emulator has the capability to produce time series data for ring oscillators (RO), incorporating phase noise. Each consecutive value represents the absolute timing of the rising edge of the RO signal. The phase noise encompasses both thermal (white) and flicker noise (colored).
 
 As instance, to produce 10,000,000 cycles of a ring oscillator operating at a frequency of 500MHz, execute the following command:
 
 ```
-$ python emulator/generate_ro.py 10e6 500e6 > data/ro.txt
+$ python emulator/timeseries.py 10e6 500e6 data/ro.txt
 ```
 
-Here is an example of the generated file:
+Here is an example of the generated file, each line represents a RO period in femtosecond (fs):
 
 ```
-1999658 fs
-1998880 fs
-1983733 fs
-2001320 fs
-1995537 fs
-2002511 fs
-2003033 fs
-2012407 fs
-2012336 fs
+1999658
+1998880
+1983733
+2001320
+1995537
+2002511
+2003033
+2012407
+2012336
 ...
-2002883 fs
-1999630 fs
+2002883
+1999630
 ```
 
-Optionnaly, Allan variance coefficients a1, a2 and noise facors f1, f2 can be specified for thermal and flicker noises.
+Optionnaly, Allan variance coefficients a1, a2 and noise facors f1, f2 can be specified for both thermal and flicker noises.
 
 ```
-$ python emulator/generate_ro.py 10e6 500e6 2.81e-14 1.16e-10 2 0.135
+$ python emulator/generate_ro.py -a1 2.56e-14 -f1 1.919 -a2 1.11e-09 -f2 0.139 10e6 500e6 data/ro.txt
 ```
 
-# Simulate entropy source architectures
+# Simulate RAW entropy source architectures
 
 Prior to run HDL simulation, it is imperative to create ringo time series `ro1.txt` and `ro2.txt` with at least 10M cycles each. These files are taken as input stimuli for entropy sources and should be located in the `data` directory. Detailed instruction can be found in the [previous section](#emulate-noisy-ring-oscillators).
 
@@ -108,7 +108,7 @@ make run TESTBENCH=ero_tb DURATION=10ms
 
 ```
 
-In any case, simulator will save the binary streams from the entropy sources into the output files `data/*_tb.txt`.
+In any case, simulator will save the binary streams from the entropy sources into the output text files `data/*_tb.txt`. These text files can be converted to binary files with the script `convert_to_binary.py` located in the `analysis` directory.
 
 If you make modifications to the VHDL sources, you have the option to compile them directly from the QuestaSim transcript command line using the `> do compile.tcl` command.
 
@@ -120,23 +120,31 @@ All analyze and evaluation tools are available in the `analyze` directory.
 
 ## Allan variance
 
-You can compute the Allan Variance using data for a ring oscillator time serie, whether it's obtained from measurements or emulation. The Python script `allan_variance.py` can plot of plotting the normalized Allan Variance versus samples accumulation. For instance, you can use the following command to plot the Allan Variance of an emulated ring oscillator:
+You can compute the Allan Variance using data for a ring oscillator time serie, whether it's obtained from measurements or emulation. The Python script `allanvariance.py` can plot the normalized Allan Variance versus samples accumulation. For instance, you can use the following command to plot the Allan Variance of an emulated ring oscillator:
 
 ```
-$ python analysis/allan_variance.py data/ro1.txt data/allanvar.png
+$ python analysis/allan_variance.py -t "Plot title" data/ro1.txt data/allanvar.png
 ```
+
+![Allan variance example for a 500Mz ring oscillator](images/allanvariance.png)
 
 Please note that the Allan variance can also be plotted for the COSO counter values.
 
 ## COSO counter distribution
 
-You can visualize the counter values generated by the Coherent Sampling Ring Oscillator (COSO), whether simulated or obtained from the FPGA board, by creating a histogram using the Python script `coso_distribution.py`.
+You can visualize the counter values generated by the Coherent Sampling Ring Oscillator (COSO), whether simulated or obtained from the FPGA board, by creating a histogram using the Python script `distribution.py`.
 
 ```
-$ python analysis/coso_distribution.py data/coso_tb.txt data/coso_distribution.png
+$ python analysis/distribution.py -t "Plot title" data/coso_tb.txt data/distribution.png
 ```
+
+![COSO values with RO pair at 500MHz and 505MHz](images/cosodistribution.png)
 
 The provided example illustrates the generation of a COSO distribution plot using data from `coso_tb.txt`, which is produced through simulation.
+
+## Entropy estimation
+
+Entropy estimators take binary files as input. The script `tobinary.py` can be used to convert ERO, MURO and COSO text output files to binary. This script takes one integer value (0, 1, or n) per line, extracts the less significant bit (LSB) and pack successive bits to bytes.
 
 # Howtos and receipes
 
@@ -160,6 +168,12 @@ make run TESTBENCH=ero_tb DURATION=20s
 
 Please note that for long time series, the emulator requires a significant amount of RAM. In such cases, it is advisable to split the generation process into smaller segments and concatenate them.
 
+## How to run standardized test
+
 # License
 
 The **OpenTRNG** project is distributed under the GNU GPLv3 license.
+
+# Contributions
+
+Pull requests are welcome and will be reviewed before being merged. No timelines are promised. The code is maintained by ???.

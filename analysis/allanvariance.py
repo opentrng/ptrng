@@ -1,20 +1,17 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import argparse
 import lsne
-import sys
 
-# Test command line arguments
-if len(sys.argv)!=3:
-	print("Usage: python {:s} <data> <plot>".format(sys.argv[0]))
-	print("Generate a normalized Allan Variance <plot> for a ring oscillator time serie or for COSO counter values. The <data> input file should contain one sample per line.")
-	quit()
-
-# Get parameters
-datafile = sys.argv[1]
-plotfile = sys.argv[2]
+# Get command line arguments
+parser = argparse.ArgumentParser(description="Generate a normalized Allan Variance plot for a RO time serie or for COSO counter values.")
+parser.add_argument("datafile", type=str, help="data input file (text format, should contain one sample per line)")
+parser.add_argument("plotfile", type=str, help="plot output file (possibles extensions png, jpg, pdf)")
+parser.add_argument("-t", "--title", type=str, default="", help="plot title")
+args=parser.parse_args()
 
 # Load the data file
-data = np.loadtxt(datafile)
+data = np.loadtxt(args.datafile)
 
 # Compute the cumulative sum and the average value
 csum = np.cumsum(data)
@@ -34,13 +31,13 @@ print('Polynomial coefficients:')
 print(poly)
 
 # Plot in log/log
-plt.title('Allan variance')
+plt.title(args.title)
 plt.xscale('log')
 plt.yscale('log')
-plt.xlabel('N accumulation')
+plt.xlabel('N (accumulation)')
 plt.ylabel('Normalized variance')
 plt.grid(visible=True, which='major', axis='both')
 plt.plot(nspace, allanvar, marker='+')
 plt.plot(nspace, np.polyval(poly, nspace), color='red')
 plt.legend(['Variance','Polynomial fit'])
-plt.savefig(plotfile)
+plt.savefig(args.plotfile)
