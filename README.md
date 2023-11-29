@@ -3,18 +3,18 @@
 Welcome to **OpenTRNG**! This project is dedicated to delivering the community open-source implementations of reference entropy sources based on ring oscillators. Through **OpenTRNG**, you have the capability to:
 
 1. [Emulate noisy ring oscillators](#emulate-noisy-ring-oscillators)
-2. [Simulate RAW entropy source architectures](#simulate-raw-entropy-source-architectures)
-3. TODO Execute True Random Number Generators on FPGA
+2. [Simulate entropy source architectures](#simulate-entropy-source-architectures)
+3. [Run entropy sources on FPGA](#run-entropy-sources-on-fpga)
 4. [Analyze and evaluate their outcomes](#analyze-and-evaluate-outputs)
 
 ## Disclaimer
 
-The **OpenTRNG** project implements reference implementations for TRNG as found in the scientific litterature, the source code is made available for accademic purposes only. As compliance with verification and certification standards cannot be guarantee, it shall not be deployed "as is" in a product. Please be aware that any misuse or unintended application of this project is beyond the responsibility of CEA.
+The **OpenTRNG** project implements reference implementations for entropy sources and TRNG as found in the scientific litterature, the source code is made available for accademic purposes only. As compliance with verification and certification standards cannot be guarantee, it shall not be deployed "as is" in a product. Please be aware that any misuse or unintended application of this project is beyond the responsibility of CEA.
 
-If you plan to integrate a True Random Number Generator (TRNG) into a product, feel free to contact us using the following links for further information.
+If you plan to integrate a True Random Number Generator (TRNG) into a product, feel free to contact us using the following links for further information:
 
-* https://www.leti-cea.com/cea-tech/leti/english/Pages/Applied-Research/Facilities/cyber-security-platform.aspx
-* https://www.cea.fr/english
+* [CEA-Leti](https://www.leti-cea.com/cea-tech/leti/english/Pages/Applied-Research/Facilities/cyber-security-platform.aspx)
+* [CEA](https://www.cea.fr/english)
 
 ## Available entropy sources
 
@@ -76,7 +76,7 @@ Optionnaly, Allan variance coefficients a1, a2 and noise facors f1, f2 can be sp
 $ python emulator/generate_ro.py -a1 2.56e-14 -f1 1.919 -a2 1.11e-09 -f2 0.139 10e6 500e6 data/ro.txt
 ```
 
-# Simulate RAW entropy source architectures
+# Simulate entropy source architectures
 
 Prior to run HDL simulation, it is imperative to create ringo time series `ro1.txt` and `ro2.txt` with at least 10M cycles each. These files are taken as input stimuli for entropy sources and should be located in the `data` directory. Detailed instruction can be found in the [previous section](#emulate-noisy-ring-oscillators).
 
@@ -114,6 +114,8 @@ If you make modifications to the VHDL sources, you have the option to compile th
 
 Important Note: For adequate phase noise accuracy in the ring oscillators, it is imperative to conduct VHDL simulation at a resolution of femtoseconds (fs).
 
+# Run entropy sources on FPGA
+
 # Analyze and evaluate outputs
 
 All analyze and evaluation tools are available in the `analyze` directory.
@@ -146,6 +148,19 @@ The provided example illustrates the generation of a COSO distribution plot usin
 
 Entropy estimators take binary files as input. The script `tobinary.py` can be used to convert ERO, MURO and COSO text output files to binary. This script takes one integer value (0, 1, or n) per line, extracts the less significant bit (LSB) and pack successive bits to bytes.
 
+You can estimate entropy of the generated binary streams with the script `entropyestimator.py` and different estimators:
+* Shannon entropy
+* Most Common Value (from NIST SP800-90B)
+* Markov (from NIST SP800-90B)
+
+Each estimator can be computed for different samples size from 1 to 32 bits.
+
+```
+$ python analysis/entropyestimator.py data/ero_tb.bin mcv -b 8
+```
+
+The provided example computes the MCV estimator on 8 bits samples read from the `ero_tb.bin` binary file.
+
 # Howtos and receipes
 
 ## How to generate 10M bits with ERO
@@ -176,4 +191,4 @@ The **OpenTRNG** project is distributed under the GNU GPLv3 license.
 
 # Contributions
 
-Pull requests are welcome and will be reviewed before being merged. No timelines are promised. The code is maintained by ???.
+Pull requests are welcome and will be reviewed before being merged. No timelines are promised. The code is maintained by [CEA](https://www.cea.fr/english)-[Leti](https://www.leti-cea.com/cea-tech/leti/english/Pages/Applied-Research/Facilities/cyber-security-platform.aspx)

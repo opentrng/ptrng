@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import argparse
 import math
-import sys
 
 # Encode the array of bits into an array of words ('wordlen' is the size of each word in bits)
 def to_words(bits, wordlen):
@@ -53,124 +53,30 @@ def markov(samples):
 		])
 	return min(-math.log2(np.max(probabilities))/128, 1)
 
-# Compute the autocorrelation on the signal
-def autocorr(samples):
-	result = np.zeros(samples.size);
-	mean = np.mean(samples)
-	lags = range(1, samples.size)
-	result = np.array([np.count_nonzero(np.equal(samples, np.roll(samples, lag)) == True) for lag in lags])
-	return result/samples.size
+# Get command line arguments
+parser = argparse.ArgumentParser(description="Compute the entropy for a binary file.")
+parser.add_argument("file", type=str, help="data input file (binary)")
+parser.add_argument("estimator", type=str, choices=['shannon', 'mcv', 'markov'], help="entropy estimator")
+parser.add_argument("-b", dest="n", type=int, default=1, help="estimate with N bits samples")
+args=parser.parse_args()
 
-# Test command line arguments
-if len(sys.argv)!=2:
-	print("Usage: python {:s} <file>".format(sys.argv[0]))
-	print("Compute the entroepy of a binary respresentation text <file> with the MCV estimator. The input file must contain one character 0 or 1 per line.")
-	quit()
-
-# Get parameters
-file = sys.argv[1]
+# Test arguments
+if args.estimator=="markov" and args.n>1:
+	print("ERROR: cannot compute Markov estimator on n>1 bit words")
+	exit(-1)
 
 # Load the data file and unpack bytes to bits
-data = np.fromfile(file, dtype='uint8')
+data = np.fromfile(args.file, dtype='uint8')
 bits = np.unpackbits(data)
+words = to_words(bits, args.n)
 
-for length in np.logspace(1, 4, 20).astype(int):
-	fig = plt.figure()
-	plt.title("Autocorr length={:}".format(length))
-	plt.xlabel('x')
-	plt.ylabel('AC%')
-	legends = np.array([])
-	for wordlen in range(1, 8+1):
-		words = to_words(bits[:wordlen*length], wordlen)
-		ac = autocorr(words)
-		print("length={:} wordlen={:} max={:} avg={:}".format(length, wordlen, np.max(ac), np.avg(ac)))
-		plt.plot(ac)
-		legends = np.append(legends, "{:}bits".format(wordlen))
-	plt.legend(legends)
-	plt.savefig("autocorr_length{:05d}.png".format(length))
-essayer de voir ce qui se passe quand on fait pareil mais avec un offset dans les bits
-https://blocnotes.iergo.fr/breve/mode-mediane-moyenne-variance-et-ecart-type/
-Mode : Le mode est la valeur la plus fréquente dans un échantillon.
-Médiane : la médiane est un nombre qui divise en 2 parties la population telle que chaque partie contient le même nombre de valeurs. Dans la même logique, il y a les quartiles, déciles et centiles, qui divisent respectivement en 4, 10 et 100 la population.
-Moyenne : La moyenne arithmétique est la somme des valeurs de la variable divisée par le nombre d’individus.
-La variance : La variance est la moyenne des carrés des écarts à la moyenne.
-L’écart-type : c’est la racine carrée de la variance.
-quit()
+# Compute estimators
+if args.estimator=="shannon":
+	entropy = shannon(words)
+if args.estimator=="mcv":
+	entropy = mcv(words)
+if args.estimator=="markov":
+	entropy = markov(bits)
 
-data_wordlen = np.array([])
-data_shanon = np.array([])
-data_mcv = np.array([])
-data_markov = np.array([])
-
-for wordlen in range(1, 32+1):
-	words = to_words(bits, wordlen)
-
-	# values, counts = np.unique(words, return_counts=True)
-	# print("{:d} values ({:d} expected -> {:s})".format(values.size, 2**wordlen, str(values.size==2**wordlen)))
-	# fig = plt.figure()
-	# plt.title('Distribution')
-	# plt.xlabel('x')
-	# plt.ylabel('N(x)')
-	# # plt.bar(values, probabilities)
-	# plt.ylim(0, np.max(counts))
-	# plt.scatter(values, counts, marker='+')
-	# plt.savefig("distribution_{:02d}bits.png".format(wordlen))
-
-	# ac = autocorr(words)
-	# fig = plt.figure()
-	# plt.title('Autocorrelation')
-	# plt.xlabel('lag')
-	# plt.ylabel('AC')
-	# plt.plot(ac)
-	# plt.savefig("autocorr_{:02d}bits.png".format(wordlen))
-
-	# print("Autocor {:d}bits: {:.12f}".format(wordlen, np.max(ac)))
-
-	shanon_entropy = shannon(words)/wordlen
-	mcv_entropy = mcv(words)/wordlen
-	
-	print("Shannon {:d}bits: {:.12f}".format(wordlen, shanon_entropy))
-	print("MCV est {:d}bits: {:.12f}".format(wordlen, mcv_entropy))
-	if wordlen==1:
-		print("Markov  {:d}bits: {:.12f}".format(1, markov(words)))
-	
-	data_wordlen = np.append(data_wordlen, wordlen)
-	data_shanon = np.append(data_shanon, shanon_entropy)
-	data_mcv = np.append(data_mcv, mcv_entropy)
-	
-fig = plt.figure()
-plt.title('Entropy estimators')
-plt.xlabel('Word length (bit)')
-plt.ylabel('Entropy')
-plt.plot(data_wordlen, data_shanon)
-plt.plot(data_wordlen, data_mcv)
-plt.legend(['Shannon', 'MCV'])
-plt.savefig("entropy.png")
-
-
-# for wordlen in range(1, 32+1):
-# 	print(wordlen)
-
-# 	words = to_words(bits, wordlen)
-# 	values, counts = np.unique(np.diff(words), return_counts=True)
-# 	fig = plt.figure()
-# 	plt.title('Distribution')
-# 	plt.xlabel('x')
-# 	plt.ylabel('N(x)')
-# 	# plt.bar(values, probabilities)
-# 	plt.ylim(0, np.max(counts))
-# 	plt.scatter(values, counts, marker='+')
-# 	plt.savefig("diffdistrib_{:02d}bits.png".format(wordlen))
-
-# 	values, counts = np.unique(words, return_counts=True)
-# 	P = np.zeros((2**wordlen, 2**wordlen))
-# 	for i in range(1, words.size):
-# 		P[words[i-1], words[i]] += 1
-# 	P /= words.size/2
-
-# 	fig = plt.figure()
-# 	plt.title('Transitions proba')
-# 	plt.xlabel('x')
-# 	plt.ylabel('x+1')
-# 	plt.imshow(P)
-# 	plt.savefig("transitions_{:02d}bits.png".format(wordlen))
+# Output
+print("Entropy computed with {:s} estimator on {:d} bits samples: {:.12f}".format(args.estimator, args.n, entropy))
