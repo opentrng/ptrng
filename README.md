@@ -172,6 +172,16 @@ $ python analysis/entropy.py data/ero_tb.bin mcv -b 8
 
 The provided example computes the MCV estimator on 8 bits samples read from the `ero_tb.bin` binary file.
 
+## Auto-correlation
+
+The Python script `autocorrelation.py` plots the autocorrelation for a random binary file, read by words of `b` bits. The `d` parameter limits the maxium lag (depth) of the signal correlation with itself.
+
+```
+$ python analysis/autocorrelation.py -t "Plot title" data/coso_tb.bin autocorr.png -b 8 -d 100
+```
+
+This example plots the correlation of the signal with itself in a maximum lag of 100 samples of 8 bits each.
+
 # Appendix: Howtos and receipes
 
 ## How to generate 10M bits with ERO

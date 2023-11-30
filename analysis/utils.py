@@ -13,3 +13,18 @@ def regression(x,y,a):
             F[c,r] = x[r]**a[c] / y[r]**2
     C = np.matmul(np.matmul(np.linalg.inv(np.matmul(F, H)), F), y)
     return C
+
+# Encode the array of bits into an array of words ('wordlen' is the size of each word in bits)
+def to_words(bits, wordlen):
+    assert wordlen > 0 and wordlen <= 32
+    if wordlen==1:
+        return bits
+    bitcount = bits.size - bits.size%wordlen
+    wordcout = int(bitcount/wordlen)
+    trucated = bits[:bitcount]
+    reshaped = np.reshape(trucated, (wordcout, wordlen))
+    padding = np.zeros((wordcout, 32-wordlen), dtype=int)
+    words32bits = np.concatenate((padding, reshaped), axis=1)
+    words4bytes = np.packbits(words32bits, axis=1)
+    words = np.apply_along_axis(int.from_bytes, 1, words4bytes, byteorder='big', signed=False)
+    return words

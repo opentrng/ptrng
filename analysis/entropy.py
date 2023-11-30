@@ -2,19 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 import math
-
-# Encode the array of bits into an array of words ('wordlen' is the size of each word in bits)
-def to_words(bits, wordlen):
-	assert wordlen > 0 and wordlen <= 32
-	bitcount = bits.size - bits.size%wordlen
-	wordcout = int(bitcount/wordlen)
-	trucated = bits[:bitcount]
-	reshaped = np.reshape(trucated, (wordcout, wordlen))
-	padding = np.zeros((wordcout, 32-wordlen), dtype=int)
-	words32bits = np.concatenate((padding, reshaped), axis=1)
-	words4bytes = np.packbits(words32bits, axis=1)
-	words = np.apply_along_axis(int.from_bytes, 1, words4bytes, byteorder='big', signed=False)
-	return words
+import utils
 
 # Shannon entropy
 def shannon(samples):
@@ -99,9 +87,9 @@ bits = np.unpackbits(data)
 
 # Compute estimators
 if args.estimator=="shannon":
-	entropy = shannon(to_words(bits, args.n))
+	entropy = shannon(utils.to_words(bits, args.n))
 if args.estimator=="mcv":
-	entropy = mcv(to_words(bits, args.n))
+	entropy = mcv(utils.to_words(bits, args.n))
 if args.estimator=="markov":
 	entropy = markov(bits)
 if args.estimator=="t8":

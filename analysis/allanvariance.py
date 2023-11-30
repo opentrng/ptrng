@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
-import lsne
+import utils
 
 # Get command line arguments
 parser = argparse.ArgumentParser(description="Generate a normalized Allan Variance plot for a RO time serie or for COSO counter values.")
 parser.add_argument("datafile", type=str, help="data input file (text format, should contain one sample per line)")
 parser.add_argument("plotfile", type=str, help="plot output file (possibles extensions png, jpg, pdf)")
-parser.add_argument("-t", "--title", type=str, default="", help="plot title")
+parser.add_argument("-t", dest="title", type=str, default="", help="plot title")
 args=parser.parse_args()
 
 # Load the data file
@@ -26,7 +26,7 @@ for n in nspace:
 	allanvar = np.append(allanvar, np.var(np.diff(np.diff(csum[0:np.size(csum):n])))/mean**2)
 
 # Do the polynomial regression LSNE (np.polyfit only fit values in high decades)
-poly = lsne.regression(nspace, allanvar, [2, 1, 0])
+poly = utils.regression(nspace, allanvar, [2, 1, 0])
 print('Polynomial coefficients:')
 print(poly)
 
