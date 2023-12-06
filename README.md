@@ -1,19 +1,19 @@
 # Introduction
 
-Welcome to **OpenTRNG**/***entropysource***! This project is dedicated to delivering the community open-source implementations of reference entropy sources based on ring oscillators. Through **OpenTRNG**/***entropysource***, you have the capability to:
+Welcome to **OpenTRNG/entropy**! This project is dedicated to delivering the community open-source implementations of reference entropy sources based on ring oscillators for a Physical True Random Number Generator (TRNG or PTRNG). Through **OpenTRNG/entropy**, you have the capability to:
 
 1. [Emulate noisy ring oscillators](#1-emulate-noisy-ring-oscillators)
 2. [Simulate entropy source architectures](#2-simulate-entropy-source-architectures)
 3. [Run entropy sources on FPGA](#3-run-entropy-sources-on-fpga)
 4. [Analyze and evaluate their outcomes](#4-analyze-and-evaluate-outputs)
 
-**OpenTRNG** is fully compatible with [OpenTitan](https://opentitan.org), our entropy source implementations can be used as PTRNG input for OpenTITAN's hardware IP blocks.
+**OpenTRNG/entropy** is fully compatible with [OpenTitan](https://opentitan.org), our entropy source implementations can be used as PTRNG or CSRNG input for OpenTITAN's hardware IP blocks.
 
 ## Disclaimer
 
 The **OpenTRNG** project implements reference implementations for entropy sources and TRNG as found in the scientific litterature, the source code is made available for accademic purposes only. As compliance with verification and certification standards cannot be guarantee, it shall not be deployed "as is" in a product. Please be aware that any misuse or unintended application of this project is beyond the responsibility of CEA.
 
-If you plan to integrate a True Random Number Generator (TRNG) into a product, feel free to contact us.
+If you plan to integrate a Random Number Generator (RNG) into a product, feel free to contact us.
 
 ## License
 
@@ -26,7 +26,7 @@ Pull requests are welcome and will be reviewed before being merged. No integrati
 
 ## Available entropy sources
 
-As of now, **OpenTRNG** includes the following reference architectures:
+As of now, **OpenTRNG/entropy** includes the following reference architectures:
 
 * Elementary based Ring Oscilator (ERO),
 * Multi Ring Oscilator (MURO),
@@ -45,7 +45,7 @@ The repository structure contains:
 
 ### Python
 
-Create a virtual environment `$ python3 -m venv .venv` activate the venv `$ .ven/bin/activate` and install required packages `$ pip install -r requirements.txt`.
+Create a virtual environment `$ python3 -m venv .venv` activate the venv `$ .ven/bin/activate` and install required packages with `$ pip install -r requirements.txt`. For other Python environment or package managers (like `conda`), all required modules are listed in `requirements.txt`.
 
 ### HDL simulator
 
@@ -174,7 +174,7 @@ The provided example computes the MCV estimator on 8 bits samples read from the 
 
 ## Auto-correlation
 
-The Python script `autocorrelation.py` plots the autocorrelation for a random binary file, read by words of `b` bits. The `d` parameter limits the maxium lag (depth) of the signal correlation with itself.
+The Python script `autocorrelation.py` plots the autocorrelation for a random binary file, read by words of `b` bits. The `d` parameter limits the maximum lag (depth) of the signal correlation with itself.
 
 ```
 $ python analysis/autocorrelation.py -t "Plot title" data/coso_tb.bin autocorr.png -b 8 -d 100
