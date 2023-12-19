@@ -7,24 +7,24 @@ use ieee.numeric_std.all;
 entity clkdiv is
 	generic (
 		-- Maximum division factor width (default 32 bits)
-		MAX_WIDTH: integer := 32
+		FACTOR_WIDTH: integer := 32
 	);
 	port (
 		-- Input clock to be divided
 		original: in std_logic;
 		-- Division factor (1: no division, 2: division by 2,...)
-		factor: in std_logic_vector (MAX_WIDTH-1 downto 0);
+		factor: in std_logic_vector (FACTOR_WIDTH-1 downto 0);
 		-- Divided output clock
 		divided: out std_logic
 	);
 end entity;
 
--- The linear divider can divide the clock by factors in interval [1, 2^MAX_WIDTH[.
+-- The linear divider can divide the clock by factors in interval [1, 2^FACTOR_WIDTH[.
 architecture rtl of clkdiv is
 
-	signal resync: std_logic_vector(MAX_WIDTH-1 downto 0) := (others => '0');
-	signal stable: std_logic_vector (MAX_WIDTH-1 downto 0) := (others => '0');
-	signal counter: std_logic_vector (MAX_WIDTH-1 downto 0) := (others => '0');
+	signal resync: std_logic_vector(FACTOR_WIDTH-1 downto 0) := (others => '0');
+	signal divider: std_logic_vector (FACTOR_WIDTH-1 downto 0) := (others => '0');
+	signal counter: std_logic_vector (FACTOR_WIDTH-1 downto 0) := (others => '0');
 	signal reshaped: std_logic;
 
 begin
@@ -34,7 +34,7 @@ begin
 	begin
 		if rising_edge(original) then
 			resync <= factor;
-			stable <= resync;
+			divider <= resync;
 		end if;
 	end process;
 
@@ -42,9 +42,9 @@ begin
 	process (original)
 	begin
 		if rising_edge(original) then
-			if unsigned(counter) < unsigned(stable-1) then
+			if unsigned(counter) < unsigned(divider-1) then
 				counter <= counter + 1;
-				if unsigned(counter) > unsigned(stable(MAX_WIDTH-1 downto 1)-1) then
+				if unsigned(counter) > unsigned(divider(FACTOR_WIDTH-1 downto 1)-1) then
 					reshaped <= '0';
 				else
 					reshaped <= '1';
@@ -57,6 +57,6 @@ begin
 	end process;
 
 	-- Select the rehaped clock if the divided is a least 2, else the original signal
-	divided <= '0' when stable = 0 else original when stable = 1 else counter(0) when stable = 2 else reshaped;
+	divided <= '0' when divider = 0 else original when divider = 1 else counter(0) when divider = 2 else reshaped;
 
 end architecture;
