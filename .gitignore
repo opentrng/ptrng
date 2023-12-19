@@ -1,10 +1,6 @@
 data/*
-hardware/sim/*.ini
-hardware/sim/*.mpf
-hardware/sim/*.mti
-hardware/sim/*.wlf
-hardware/sim/transcript
-hardware/sim/work
+hardware/sim/*/sim_build
+hardware/sim/*/results.xml
 *.pyc
 .ucdprod*
 .venv

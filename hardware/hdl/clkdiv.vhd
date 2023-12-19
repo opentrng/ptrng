@@ -3,8 +3,8 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
 
--- This entity is a simple clock divider, it comes with two architectures: shift and linear.
-entity divider is
+-- This entity is a simple linear clock divider. The 'factor' input can be in another clock domain than 'original' clock.
+entity clkdiv is
 	generic (
 		-- Maximum division factor width (default 32 bits)
 		MAX_WIDTH: integer := 32
@@ -13,45 +13,14 @@ entity divider is
 		-- Input clock to be divided
 		original: in std_logic;
 		-- Division factor (1: no division, 2: division by 2,...)
-		factor: std_logic_vector (MAX_WIDTH-1 downto 0);
+		factor: in std_logic_vector (MAX_WIDTH-1 downto 0);
 		-- Divided output clock
 		divided: out std_logic
 	);
 end entity;
 
--- The divider pow2 architecture can divide the clock by power of 2 by shifting the LSB of the counter.
-architecture pow2 of divider is
-
-	signal metastable: std_logic_vector (MAX_WIDTH-1 downto 0) := (others => '0');
-	signal stable: std_logic_vector (MAX_WIDTH-1 downto 0) := (others => '0');
-	signal counter: std_logic_vector (MAX_WIDTH-1 downto 0) := (others => '0');
-
-begin
-
-	-- Resynchronize the input signal to 'original' clock
-	process (original)
-	begin
-		if rising_edge(original) then
-			metastable <= factor;
-			stable <= metastable;
-		end if;
-	end process;
-
-	-- Counter
-	process (original)
-	begin
-		if rising_edge(original) then
-			counter <= counter + 1;
-		end if;
-	end process;
-
-	-- Extract one bit from the counter to obtain the divided clock
-	divided <= original when stable = 0 else counter(conv_integer(stable-1));
-
-end architecture;
-
--- The divider linear architecture can divide the clock by factors in interval [1, 2^MAX_WIDTH[.
-architecture linear of divider is
+-- The linear divider can divide the clock by factors in interval [1, 2^MAX_WIDTH[.
+architecture rtl of clkdiv is
 
 	signal resync: std_logic_vector(MAX_WIDTH-1 downto 0) := (others => '0');
 	signal stable: std_logic_vector (MAX_WIDTH-1 downto 0) := (others => '0');
@@ -73,9 +42,9 @@ begin
 	process (original)
 	begin
 		if rising_edge(original) then
-			if counter < stable-1 then
+			if unsigned(counter) < unsigned(stable-1) then
 				counter <= counter + 1;
-				if counter > stable(MAX_WIDTH-1 downto 1)-1 then
+				if unsigned(counter) > unsigned(stable(MAX_WIDTH-1 downto 1)-1) then
 					reshaped <= '0';
 				else
 					reshaped <= '1';
