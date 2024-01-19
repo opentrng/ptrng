@@ -1,7 +1,7 @@
-data/*
-hardware/sim/*/sim_build
-hardware/sim/*/results.xml
-hardware/sim/*/*.vcd
+/emulator/data/*
+/hardware/sim/*/sim_build
+/hardware/sim/*/results.xml
+/hardware/sim/*/*.vcd
 *.pyc
 .ucdprod*
 .venv
