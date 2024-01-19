@@ -2,6 +2,15 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, RisingEdge, FallingEdge
 
+@cocotb.test()
+async def test_division_by_zero(dut):
+	cycles = 1000
+	dut.factor.value = 0
+	await cocotb.start(Clock(dut.original, 10, units="ns").start())
+	for i in range(cycles):
+		await RisingEdge(dut.original)
+		assert dut.divided.value == 0, "Divided clock output is not tied to logic 0"
+
 async def do_division_by_n(dut, n):
 	original_period = 10
 	wait = 5
@@ -14,15 +23,6 @@ async def do_division_by_n(dut, n):
 	measured_time = round(cocotb.utils.get_sim_time(units='ns')-start_time)
 	estimated_time = original_period*n*cycles
 	assert measured_time == estimated_time, "Wrong duration for %d divided clock cycles" % cycles
-
-@cocotb.test()
-async def test_division_by_zero(dut):
-	cycles = 1000
-	dut.factor.value = 0
-	await cocotb.start(Clock(dut.original, 10, units="ns").start())
-	for i in range(cycles):
-		await RisingEdge(dut.original)
-		assert dut.divided.value == 0, "Divided clock output is not tied to logic 0"
 
 @cocotb.test()
 async def test_division_by_1(dut):
