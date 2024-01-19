@@ -22,14 +22,7 @@ async def test_total_failure_alarm(dut):
 
 async def noisy_clock(signal, frequency):
 	while True:
-		print("starting generate...")
 		periods = utils.generate_series(1e6, frequency)
-		diff = np.diff(periods)
-		print("mean {:f} std {:f}".format(np.mean(periods), np.std(periods)))
-		print("mean {:f} std {:f}".format(np.mean(diff), np.std(diff)))
-		total = (0.11+0.18)*2
-		std = np.std(diff)/1000000
-		print("total {:f} num {:f}".format(total, total/std))
 		for period in periods:
 			half = int(period / 2)
 			signal.value = 1
