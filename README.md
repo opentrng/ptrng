@@ -2,27 +2,23 @@
 
 Welcome to **OpenTRNG/entropy**! This project is dedicated to delivering the community open-source implementations of reference entropy sources based on ring oscillators for a Physical True Random Number Generator (TRNG or PTRNG). Through **OpenTRNG/entropy**, you have the capability to:
 
-1. [Emulate noisy ring oscillators](#1-emulate-noisy-ring-oscillators)
-2. [Simulate entropy source architectures](#2-simulate-entropy-source-architectures)
-3. [Run entropy sources on FPGA](#3-run-entropy-sources-on-fpga)
-4. [Analyze and evaluate their outcomes](#4-analyze-and-evaluate-outputs)
+1. [Emulate noisy ring oscillators](#emulate-noisy-ring-oscillators)
+2. [Simulate entropy source architectures](#simulate-entropy-source-architectures)
+3. [Run entropy sources on FPGA](#run-entropy-sources-on-fpga)
+4. [Analyze and evaluate their outcomes](#analyze-and-evaluate-outputs)
 
-**OpenTRNG/entropy** is fully compatible with [OpenTitan](https://opentitan.org), our entropy source implementations can be used as PTRNG or CSRNG input for OpenTITAN's hardware IP blocks.
+**OpenTRNG/entropy** is fully compatible with [OpenTitan](https://opentitan.org), our entropy source implementations can be used as PTRNG or CSRNG input for OpenTitan's hardware IP blocks.
 
-## Disclaimer
+> [!WARNING]
+> The **OpenTRNG** project implements reference implementations for entropy sources and TRNG as found in the scientific litterature, the source code is made available for accademic purposes only. As compliance with verification and certification standards cannot be guarantee, it shall not be deployed "as is" in a product. Please be aware that any misuse or unintended application of this project is beyond the responsibility of CEA. If you plan to integrate a Random Number Generator (RNG) into a product, feel free to contact us.
 
-The **OpenTRNG** project implements reference implementations for entropy sources and TRNG as found in the scientific litterature, the source code is made available for accademic purposes only. As compliance with verification and certification standards cannot be guarantee, it shall not be deployed "as is" in a product. Please be aware that any misuse or unintended application of this project is beyond the responsibility of CEA.
-
-If you plan to integrate a Random Number Generator (RNG) into a product, feel free to contact us.
-
-## License
+## License and contributions
 
 The **OpenTRNG** project is distributed under the GNU GPLv3 license.
 
-## Contributions
-
 Pull requests are welcome and will be reviewed before being merged. No integration timelines are promised. The code is maintained by [CEA](https://www.cea.fr/english)-[Leti](https://www.leti-cea.com/cea-tech/leti/english/Pages/Applied-Research/Facilities/cyber-security-platform.aspx).
 
+# Why OpenTRNG?
 
 ## Available entropy sources
 
@@ -32,14 +28,15 @@ As of now, **OpenTRNG/entropy** includes the following reference architectures:
 * Multi Ring Oscilator (MURO),
 * Coherent Sampling Ring Oscilator (COSO).
 
+# Quick-start
+
 ## Repository organization
 
 The repository structure contains:
 
 * the `emulator` directory, including the ring oscillator time series emulator,
 * the `hardware` directory, containing VHDL for simulation and FPGA implementation,
-* the `software` directory, emcompassing all scripts designed for remote control of the **OpenTRNG** plateform on FPGA and for the analysis of the resulting random binary sequences,
-* the `data` directory, used to store all generated and measured data.
+* the `software` directory, emcompassing all scripts designed for remote control of the **OpenTRNG** plateform on FPGA and for the analysis of the resulting random binary sequences.
 
 ## Prerequisites
 
@@ -49,16 +46,16 @@ Create a virtual environment `$ python3 -m venv .venv` activate the venv `$ .ven
 
 ### HDL simulator
 
-You can perform VHDL simulation for **OpenTRNG** using Mentor QuestaSim (Modelsim). Ensure that the `vsimk` command is accessible in your  path. We have plans to incorporate GHDL support in the upcoming updates.
+You can perform VHDL simulation for **OpenTRNG** blocks using [GHDL](https://github.com/ghdl/ghdl) or other various simulators such as QuestaSim. Ensure that the `ghdl` command (or other simulator command) is accessible in your path. Testbenches for verification are written in python with [cocotb](https://www.cocotb.org). The generated waves (`vcd` files) can be displayed with [GTKWave](https://sourceforge.net/projects/gtkwave).
 
-# 1. Emulate noisy ring oscillators
+# Emulate noisy ring oscillators
 
 The emulator has the capability to produce time series data for ring oscillators (RO), incorporating phase noise. Each consecutive value represents the absolute timing of the rising edge of the RO signal. The phase noise encompasses both thermal (white) and flicker noise (colored).
 
 As instance, to produce 10,000,000 cycles of a ring oscillator operating at a frequency of 500MHz, execute the following command:
 
 ```
-$ python emulator/timeseries.py 10e6 500e6 data/ro.txt
+$ python emulator/ro.py 10e6 500e6 data/ro.txt
 ```
 
 Here is an example of the generated file, each line represents a RO period in femtosecond (fs):
@@ -80,13 +77,13 @@ Here is an example of the generated file, each line represents a RO period in fe
 
 ![500MHz noisy ring oscillator periods distribution (fs)](images/rodistribution.png)
 
-Optionnaly, Allan variance coefficients a1, a2 and noise facors f1, f2 can be specified for both thermal and flicker noises.
+Optionnaly, noise amplitudes `a1` and `a2` can be specified respectively for thermal and flicker noises. As instance, with measured coefficients for a ringo at 100MHz in Xilinx Artix7 FPGA:
 
 ```
-$ python emulator/generate_ro.py -a1 2.56e-14 -f1 1.919 -a2 1.11e-09 -f2 0.139 10e6 500e6 data/ro.txt
+$ python emulator/ro.py -a1 1.42e-13 -a2 1.15e-25 10e6 100e6 data/ro.txt
 ```
 
-# 2. Simulate entropy source architectures
+# Simulate entropy source architectures
 
 Prior to run HDL simulation, it is imperative to create ringo time series `ro1.txt` and `ro2.txt` with at least 10M cycles each. These files are taken as input stimuli for entropy sources and should be located in the `data` directory. Detailed instruction can be found in the [previous section](#emulate-noisy-ring-oscillators).
 
@@ -124,9 +121,9 @@ If you make modifications to the VHDL sources, you have the option to compile th
 
 Important Note: For adequate phase noise accuracy in the ring oscillators, it is imperative to conduct VHDL simulation at a resolution of femtoseconds (fs).
 
-# 3. Run entropy sources on FPGA
+# Run entropy sources on FPGA
 
-# 4. Analyze and evaluate outputs
+# Analyze and evaluate outputs
 
 All analyze and evaluation tools are available in the `analyze` directory.
 
@@ -140,7 +137,7 @@ $ python analysis/allan_variance.py -t "Plot title" data/ro1.txt data/allanvar.p
 
 ![Allan variance example for a 500Mz ring oscillator](images/allanvariance.png)
 
-Please note that the Allan variance can also be plotted for the COSO counter values.
+Please note that the Allan variance can also be plotted for the COSO counter values to estimate thermal and flicker noise contributions.
 
 ## COSO counter distribution
 
@@ -203,5 +200,7 @@ make run TESTBENCH=ero_tb DURATION=20s
 ```
 
 Please note that for long time series, the emulator requires a significant amount of RAM. In such cases, it is advisable to split the generation process into smaller segments and concatenate them.
+
+## How to estimate thermal and flicker noise amplitude factors
 
 ## How to run standardized test

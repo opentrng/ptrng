@@ -27,8 +27,9 @@ for n in nspace:
 
 # Do the polynomial regression LSNE (np.polyfit only fit values in high decades)
 poly = utils.regression(nspace, allanvar, [2, 1, 0])
-print('Polynomial coefficients:')
-print(poly)
+print("Polynomial regression coefficients:")
+print(" - thermal: {:e}".format(poly[1]))
+print(" - flicker: {:e}".format(poly[0]))
 
 # Plot in log/log
 plt.title(args.title)
