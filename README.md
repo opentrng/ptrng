@@ -3,7 +3,8 @@
 Welcome to **OpenTRNG/entropy**! This project is dedicated to delivering the community open-source implementations of reference entropy sources based on ring oscillators for a Physical True Random Number Generator (TRNG or PTRNG). Through **OpenTRNG/entropy**, you have the capability to:
 
 1. [Emulate noisy ring oscillators](#emulate-noisy-ring-oscillators)
-2. [Simulate entropy source architectures](#simulate-entropy-source-architectures)
+1. [Emulate entropy sources](#emulate-entropy-source)
+2. [Simulate entropy source HDL](#simulate-entropy-source-hdl)
 3. [Run entropy sources on FPGA](#run-entropy-sources-on-fpga)
 4. [Analyze and evaluate their outcomes](#analyze-and-evaluate-outputs)
 
@@ -77,13 +78,39 @@ Here is an example of the generated file, each line represents a RO period in fe
 
 ![500MHz noisy ring oscillator periods distribution (fs)](images/rodistribution.png)
 
-Optionnaly, noise amplitudes `a1` and `a2` can be specified respectively for thermal and flicker noises. As instance, with measured coefficients for a ringo at 100MHz in Xilinx Artix7 FPGA:
+By default thermal and flicker noise amplitude coefficients respectively `a1` and `a2` were measured for 500MHz ringos fabricated on an industrial 28nm FD-SOI (Fully Depleted Silicon on Insulator) technology. Optionnaly, noise amplitudes `a1` and `a2` can be specified for custom thermal and flicker noise model. As instance, with measured coefficients for a ringo at 100MHz in a Xilinx Artix7 FPGA:
 
 ```
 $ python emulator/ro.py -a1 1.42e-13 -a2 1.15e-25 10e6 100e6 data/ro.txt
 ```
 
-# Simulate entropy source architectures
+# Emulate entropy source
+
+Emulation of the ERO, MURO, and COSO entropy sources is achievable through Python scripts utilizing [noisy ring-oscillator emulation](#emulate-noisy-ring-oscillators). Select an entropy source, specify the frequencies of the desired ring oscillators, and the script will generate a file containing the raw random output.
+
+For example, to produce a stream of 10,000 bits using the ERO entropy source, with the first ring oscillator set at 120MHz and the second one at 122MHz, along with a divisor of 500, run the following command:
+
+```
+$ python emulator/ero.py 10000 120e6 122e6 500 data/ero.txt
+```
+
+The MURO entropy source employs more than two ring oscillators. For instance, to generate a stream of 10,000 bits using three ring oscillators at frequencies of 98, 109, and 120MHz, sampled by a fourth ring oscillator at 111MHz with a frequency divisor of 200, utilize the following command:
+
+```
+$ python emulator/muro.py 10000 98e6 109e6 120e6 111e6 200 data/muro.txt
+```
+
+In a simpler configuration, the COSO requires only two ring-oscillator frequencies as input. To generate a stream of 10,000 bits with a COSO operating at 121MHz and 122MHz, use the following command:
+
+```
+$ python emulator/coso.py 10000 121e6 122e6 data/coso.txt
+```
+
+Optionnaly, as explained in the previous section, noise amplitudes `a1` and `a2` can be specified for custom thermal and flicker noise model.
+
+The entropy source emulators are used as goldent model for HDL simulation (see next section).
+
+# Simulate entropy source HDL
 
 Prior to run HDL simulation, it is imperative to create ringo time series `ro1.txt` and `ro2.txt` with at least 10M cycles each. These files are taken as input stimuli for entropy sources and should be located in the `data` directory. Detailed instruction can be found in the [previous section](#emulate-noisy-ring-oscillators).
 
@@ -122,6 +149,8 @@ If you make modifications to the VHDL sources, you have the option to compile th
 Important Note: For adequate phase noise accuracy in the ring oscillators, it is imperative to conduct VHDL simulation at a resolution of femtoseconds (fs).
 
 # Run entropy sources on FPGA
+
+## Global FPGA architecture
 
 # Analyze and evaluate outputs
 

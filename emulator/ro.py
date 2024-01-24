@@ -15,4 +15,4 @@ args=parser.parse_args()
 series = utils.generate_periods(args.periods, args.frequency, args.a1, args.a2)
 
 # Output periods at femtosecond
-np.savetxt(args.filename, series, "%d")
+np.savetxt(args.filename, series * 1e15, "%d")

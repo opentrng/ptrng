@@ -1,4 +1,4 @@
-/emulator/data/*
+/data/*
 /hardware/sim/*/sim_build
 /hardware/sim/*/results.xml
 /hardware/sim/*/*.vcd
@@ -6,3 +6,4 @@
 .ucdprod*
 .venv
 Thumbs.db
+__pycache__
