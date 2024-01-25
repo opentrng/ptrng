@@ -142,6 +142,8 @@ The summary of the testbench execution is displayed in the terminal:
 
 Thanks to `ghdl` simulator, all testbenches record their waveform data in the `waves.vcd` file. These files can be visualized using tools like [GTKWave](https://sourceforge.net/projects/gtkwave), for example.
 
+![COSO testbench waves](images/cosowaves.png)
+
 # Run entropy sources on FPGA
 
 ## Global FPGA architecture
