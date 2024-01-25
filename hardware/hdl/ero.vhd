@@ -21,16 +21,14 @@ end entity;
 -- This architecture implements the RTL version of ERO.
 architecture rtl of ero is
 
-	signal ro2_div: std_logic;
-	--signal metastable: std_logic;
-	--signal stable: std_logic;
+	signal ro2_div: std_logic := '0';
 
 begin
 
 	-- Takes RO2 through the clock divider
-	divider: entity work.divider(linear)
+	divider: entity work.clkdiv
 	generic map (
-		MAX_WIDTH => 32
+		FACTOR_WIDTH => 32
 	)
 	port map (
 		original => ro2,
@@ -43,9 +41,6 @@ begin
 	begin
 		if rising_edge(ro2_div) then
 			data <= ro1;
-			--metastable <= ro1;
-			--stable <= metastable;
-			--data <= stable;
 		end if;
 	end process;
 

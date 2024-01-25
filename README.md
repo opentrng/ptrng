@@ -3,10 +3,10 @@
 Welcome to **OpenTRNG/entropy**! This project is dedicated to delivering the community open-source implementations of reference entropy sources based on ring oscillators for a Physical True Random Number Generator (TRNG or PTRNG). Through **OpenTRNG/entropy**, you have the capability to:
 
 1. [Emulate noisy ring oscillators](#emulate-noisy-ring-oscillators)
-1. [Emulate entropy sources](#emulate-entropy-source)
-2. [Simulate entropy source HDL](#simulate-entropy-source-hdl)
-3. [Run entropy sources on FPGA](#run-entropy-sources-on-fpga)
-4. [Analyze and evaluate their outcomes](#analyze-and-evaluate-outputs)
+2. [Emulate entropy sources](#emulate-entropy-source)
+3. [Simulate entropy source HDL](#simulate-entropy-source-hdl)
+4. [Run entropy sources on FPGA](#run-entropy-sources-on-fpga)
+5. [Analyze and evaluate their outcomes](#analyze-and-evaluate-outputs)
 
 **OpenTRNG/entropy** is fully compatible with [OpenTitan](https://opentitan.org), our entropy source implementations can be used as PTRNG or CSRNG input for OpenTitan's hardware IP blocks.
 
@@ -47,7 +47,9 @@ Create a virtual environment `$ python3 -m venv .venv` activate the venv `$ .ven
 
 ### HDL simulator
 
-You can perform VHDL simulation for **OpenTRNG** blocks using [GHDL](https://github.com/ghdl/ghdl) or other various simulators such as QuestaSim. Ensure that the `ghdl` command (or other simulator command) is accessible in your path. Testbenches for verification are written in python with [cocotb](https://www.cocotb.org). The generated waves (`vcd` files) can be displayed with [GTKWave](https://sourceforge.net/projects/gtkwave).
+You can perform VHDL simulation for **OpenTRNG** blocks using [GHDL](https://github.com/ghdl/ghdl) or other various simulators such as QuestaSim. Ensure that the `ghdl` command (or other simulator command) is accessible in your path. Testbenches for simulation and verification are written in python with [cocotb](https://www.cocotb.org). The generated waves (`vcd` files) can be displayed with [GTKWave](https://sourceforge.net/projects/gtkwave).
+
+If you are not using `ghdl`, please refer to the `hardware/sim/config.mk` file to configure your own simulator for all the testbenches.
 
 # Emulate noisy ring oscillators
 
@@ -84,6 +86,8 @@ By default thermal and flicker noise amplitude coefficients respectively `a1` an
 $ python emulator/ro.py -a1 1.42e-13 -a2 1.15e-25 10e6 100e6 data/ro.txt
 ```
 
+To obtain additional information about all script parameters, execute `python emulator/ro.y -h`.
+
 # Emulate entropy source
 
 Emulation of the ERO, MURO, and COSO entropy sources is achievable through Python scripts utilizing [noisy ring-oscillator emulation](#emulate-noisy-ring-oscillators). Select an entropy source, specify the frequencies of the desired ring oscillators, and the script will generate a file containing the raw random output.
@@ -94,7 +98,7 @@ For example, to produce a stream of 10,000 bits using the ERO entropy source, wi
 $ python emulator/ero.py 10000 120e6 122e6 500 data/ero.txt
 ```
 
-The MURO entropy source employs more than two ring oscillators. For instance, to generate a stream of 10,000 bits using three ring oscillators at frequencies of 98, 109, and 120MHz, sampled by a fourth ring oscillator at 111MHz with a frequency divisor of 200, utilize the following command:
+The MURO entropy source employs more than two ring oscillators. For instance, to generate a stream of 10,000 bits using a tuple of ring oscillators at frequencies of 98, 109, and 120MHz, sampled by a ring oscillator at 111MHz with a frequency divisor of 200, utilize the following command:
 
 ```
 $ python emulator/muro.py 10000 98e6 109e6 120e6 111e6 200 data/muro.txt
@@ -108,45 +112,35 @@ $ python emulator/coso.py 10000 121e6 122e6 data/coso.txt
 
 Optionnaly, as explained in the previous section, noise amplitudes `a1` and `a2` can be specified for custom thermal and flicker noise model.
 
-The entropy source emulators are used as goldent model for HDL simulation (see next section).
+For more details on script parameters, execute `python emulator/<*.py> -h`.
+
+The entropy source emulators are used as golden model for HDL simulation (see next section).
 
 # Simulate entropy source HDL
 
-Prior to run HDL simulation, it is imperative to create ringo time series `ro1.txt` and `ro2.txt` with at least 10M cycles each. These files are taken as input stimuli for entropy sources and should be located in the `data` directory. Detailed instruction can be found in the [previous section](#emulate-noisy-ring-oscillators).
+Testbenches for simulating entropy sources are scripted using [cocotb](https://www.cocotb.org) in Python, and they are located in the `hardware/sim` directory. Each testbench comprises multiple test cases. The ring-oscillator emulator is used in the testcases to generate noisy clock signals.
 
-As of now all available testbenches are:
-* `ero_tb`
-* `coso_tb`
-* TODO
-
-A Makefile has been supplied to facilitate simulations, it can be accessed from the `hardware/sim` directory. This Makefile incorporates the following commands.
-
-Compile all VHDL files for simulation:
+For example, to execute the simulation of the COSO testbench, use the following commands:
 
 ```
-make compile
-
+cd hardware/sim/test_coso
+make
 ```
 
-To start the QuestaSim GUI, initiate the simulation for the `ero_tb` testbench and load the waves:
+The summary of the testbench execution is displayed in the terminal:
 
 ```
-make gui TESTBENCH=ero_tb
-
+********************************************************************************************
+** TEST                                STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
+********************************************************************************************
+** test_coso.test_total_failure_alarm   PASS       10010.00           0.09     113097.26  **
+** test_coso.test_gen_random_100        PASS       63706.73           3.67      17337.83  **
+********************************************************************************************
+** TESTS=2 PASS=2 FAIL=0 SKIP=0                    73716.73           4.04      18252.38  **
+********************************************************************************************
 ```
 
-Alternatively, you can directly launch QuestaSim in batch mode and execute the simulation of the `ero_tb` testbench for a specified duration:
-
-```
-make run TESTBENCH=ero_tb DURATION=10ms
-
-```
-
-In any case, simulator will save the binary streams from the entropy sources into the output text files `data/*_tb.txt`. These text files can be converted to binary files with the script `convert_to_binary.py` located in the `analysis` directory.
-
-If you make modifications to the VHDL sources, you have the option to compile them directly from the QuestaSim transcript command line using the `> do compile.tcl` command.
-
-Important Note: For adequate phase noise accuracy in the ring oscillators, it is imperative to conduct VHDL simulation at a resolution of femtoseconds (fs).
+Thanks to `ghdl` simulator, all testbenches record their waveform data in the `waves.vcd` file. These files can be visualized using tools like [GTKWave](https://sourceforge.net/projects/gtkwave), for example.
 
 # Run entropy sources on FPGA
 

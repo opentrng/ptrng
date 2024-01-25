@@ -104,6 +104,8 @@ def muro(ro, ro2, div):
 		bits, xsetup, xhold = sampling(0, 1, valuestimes, samplingtimes)
 		mbits = np.vstack((mbits, bits))
 
+	# TODO: also prepare the model for XORing ROs before sampling
+
 	# Element wise XOR bits from all sampled RO
 	return np.bitwise_xor.reduce(mbits.astype(int), axis=0)
 
