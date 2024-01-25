@@ -3,7 +3,7 @@ from cocotb.clock import Clock
 from cocotb.clock import Timer
 from cocotb.triggers import ClockCycles, RisingEdge, FallingEdge
 from cocotb.types import Logic
-import utils
+import emulator
 
 @cocotb.test()
 async def test_total_failure_alarm(dut):
@@ -16,7 +16,7 @@ async def test_total_failure_alarm(dut):
 
 async def noisy_clock(signal, frequency):
 	while True:
-		periods = (utils.generate_periods(1e6, frequency, utils.A1_F500M, utils.A2_F500M) * 1e15).astype(int)
+		periods = (emulator.generate_periods(1e6, frequency, emulator.A1_F500M, emulator.A2_F500M) * 1e15).astype(int)
 		for period in periods:
 			half = int(period / 2)
 			signal.value = 1

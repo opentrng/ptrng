@@ -9,7 +9,7 @@ A1_F500M = 1.334028139656070e-14
 A2_F500M = 7.985611510791367e-09
 
 # Default number of periods to generate
-PERIODS = int(10e6)
+GENPERIODS = int(10e6)
 
 # Generate a time series of a number of periods from a noisy RO at given frequency
 def generate_periods(periods, frequency, a1, a2):

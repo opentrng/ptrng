@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 import math
-import utils
+import binutils
 
 # Compute the autocorrelation on the signal
 def autocorr(samples, depth):
@@ -28,5 +28,5 @@ bits = np.unpackbits(data)
 plt.title(args.title)
 plt.xlabel('Autocorrelation lag')
 plt.ylabel('Normalized correlation')
-plt.plot(autocorr(utils.to_words(bits, args.n), args.depth)*2**args.n)
+plt.plot(autocorr(binutils.to_words(bits, args.n), args.depth)*2**args.n)
 plt.savefig(args.plotfile)

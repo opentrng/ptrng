@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 import math
-import utils
+import binutils
 
 # Shannon entropy
 def shannon(samples):
@@ -87,9 +87,9 @@ bits = np.unpackbits(data)
 
 # Compute estimators
 if args.estimator=="shannon":
-	entropy = shannon(utils.to_words(bits, args.n))
+	entropy = shannon(binutils.to_words(bits, args.n))
 if args.estimator=="mcv":
-	entropy = mcv(utils.to_words(bits, args.n))
+	entropy = mcv(binutils.to_words(bits, args.n))
 if args.estimator=="markov":
 	entropy = markov(bits)
 if args.estimator=="t8":
