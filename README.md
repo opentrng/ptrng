@@ -35,8 +35,8 @@ As of now, **OpenTRNG/entropy** includes the following reference architectures:
 
 The repository structure contains:
 
-* the `emulator` directory, including the ring oscillator time series emulator,
-* the `hardware` directory, containing VHDL for simulation and FPGA implementation,
+* the `emulator` directory, including the [ring oscillator time series emulator](#emulate-noisy-ring-oscillators) and [entropy sources emulator](#emulate-entropy-source),
+* the `hardware` directory, containing VHDL for [simulation](#simulate-entropy-source-hdl) and [FPGA implementation](#run-entropy-sources-on-fpga),
 * the `software` directory, emcompassing all scripts designed for remote control of the **OpenTRNG** plateform on FPGA and for the analysis of the resulting random binary sequences.
 
 ## Prerequisites
@@ -112,7 +112,7 @@ $ python emulator/coso.py 10000 121e6 122e6 data/coso.txt
 
 Optionnaly, as explained in the previous section, noise amplitudes `a1` and `a2` can be specified for custom thermal and flicker noise model.
 
-For more details on script parameters, execute `python emulator/<*.py> -h`.
+For more details on script parameters, execute `python emulator/<*.py> -h`. To get more help on the emulator internal routines contained in `emulator.py`, please take a look at the jupyter notebook `playground.ipynb`.
 
 The entropy source emulators are used as golden model for HDL simulation (see next section).
 
