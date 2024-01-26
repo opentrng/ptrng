@@ -73,9 +73,6 @@ Here is an example of the generated file, each line represents a RO period in fe
 2001320
 1995537
 2002511
-2003033
-2012407
-2012336
 ...
 2002883
 1999630
@@ -89,7 +86,8 @@ By default thermal and flicker noise amplitude coefficients respectively `a1` an
 $ python emulator/ro.py -a1 1.42e-13 -a2 1.15e-25 10e6 100e6 data/ro.txt
 ```
 
-To obtain additional information about all script parameters, execute `python emulator/ro.y -h`.
+> [!TIP]
+> To obtain additional information about all script parameters, execute `python emulator/ro.y -h`.
 
 # Emulate entropy source
 
@@ -106,6 +104,10 @@ The MURO entropy source employs more than two ring oscillators. For instance, to
 ```
 $ python emulator/muro.py 10000 98e6 109e6 120e6 111e6 200 data/muro.txt
 ```
+
+Below is an illustration of the raw binary output for the COSO entropy source.
+
+![An example of raw binary output for the COSO entropy source](images/cosorawbinary.png)
 
 In a simpler configuration, the COSO requires only two ring-oscillator frequencies as input. To generate a stream of 10,000 bits with a COSO operating at 121MHz and 122MHz, use the following command:
 
