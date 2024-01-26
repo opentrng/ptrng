@@ -31,13 +31,16 @@ As of now, **OpenTRNG/entropy** includes the following reference architectures:
 
 # Quick-start
 
+Take a look at repository organization and, based on your requirements, navigate to the relevant section of this file to begin using **OpenTRNG**.
+
 ## Repository organization
 
-The repository structure contains:
+The repository structure contains these main directories:
 
-* the `emulator` directory, including the [ring oscillator time series emulator](#emulate-noisy-ring-oscillators) and [entropy sources emulator](#emulate-entropy-source),
-* the `hardware` directory, containing VHDL for [simulation](#simulate-entropy-source-hdl) and [FPGA implementation](#run-entropy-sources-on-fpga),
-* the `software` directory, emcompassing all scripts designed for remote control of the **OpenTRNG** plateform on FPGA and for the analysis of the resulting random binary sequences.
+* `emulator`: includes the [ring oscillator time series emulator](#emulate-noisy-ring-oscillators) and [entropy sources emulator](#emulate-entropy-source), it also contains a jupyter notebook `playground.ipynb` if you need to understand and use the emulator internal routines,
+* `hardware`: contains VHDL for [simulation](#simulate-entropy-source-hdl) and [FPGA implementation](#run-entropy-sources-on-fpga),
+* `software`: gathers all scripts designed for remote control of the **OpenTRNG** plateform on FPGA,
+* `analysis`: inclues the tools for the [analysis](#analyze-and-evaluate-outputs) of the resulting random binary sequences (such as entropy estimators and auto-correlations).
 
 ## Prerequisites
 
@@ -112,7 +115,8 @@ $ python emulator/coso.py 10000 121e6 122e6 data/coso.txt
 
 Optionnaly, as explained in the previous section, noise amplitudes `a1` and `a2` can be specified for custom thermal and flicker noise model.
 
-For more details on script parameters, execute `python emulator/<*.py> -h`. To get more help on the emulator internal routines contained in `emulator.py`, please take a look at the jupyter notebook `playground.ipynb`.
+> [!TIP]
+> For more details on script parameters, execute `python emulator/<*.py> -h`.
 
 The entropy source emulators are used as golden model for HDL simulation (see next section).
 
@@ -146,7 +150,15 @@ Thanks to `ghdl` simulator, all testbenches record their waveform data in the `w
 
 # Run entropy sources on FPGA
 
+## FPGA targets
+
 ## Global FPGA architecture
+
+## Dependencies
+
+## Synthetize, place route and program device
+
+## Remote control from a PC
 
 # Analyze and evaluate outputs
 
