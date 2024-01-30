@@ -1,8 +1,6 @@
 import cocotb
-from cocotb.clock import Clock
 from cocotb.clock import Timer
-from cocotb.triggers import ClockCycles, RisingEdge, FallingEdge
-from cocotb.types import Logic
+from cocotb.triggers import RisingEdge
 import emulator
 
 async def noisy_clock(signal, frequency):

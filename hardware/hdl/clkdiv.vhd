@@ -1,7 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
-use ieee.numeric_std.all;
 
 -- This entity is a simple linear clock divider. The 'factor' input can be in another clock domain than 'original' clock.
 entity clkdiv is
@@ -22,7 +21,7 @@ end entity;
 -- The linear divider can divide the clock by factors in interval [1, 2^FACTOR_WIDTH[.
 architecture rtl of clkdiv is
 
-	signal resync: std_logic_vector(FACTOR_WIDTH-1 downto 0) := (others => '0');
+	signal resync: std_logic_vector (FACTOR_WIDTH-1 downto 0) := (others => '0');
 	signal divider: std_logic_vector (FACTOR_WIDTH-1 downto 0) := (others => '0');
 	signal counter: std_logic_vector (FACTOR_WIDTH-1 downto 0) := (others => '0');
 	signal reshaped: std_logic;
@@ -42,9 +41,9 @@ begin
 	process (original)
 	begin
 		if rising_edge(original) then
-			if unsigned(counter) < unsigned(divider-1) then
+			if counter < divider-1 then
 				counter <= counter + 1;
-				if unsigned(counter) > unsigned(divider(FACTOR_WIDTH-1 downto 1)-1) then
+				if counter > divider(FACTOR_WIDTH-1 downto 1)-1 then
 					reshaped <= '0';
 				else
 					reshaped <= '1';
