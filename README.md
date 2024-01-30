@@ -93,27 +93,27 @@ $ python emulator/ro.py -a1 1.42e-13 -a2 1.15e-25 10e6 100e6 data/ro.txt
 
 Emulation of the ERO, MURO, and COSO entropy sources is achievable through Python scripts utilizing [noisy ring-oscillator emulation](#emulate-noisy-ring-oscillators). Select an entropy source, specify the frequencies of the desired ring oscillators, and the script will generate a file containing the raw random output.
 
-For example, to produce a stream of 10,000 bits using the ERO entropy source, with the first ring oscillator set at 120MHz and the second one at 122MHz, along with a divisor of 500, run the following command:
+For example, to produce a stream of 10,000 bits using the ERO entropy source, with a first ring-oscillator set at 120MHz along with a divisor of 500 that samples the second ring-oscillator at 122MHz, run the following command:
 
 ```
-$ python emulator/ero.py 10000 120e6 122e6 500 data/ero.txt
+$ python emulator/ero.py 10000 500 120e6 122e6 data/ero.txt
 ```
 
-The MURO entropy source employs more than two ring oscillators. For instance, to generate a stream of 10,000 bits using a tuple of ring oscillators at frequencies of 98, 109, and 120MHz, sampled by a ring oscillator at 111MHz with a frequency divisor of 200, utilize the following command:
+The MURO entropy source employs more than two ring oscillators. For instance, to generate a stream of 10,000 bits with a sampling frequency at 111MHz divided by 200 that samples a tuple of ring oscillators at frequencies of 98, 109, and 120MHz, utilize the following command:
 
 ```
-$ python emulator/muro.py 10000 98e6 109e6 120e6 111e6 200 data/muro.txt
+$ python emulator/muro.py 10000 200 111e6 98e6 109e6 120e6 data/muro.txt
 ```
-
-Below is an illustration of the raw binary output for the COSO entropy source.
-
-![An example of raw binary output for the COSO entropy source](images/cosorawbinary.png)
 
 In a simpler configuration, the COSO requires only two ring-oscillator frequencies as input. To generate a stream of 10,000 bits with a COSO operating at 121MHz and 122MHz, use the following command:
 
 ```
 $ python emulator/coso.py 10000 121e6 122e6 data/coso.txt
 ```
+
+Below is an illustration of the raw binary output for the COSO entropy source.
+
+![An example of raw binary output for the COSO entropy source](images/cosorawbinary.png)
 
 Optionnaly, as explained in the previous section, noise amplitudes `a1` and `a2` can be specified for custom thermal and flicker noise model.
 

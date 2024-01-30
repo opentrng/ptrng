@@ -2,14 +2,14 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
--- This entity defines the Coherent Sampling Ring Oscillator entropy source, where the first ring oscillator samples the second one, resulting in the generation of a beat signal. A counter, incremented by the second ring oscillator (RO2), measures the period of the beat signal. The COSO's random output is derived from the least significant bit (LSB) of the counter and is accessible through the 'lsb' port. Additionally, the resampled internal counter signal is available through the 'raw' port, and both of these signals are synchronized with the output clock ('clk').
+-- This entity defines the Coherent Sampling Ring Oscillator entropy source, where the first ring oscillator 'ro0' samples the second one 'ro1', resulting in the generation of a beat signal. A counter, incremented by 'ro0', measures the period of the beat signal. The COSO's random output is derived from the least significant bit (LSB) of the counter and is accessible through the 'lsb' port. Additionally, the resampled internal counter signal is available through the 'raw' port, and both of these signals are synchronized with the output clock ('clk').
 entity coso is
 	port (
-		-- First ring oscillaor input
+		-- Sampling ring-oscillator input
+		ro0: in std_logic;
+		-- Sampled ring-oscillator input
 		ro1: in std_logic;
-		-- Second ring oscillaor input
-		ro2: in std_logic;
-		-- Clock output (equal to ro2/div)
+		-- Clock output (aka the beat signal)
 		clk: out std_logic;
 		-- Entropy source data output (counter LSB)
 		lsb: out std_logic;
@@ -29,10 +29,10 @@ architecture rtl of coso is
 
 begin
 
-	-- Sample RO1 with RO2 to create the beat signal
-	process (ro2)
+	-- Sample RO1 with RO0 to create the beat signal
+	process (ro0)
 	begin
-		if rising_edge(ro2) then
+		if rising_edge(ro0) then
 			beat <= ro1;
 			prev <= beat;
 		end if;
@@ -41,12 +41,12 @@ begin
 	-- Detect beat rising edge to create counter reset
 	reset <= '1' when beat = '1' and prev = '0' else '0';
 
-	-- Count the full period of the beat in steps of RO2
-	process (ro2, reset)
+	-- Count the full period of the beat in steps of RO0
+	process (ro0, reset)
 	begin
 		if reset = '1' then
 			counter <= (others => '0');
-		elsif rising_edge(ro2) then
+		elsif rising_edge(ro0) then
 			counter <= counter + 1;
 		end if;
 	end process;

@@ -7,12 +7,12 @@ import emulator
 
 @cocotb.test()
 async def test_total_failure_alarm(dut):
+	await cocotb.start(Clock(dut.ro0, 10, units="ns").start())
 	await cocotb.start(Clock(dut.ro1, 10, units="ns").start())
-	await cocotb.start(Clock(dut.ro2, 10, units="ns").start())
-	await ClockCycles(dut.ro2, 2, rising=True)
+	await ClockCycles(dut.ro0, 2, rising=True)
 	for i in range(1000):
-		await RisingEdge(dut.ro2)
-		assert dut.clk.value == 1, "When RO1 and RO2 are locked, beat signal should be stucked at logic 1"
+		await RisingEdge(dut.ro0)
+		assert dut.clk.value == 1, "When RO0 and RO1 are locked, beat signal should be stucked at logic 1"
 
 async def noisy_clock(signal, frequency):
 	while True:
@@ -26,8 +26,8 @@ async def noisy_clock(signal, frequency):
 
 @cocotb.test()
 async def test_gen_random_100(dut):
-	await cocotb.start(noisy_clock(dut.ro1, 500e6))
-	await cocotb.start(noisy_clock(dut.ro2, 501e6))
+	await cocotb.start(noisy_clock(dut.ro0, 500e6))
+	await cocotb.start(noisy_clock(dut.ro1, 501e6))
 	for i in range(100):
 		await RisingEdge(dut.clk)
 		print("Random bit {:d} (COSO counter {:d})".format(dut.lsb.value.integer, dut.raw.value.integer))

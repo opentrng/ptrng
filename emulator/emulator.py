@@ -76,31 +76,31 @@ def sampling(v0, v1, valuestimes, samplingtimes, ts=0, th=0):
 	# The function returns the samples (v0, v1) and setup/hold violations
 	return samples, xsetup, xhold
 
-# Emulate a ERO entropy source with two ring oscillators 'ro1' and 'ro2/div', returns ERO random bits
-def ero(ro1, ro2, div):
-	# Divide RO2 frequency
-	ro2div = frequency_divider(ro2, div)
+# Emulate a ERO entropy source with two ring oscillators 'ro1' sampled by 'ro0/div', returns ERO random bits
+def ero(div, ro0, ro1):
+	# Divide RO0 frequency
+	ro0div = frequency_divider(ro0, div)
 
-	# Create the vectors of absolute times for RO1 edges (rising and falling) and RO2 rising edges
+	# Create the vectors of absolute times for RO1 edges (rising and falling) and RO0/div rising edges
 	valuestimes = risingfalling_edges(ro1)
-	samplingtimes = rising_edges(ro2div)
+	samplingtimes = rising_edges(ro0div)
 
-	# Do the samping with edges times of RO1 and RO2
+	# Do the samping with edges times
 	bits, xsetup, xhold = sampling(0, 1, valuestimes, samplingtimes)
 
 	# Return the random bit directly
 	return bits
 
-# Emulate a MURO entropy source with multiple ringos 'ro' sampled with 'ro2/div', returns MURO random bits
-def muro(ro, ro2, div):
-	# Generate rising edege times for RO2/div
-	ro2div = frequency_divider(ro2, div)
-	samplingtimes = rising_edges(ro2div)
+# Emulate a MURO entropy source with multiple ringos 'ro[x]' sampled with 'ro0/div', returns MURO random bits
+def muro(div, ro0, rox):
+	# Generate rising edege times for RO0/div
+	ro0div = frequency_divider(ro0, div)
+	samplingtimes = rising_edges(ro0div)
 
-	# Sample all ROs with RO2/div
-	mbits = np.empty((0, len(ro2div)))
-	for ro1 in ro:
-		valuestimes = risingfalling_edges(ro1)
+	# Sample all ROx with RO0/div
+	mbits = np.empty((0, len(ro0div)))
+	for ro in rox:
+		valuestimes = risingfalling_edges(ro)
 		bits, xsetup, xhold = sampling(0, 1, valuestimes, samplingtimes)
 		mbits = np.vstack((mbits, bits))
 
@@ -109,13 +109,13 @@ def muro(ro, ro2, div):
 	# Element wise XOR bits from all sampled RO
 	return np.bitwise_xor.reduce(mbits.astype(int), axis=0)
 
-# Emulate a COSO entropy source with two ring oscillators 'ro1' and 'ro2', returns COSO counter values
-def coso(ro1, ro2):
-	# Create the vectors of absolute times for RO1 edges (rising and falling) and RO2 rising edges
+# Emulate a COSO entropy source with two ring oscillators 'ro1' sampled by 'ro0', returns COSO counter values
+def coso(ro0, ro1):
+	# Create the vectors of absolute times for RO1 edges (rising and falling) and RO0 rising edges
 	valuestimes = risingfalling_edges(ro1)
-	samplingtimes = rising_edges(ro2)
+	samplingtimes = rising_edges(ro0)
 
-	# Do the samping with edges times of RO1 and RO2
+	# Do the samping with edges times
 	beat, xsetup, xhold = sampling(-1, 1, valuestimes, samplingtimes)
 
 	# Count the consecutive lengths of '0' runs and '1' runs
