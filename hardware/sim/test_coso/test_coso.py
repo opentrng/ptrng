@@ -30,4 +30,4 @@ async def test_gen_random_100(dut):
 	await cocotb.start(noisy_clock(dut.ro1, 501e6))
 	for i in range(100):
 		await RisingEdge(dut.clk)
-		print("Random bit {:d} (COSO counter {:d})".format(dut.lsb.value.integer, dut.raw.value.integer))
+		dut._log.info("Random bit {:d} (COSO counter {:d})".format(dut.lsb.value.integer, dut.raw.value.integer))

@@ -74,7 +74,7 @@ def sampling(v0, v1, valuestimes, samplingtimes, ts=0, th=0):
 			xhold[idx_s] = 1 if valuestimes[idx_v]-th<samplingtimes[idx_s] else 0
 
 	# The function returns the samples (v0, v1) and setup/hold violations
-	return samples, xsetup, xhold
+	return samples.astype(int), xsetup.astype(int), xhold.astype(int)
 
 # Emulate a ERO entropy source with two ring oscillators 'ro1' sampled by 'ro0/div', returns ERO random bits
 def ero(div, ro0, ro1):

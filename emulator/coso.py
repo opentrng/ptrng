@@ -31,6 +31,7 @@ while len(values) < int(args.size):
 
 # Give the mean value of counters
 print("Average counter value: {:.2f}".format(np.mean(values)))
+print("Output bits bias: {:.2f}".format(np.mean(values%2==0)))
 
 # Save the requested number of values to a text file
 np.savetxt(args.filename, values[:int(args.size)], "%d")

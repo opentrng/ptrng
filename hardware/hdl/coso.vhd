@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
--- This entity defines the Coherent Sampling Ring Oscillator entropy source, where the first ring oscillator 'ro0' samples the second one 'ro1', resulting in the generation of a beat signal. A counter, incremented by 'ro0', measures the period of the beat signal. The COSO's random output is derived from the least significant bit (LSB) of the counter and is accessible through the 'lsb' port. Additionally, the resampled internal counter signal is available through the 'raw' port, and both of these signals are synchronized with the output clock ('clk').
+-- This entity defines the Coherent Sampling Ring Oscillator entropy source, where the first ring oscillator RO0 is used to sample RO1, resulting in the generation of a beat signal. A counter, incremented by RO0, measures the period of the beat signal. The COSO's random output bit is derived from the counter least significant bit (LSB). Additionally, the raw counter value is accessible on output port. Both of these signals are synchronized with the output clock 'clk'.
 entity coso is
 	port (
 		-- Sampling ring-oscillator input
