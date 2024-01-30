@@ -67,7 +67,4 @@ Below is an illustration of the raw binary output for the COSO entropy source.
 
 Optionnaly, as explained in the previous section, noise amplitudes `a1` and `a2` can be specified for custom thermal and flicker noise model.
 
-> [!TIP]
-> For more details on their parameters, call the scripts with `-h`.
-
 The entropy source emulators are used as golden model for HDL simulation.

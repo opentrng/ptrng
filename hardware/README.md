@@ -35,5 +35,3 @@ Thanks to `ghdl` simulator, all testbenches record their waveform data in the `w
 ## FPGA targets
 
 ## Synthetize, place route and program device
-
-# Remote control entropy source on FPGA
