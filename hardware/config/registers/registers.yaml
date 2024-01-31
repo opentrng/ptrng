@@ -1,0 +1,101 @@
+regmap:
+-   name: ID
+    description: Entropy source identification register for UID and revision number.
+    address: 0
+    bitfields:
+    -   name: UID
+        description: Unique ID for OpenTRNG entropy source
+        reset: 0xCEA3
+        width: 16
+        lsb: 0
+        access: ro
+        hardware: f
+    -   name: REV
+        description: Revision number
+        reset: 1
+        width: 16
+        lsb: 16
+        access: ro
+        hardware: f
+-   name: GLOBAL
+    description: Global control register for the entropy source
+    bitfields:
+    -   name: RESET
+        description: Synchronous reset active to `'1'`
+        width: 1
+        lsb: 0
+        access: wosc
+        hardware: o
+-   name: RING
+    description: Ring-oscillator enable register (enable bits are active at `'1'`).
+    bitfields:
+    -   name: ENABLE
+        description: The bit at index _i_ in the bitfield enables the RO number _i_
+        width: 32
+        lsb: 0
+        access: rw
+        hardware: o
+-   name: FREQCOUNT
+    description: Frequency counter control register.
+    bitfields:
+    -   name: EN
+        description: Enable the frequency counter (active at `'1'`)
+        width: 1
+        lsb: 0
+        access: rw
+        hardware: o
+    -   name: START
+        description: Write `'1'` to start the frequency counter measure
+        width: 1
+        lsb: 1
+        access: wosc
+        hardware: o
+    -   name: DONE
+        description: This field is set to `'1'` when the measure is done and ready to be read
+        width: 1
+        lsb: 2
+        access: ro
+        hardware: i
+    -   name: SELECT
+        description: Select the index of the ring-oscillator for frequency measurement
+        width: 5
+        lsb: 3
+        access: rw
+        hardware: o
+    -   name: RESULT
+        description: Measured value (unit in cycles of the system clock)
+        width: 24
+        lsb: 8
+        access: ro
+        hardware: i
+# -   name: REG_TYPE
+#     description: Register to select the type of entropy source.
+#     bitfields:
+#     -   name : TYPE
+#         reset: 0
+#         width: 8
+#         lsb: 0
+#         access: rw
+#         hardware: o
+#         enums:
+#         -   name: NONE
+#             description: No entropy source
+#             value: 0
+#         -   name: TEST_LFSR
+#             description: LFSR for test purpose only
+#             value: 1
+#         -   name: ERO
+#             description: Elementary Ring-Oscillator entropy source
+#             value: 2
+#         -   name: MURO
+#             description: Multi Ring-Oscillator entropy source
+#             value: 3
+#         -   name: COSO
+#             description: Coherent Sampling Ring-Oscillator entropy source
+#             value: 4
+# -   name: DIVIDER
+# -   name: ACCUMULATOR
+# -   name: ENTROPY
+# -   name: ONLINETESTS
+# -   name: FIFOCTRL
+# -   name: FIFODATA
