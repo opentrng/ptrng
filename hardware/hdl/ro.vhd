@@ -5,7 +5,7 @@ use ieee.std_logic_1164.all;
 entity ro is
 	generic (
 		-- Number of elements in the ring
-		LEN: integer
+		LEN: natural
 	);
 	port (
 		-- Enable signal (active '1')

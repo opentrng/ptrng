@@ -6,7 +6,7 @@ use ieee.std_logic_unsigned.all;
 entity clkdiv is
 	generic (
 		-- Maximum division factor width (default 32 bits)
-		FACTOR_WIDTH: integer := 32
+		FACTOR_WIDTH: natural := 32
 	);
 	port (
 		-- Input clock to be divided
