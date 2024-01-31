@@ -27,7 +27,7 @@ architecture rtl of ro is
 begin
 
 	-- NAND for inverting the signal and enable the ring
-	ring_inverse_and_enable: entity work.nand
+	nand: entity work.nand
 	port map (
 		i0 => ring(LEN),
 		i1 => enable,
@@ -35,8 +35,9 @@ begin
 	);
 
 	-- Generate all elements (buffers or inverters)
-	generate_ring: for I in 0 to LEN-1 generate
+	generate_elements: for I in 0 to LEN-1 generate
 		delay: entity work.buffer
+		--delay: entity work.inverter
 		port map (
 			i0 => ring(I),
 			o => ring(I+1)
