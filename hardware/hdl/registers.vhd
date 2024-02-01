@@ -33,7 +33,9 @@ port(
     -- FREQCOUNT.SELECT
     csr_freqcount_select_out : out std_logic_vector(4 downto 0);
     -- FREQCOUNT.RESULT
-    csr_freqcount_result_in : in std_logic_vector(23 downto 0);
+    csr_freqcount_result_in : in std_logic_vector(22 downto 0);
+    -- FREQCOUNT.OVERFLOW
+    csr_freqcount_overflow_in : in std_logic;
 
     -- Local Bus
     waddr  : in  std_logic_vector(ADDR_W-1 downto 0);
@@ -74,7 +76,8 @@ signal csr_freqcount_en_ff : std_logic;
 signal csr_freqcount_start_ff : std_logic;
 signal csr_freqcount_done_ff : std_logic;
 signal csr_freqcount_select_ff : std_logic_vector(4 downto 0);
-signal csr_freqcount_result_ff : std_logic_vector(23 downto 0);
+signal csr_freqcount_result_ff : std_logic_vector(22 downto 0);
+signal csr_freqcount_overflow_ff : std_logic;
 
 signal rdata_ff : std_logic_vector(31 downto 0);
 signal rvalid_ff : std_logic;
@@ -87,13 +90,11 @@ begin
 
 
 csr_id_ren <= ren when (raddr = std_logic_vector(to_unsigned(0, ADDR_W))) else '0'; -- 0x0
-process (clk) begin
-if rising_edge(clk) then
+process (clk, rst) begin
 if (rst = '1') then
     csr_id_ren_ff <= '0'; -- 0x0
-else
+elsif rising_edge(clk) then
         csr_id_ren_ff <= csr_id_ren;
-end if;
 end if;
 end process;
 
@@ -106,14 +107,12 @@ end process;
 csr_id_rdata(15 downto 0) <= csr_id_uid_ff;
 
 
-process (clk) begin
-if rising_edge(clk) then
+process (clk, rst) begin
 if (rst = '1') then
     csr_id_uid_ff <= "1100111010100011"; -- 0xcea3
-else
+elsif rising_edge(clk) then
         
             csr_id_uid_ff <= csr_id_uid_ff;
-end if;
 end if;
 end process;
 
@@ -128,14 +127,12 @@ end process;
 csr_id_rdata(31 downto 16) <= csr_id_rev_ff;
 
 
-process (clk) begin
-if rising_edge(clk) then
+process (clk, rst) begin
 if (rst = '1') then
     csr_id_rev_ff <= "0000000000000001"; -- 0x1
-else
+elsif rising_edge(clk) then
         
             csr_id_rev_ff <= csr_id_rev_ff;
-end if;
 end if;
 end process;
 
@@ -159,11 +156,10 @@ csr_global_rdata(0) <= '0';
 
 csr_global_reset_out <= csr_global_reset_ff;
 
-process (clk) begin
-if rising_edge(clk) then
+process (clk, rst) begin
 if (rst = '1') then
     csr_global_reset_ff <= '0'; -- 0x0
-else
+elsif rising_edge(clk) then
         if (csr_global_wen = '1') then
             if (wstrb(0) = '1') then
                 csr_global_reset_ff <= wdata(0);
@@ -171,7 +167,6 @@ else
         else
             csr_global_reset_ff <= '0';
         end if;
-end if;
 end if;
 end process;
 
@@ -185,13 +180,11 @@ end process;
 csr_ring_wen <= wen when (waddr = std_logic_vector(to_unsigned(8, ADDR_W))) else '0'; -- 0x8
 
 csr_ring_ren <= ren when (raddr = std_logic_vector(to_unsigned(8, ADDR_W))) else '0'; -- 0x8
-process (clk) begin
-if rising_edge(clk) then
+process (clk, rst) begin
 if (rst = '1') then
     csr_ring_ren_ff <= '0'; -- 0x0
-else
+elsif rising_edge(clk) then
         csr_ring_ren_ff <= csr_ring_ren;
-end if;
 end if;
 end process;
 
@@ -205,11 +198,10 @@ csr_ring_rdata(31 downto 0) <= csr_ring_enable_ff;
 
 csr_ring_enable_out <= csr_ring_enable_ff;
 
-process (clk) begin
-if rising_edge(clk) then
+process (clk, rst) begin
 if (rst = '1') then
     csr_ring_enable_ff <= "00000000000000000000000000000000"; -- 0x0
-else
+elsif rising_edge(clk) then
         if (csr_ring_wen = '1') then
             if (wstrb(0) = '1') then
                 csr_ring_enable_ff(7 downto 0) <= wdata(7 downto 0);
@@ -227,7 +219,6 @@ else
             csr_ring_enable_ff <= csr_ring_enable_ff;
         end if;
 end if;
-end if;
 end process;
 
 
@@ -240,13 +231,11 @@ end process;
 csr_freqcount_wen <= wen when (waddr = std_logic_vector(to_unsigned(12, ADDR_W))) else '0'; -- 0xc
 
 csr_freqcount_ren <= ren when (raddr = std_logic_vector(to_unsigned(12, ADDR_W))) else '0'; -- 0xc
-process (clk) begin
-if rising_edge(clk) then
+process (clk, rst) begin
 if (rst = '1') then
     csr_freqcount_ren_ff <= '0'; -- 0x0
-else
+elsif rising_edge(clk) then
         csr_freqcount_ren_ff <= csr_freqcount_ren;
-end if;
 end if;
 end process;
 
@@ -260,11 +249,10 @@ csr_freqcount_rdata(0) <= csr_freqcount_en_ff;
 
 csr_freqcount_en_out <= csr_freqcount_en_ff;
 
-process (clk) begin
-if rising_edge(clk) then
+process (clk, rst) begin
 if (rst = '1') then
     csr_freqcount_en_ff <= '0'; -- 0x0
-else
+elsif rising_edge(clk) then
         if (csr_freqcount_wen = '1') then
             if (wstrb(0) = '1') then
                 csr_freqcount_en_ff <= wdata(0);
@@ -272,7 +260,6 @@ else
         else
             csr_freqcount_en_ff <= csr_freqcount_en_ff;
         end if;
-end if;
 end if;
 end process;
 
@@ -288,11 +275,10 @@ csr_freqcount_rdata(1) <= '0';
 
 csr_freqcount_start_out <= csr_freqcount_start_ff;
 
-process (clk) begin
-if rising_edge(clk) then
+process (clk, rst) begin
 if (rst = '1') then
     csr_freqcount_start_ff <= '0'; -- 0x0
-else
+elsif rising_edge(clk) then
         if (csr_freqcount_wen = '1') then
             if (wstrb(0) = '1') then
                 csr_freqcount_start_ff <= wdata(1);
@@ -300,7 +286,6 @@ else
         else
             csr_freqcount_start_ff <= '0';
         end if;
-end if;
 end if;
 end process;
 
@@ -315,13 +300,11 @@ end process;
 csr_freqcount_rdata(2) <= csr_freqcount_done_ff;
 
 
-process (clk) begin
-if rising_edge(clk) then
+process (clk, rst) begin
 if (rst = '1') then
     csr_freqcount_done_ff <= '0'; -- 0x0
-else
+elsif rising_edge(clk) then
             csr_freqcount_done_ff <= csr_freqcount_done_in;
-end if;
 end if;
 end process;
 
@@ -337,11 +320,10 @@ csr_freqcount_rdata(7 downto 3) <= csr_freqcount_select_ff;
 
 csr_freqcount_select_out <= csr_freqcount_select_ff;
 
-process (clk) begin
-if rising_edge(clk) then
+process (clk, rst) begin
 if (rst = '1') then
     csr_freqcount_select_ff <= "00000"; -- 0x0
-else
+elsif rising_edge(clk) then
         if (csr_freqcount_wen = '1') then
             if (wstrb(0) = '1') then
                 csr_freqcount_select_ff(4 downto 0) <= wdata(7 downto 3);
@@ -350,6 +332,24 @@ else
             csr_freqcount_select_ff <= csr_freqcount_select_ff;
         end if;
 end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- FREQCOUNT(30 downto 8) - RESULT - Measured value (unit in cycles of the system clock)
+-- access: ro, hardware: i
+-----------------------
+
+csr_freqcount_rdata(30 downto 8) <= csr_freqcount_result_ff;
+
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_freqcount_result_ff <= "00000000000000000000000"; -- 0x0
+elsif rising_edge(clk) then
+            csr_freqcount_result_ff <= csr_freqcount_result_in;
 end if;
 end process;
 
@@ -357,20 +357,18 @@ end process;
 
 -----------------------
 -- Bit field:
--- FREQCOUNT(31 downto 8) - RESULT - Measured value (unit in cycles of the system clock)
+-- FREQCOUNT(31) - OVERFLOW - Flag set to `'1'` if an overflow occurred during measurement
 -- access: ro, hardware: i
 -----------------------
 
-csr_freqcount_rdata(31 downto 8) <= csr_freqcount_result_ff;
+csr_freqcount_rdata(31) <= csr_freqcount_overflow_ff;
 
 
-process (clk) begin
-if rising_edge(clk) then
+process (clk, rst) begin
 if (rst = '1') then
-    csr_freqcount_result_ff <= "000000000000000000000000"; -- 0x0
-else
-            csr_freqcount_result_ff <= csr_freqcount_result_in;
-end if;
+    csr_freqcount_overflow_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+            csr_freqcount_overflow_ff <= csr_freqcount_overflow_in;
 end if;
 end process;
 
@@ -384,11 +382,10 @@ wready <= '1';
 --------------------------------------------------------------------------------
 -- Read address decoder
 --------------------------------------------------------------------------------
-process (clk) begin
-if rising_edge(clk) then
+process (clk, rst) begin
 if (rst = '1') then
     rdata_ff <= "10111010101011011011111011101111"; -- 0xbaadbeef
-else
+elsif rising_edge(clk) then
     if (ren = '1') then
         if raddr = std_logic_vector(to_unsigned(0, ADDR_W)) then -- 0x0
             rdata_ff <= csr_id_rdata;
@@ -405,7 +402,6 @@ else
         rdata_ff <= "10111010101011011011111011101111"; -- 0xbaadbeef
     end if;
 end if;
-end if;
 end process;
 
 rdata <= rdata_ff;
@@ -413,17 +409,15 @@ rdata <= rdata_ff;
 --------------------------------------------------------------------------------
 -- Read data valid
 --------------------------------------------------------------------------------
-process (clk) begin
-if rising_edge(clk) then
+process (clk, rst) begin
 if (rst = '1') then
     rvalid_ff <= '0'; -- 0x0
-else
+elsif rising_edge(clk) then
     if ((ren = '1') and (rvalid = '1')) then
         rvalid_ff <= '0';
     elsif (ren = '1') then
         rvalid_ff <= '1';
     end if;
-end if;
 end if;
 end process;
 

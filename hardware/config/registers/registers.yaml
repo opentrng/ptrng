@@ -64,8 +64,14 @@ regmap:
         hardware: o
     -   name: RESULT
         description: Measured value (unit in cycles of the system clock)
-        width: 24
+        width: 23
         lsb: 8
+        access: ro
+        hardware: i
+    -   name: OVERFLOW
+        description: Flag set to `'1'` if an overflow occurred during measurement
+        width: 1
+        lsb: 31
         access: ro
         hardware: i
 # -   name: REG_TYPE

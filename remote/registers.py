@@ -113,6 +113,12 @@ class _RegFreqcount:
         rdata = self._rmap._if.read(self._rmap.FREQCOUNT_ADDR)
         return (rdata >> self._rmap.FREQCOUNT_RESULT_POS) & self._rmap.FREQCOUNT_RESULT_MSK
 
+    @property
+    def overflow(self):
+        """Flag set to `'1'` if an overflow occurred during measurement"""
+        rdata = self._rmap._if.read(self._rmap.FREQCOUNT_ADDR)
+        return (rdata >> self._rmap.FREQCOUNT_OVERFLOW_POS) & self._rmap.FREQCOUNT_OVERFLOW_MSK
+
 
 class RegMap:
     """Control/Status register map"""
@@ -145,7 +151,9 @@ class RegMap:
     FREQCOUNT_SELECT_POS = 3
     FREQCOUNT_SELECT_MSK = 0x1f
     FREQCOUNT_RESULT_POS = 8
-    FREQCOUNT_RESULT_MSK = 0xffffff
+    FREQCOUNT_RESULT_MSK = 0x7fffff
+    FREQCOUNT_OVERFLOW_POS = 31
+    FREQCOUNT_OVERFLOW_MSK = 0x1
 
     def __init__(self, interface):
         self._if = interface
