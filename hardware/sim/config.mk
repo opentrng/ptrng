@@ -8,4 +8,5 @@ endif
 
 SIM_ARGS += --vcd=waves.vcd
 
+export PYTHONPATH := $(PWD)/..:$(PYTHONPATH)
 export PYTHONPATH := $(PWD)/../../../emulator:$(PYTHONPATH)
