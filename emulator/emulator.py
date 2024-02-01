@@ -22,11 +22,12 @@ def generate_periods(periods, frequency, a1, a2):
 	thermal = cn.powerlaw_psd_gaussian(0, N)
 	flicker = cn.powerlaw_psd_gaussian(1, N)
 
-	# Generate the time serie in femtosecond composed of thermal and flicker noises
+	# Generate the time series in second composed of thermal and flicker noises
 	series = T*np.ones(N) + thermal*np.sqrt(a1*T) + flicker*np.sqrt(a2*(T**2))
 
-	# Return the time serie composed of thermal and flicker noises
-	return series
+	# Return the series with a precision limited to femtosecond (to maintain compatibility with HDL simulators)
+	limited = (series * 1e15).astype(int) * 1e-15
+	return limited
 
 # Makes a frequency divisor for an input signal given as ro period series
 def frequency_divider(ro, div):
