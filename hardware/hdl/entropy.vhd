@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
 use work.settings.all;
 
 -- OpenTRNG entropy base entity.
@@ -14,13 +15,13 @@ entity entropy is
 		-- Asynchronous reset active to '1'
 		reset: in std_logic;
 		-- Ring-oscillator enable signal
-		enable: in std_logic_vector (31 downto 0);
+		ring_enable: in std_logic_vector (31 downto 0);
 		freqcount_en: in std_logic;
 		freqcount_select: in std_logic_vector (4 downto 0);
 		freqcount_start: in std_logic;
-		freqcount_done: in std_logic;
+		freqcount_done: out std_logic;
 		freqcount_overflow: out std_logic;
-		freqcount_result: out std_logic_vector (23 downto 0)
+		freqcount_result: out std_logic_vector (22 downto 0)
 		-- Sampling clock divider (applies on RO0)
 		--divider: in std_logic_vector (31 downto 0);
 		-- Lenght of the entropy accumulator
@@ -54,7 +55,7 @@ begin
 			LEN => RO_LEN(I)
 		)
 		port map (
-			enable => enable(I),
+			enable => ring_enable(I),
 			osc => ro(I)
 		);
 	end generate;
@@ -62,14 +63,14 @@ begin
 	-- Ring frequency counters
 	freqcounter: entity work.freqcounter
 	generic map (
-		DEPTH => freqcount_result'Length
-		DURATION_LENGTH
+		W => freqcount_result'Length,
+		N => 1_000_000
 	)
 	port map (
 		clk => clk,
 		reset => reset,
-		osc => ro(freqcount_select)
-		enable => freqcount_enable,
+		osc => ro(conv_integer(freqcount_select)),
+		enable => freqcount_en,
 		start => freqcount_start,
 		done => freqcount_done,
 		overflow => freqcount_overflow,

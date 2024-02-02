@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 -- Wrapper entity for top on target board Digilent Arty A7 35T.
-entity a7_35_top is
+entity supertop is
 	port (
 		-- Main oscillator at 100MHz
 		CLK100MHZ: in std_logic;
@@ -20,7 +20,7 @@ entity a7_35_top is
 end;
 
 -- RTL architecture of A7-35T top
-architecture rtl of a7_35_top is
+architecture rtl of supertop is
 begin
 
 	-- Wrap the top
@@ -30,7 +30,7 @@ begin
 	)
 	port map (
 		clk	=> CLK100MHZ,
-		hwreset => ck_rst,
+		hw_reset => ck_rst,
 		uart_rxd => uart_rxd_out,
 		uart_txd => uart_txd_in
 	);

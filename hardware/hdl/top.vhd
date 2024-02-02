@@ -7,7 +7,7 @@ entity top is
 	);
 	port (
 		clk: in std_logic;
-		hwreset: in std_logic;
+		hw_reset: in std_logic;
 		uart_txd: in std_logic;
 		uart_rxd: out std_logic
 	);
@@ -33,14 +33,14 @@ architecture rtl of top is
 	signal write_req: std_logic;
 
 	-- Registers
-	signal reset: std_logic;
+	signal sw_reset: std_logic;
 	signal ring_enable: std_logic_vector (31 downto 0);
 	signal freqcount_en: std_logic;
 	signal freqcount_start: std_logic;
 	signal freqcount_done: std_logic;
 	signal freqcount_overflow: std_logic;
 	signal freqcount_select: std_logic_vector (4 downto 0);
-	signal freqcount_result: std_logic_vector (23 downto 0)
+	signal freqcount_result: std_logic_vector (22 downto 0);
 
 begin
 
@@ -53,11 +53,12 @@ begin
 	)
 	port map (
 		clk	=> clk,
-		reset => hwreset,
-		txd	=> uart_txd,
-		rxd	=> uart_rxd,
+		reset => hw_reset,
+		txd	=> uart_rxd,
+		rxd	=> uart_txd,
 		tx_data => tx_data,
 		tx_req => tx_req,
+		tx_brk => '0',
 		tx_busy => tx_busy,
 		rx_data => rx_data,
 		rx_data_valid => rx_data_valid,
@@ -73,7 +74,7 @@ begin
 	)
 	port map (
 		clk => clk,
-		reset => hwreset or rx_brk or rx_err,
+		reset => hw_reset or rx_brk or rx_err,
 		rx_data => rx_data,
 		rx_data_valid => rx_data_valid,
 		tx_data => tx_data,
@@ -95,7 +96,7 @@ begin
 	)
 	port map (
 		clk => clk,
-		rst => hwreset,
+		rst => hw_reset,
 
 		-- Local Bus
 		waddr => address,--  : in  std_logic_vector(ADDR_W-1 downto 0);
@@ -108,7 +109,7 @@ begin
 		rdata => rd_data,--  : out std_logic_vector(DATA_W-1 downto 0);
 		--rvalid : out std_logic;
 
-		csr_global_reset_out => reset,
+		csr_global_reset_out => sw_reset,
 		csr_ring_enable_out => ring_enable,
 		csr_freqcount_en_out => freqcount_en,
 		csr_freqcount_start_out => freqcount_start,
@@ -125,9 +126,8 @@ begin
 	)
 	port map (
 		clk => clk,
-		rst => hwreset,
-		reset => reset,
-		enable => enable,
+		reset => sw_reset,
+		ring_enable => ring_enable,
 		freqcount_en => freqcount_en,
 		freqcount_select => freqcount_select,
 		freqcount_start => freqcount_start,

@@ -1,9 +1,27 @@
+# Ignore data
 /data/*
+
+# Ignore python bins
+*.pyc
+.venv
+__pycache__
+
+# Ignore simulation output
 /hardware/sim/*/sim_build
 /hardware/sim/*/results.xml
 /hardware/sim/*/*.vcd
-*.pyc
-.ucdprod*
-.venv
+
+# Ignore Xilinx files
+.Xil
+vivado*.log
+vivado*.jou
+vivado_pid*.str
+/hardware/target/fpga/*/*.cache
+/hardware/target/fpga/*/*.hw
+/hardware/target/fpga/*/*.ip_user_files
+/hardware/target/fpga/*/*.runs
+/hardware/target/fpga/*/*.sim
+/hardware/target/fpga/*/*.xpr
+
+# Ignore windows files
 Thumbs.db
-__pycache__
