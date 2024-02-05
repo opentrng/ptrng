@@ -23,7 +23,7 @@ Base address: 0x00000000
 | Name                     | Address    | Description |
 | :---                     | :---       | :---        |
 | [ID](#id)                | 0x0000     | Entropy source identification register for UID and revision number. |
-| [GLOBAL](#global)        | 0x0004     | Global control register for the entropy source |
+| [CONTROL](#control)      | 0x0004     | Global control register for the entropy source |
 | [RING](#ring)            | 0x0008     | Ring-oscillator enable register (enable bits are active at `'1'`). |
 | [FREQCOUNT](#freqcount)  | 0x000c     | Frequency counter control register. |
 
@@ -43,7 +43,7 @@ Reset value: 0x0001cea3
 
 Back to [Register map](#register-map-summary).
 
-## GLOBAL
+## CONTROL
 
 Global control register for the entropy source
 

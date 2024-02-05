@@ -89,11 +89,6 @@ begin
 
 	-- Register map
 	registers: entity work.registers
-	generic map (
-		ADDR_W => 16,
-		DATA_W => 32,
-		STRB_W => 4
-	)
 	port map (
 		clk => clk,
 		rst => hw_reset,
@@ -109,7 +104,7 @@ begin
 		rdata => rd_data,--  : out std_logic_vector(DATA_W-1 downto 0);
 		--rvalid : out std_logic;
 
-		csr_global_reset_out => sw_reset,
+		csr_control_reset_out => sw_reset,
 		csr_ring_enable_out => ring_enable,
 		csr_freqcount_en_out => freqcount_en,
 		csr_freqcount_start_out => freqcount_start,

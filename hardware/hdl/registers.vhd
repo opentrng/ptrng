@@ -18,8 +18,8 @@ port(
     -- ID.UID
     -- ID.REV
 
-    -- GLOBAL.RESET
-    csr_global_reset_out : out std_logic;
+    -- CONTROL.RESET
+    csr_control_reset_out : out std_logic;
 
     -- RING.ENABLE
     csr_ring_enable_out : out std_logic_vector(31 downto 0);
@@ -58,9 +58,9 @@ signal csr_id_ren_ff : std_logic;
 signal csr_id_uid_ff : std_logic_vector(15 downto 0);
 signal csr_id_rev_ff : std_logic_vector(15 downto 0);
 
-signal csr_global_rdata : std_logic_vector(31 downto 0);
-signal csr_global_wen : std_logic;
-signal csr_global_reset_ff : std_logic;
+signal csr_control_rdata : std_logic_vector(31 downto 0);
+signal csr_control_wen : std_logic;
+signal csr_control_reset_ff : std_logic;
 
 signal csr_ring_rdata : std_logic_vector(31 downto 0);
 signal csr_ring_wen : std_logic;
@@ -140,32 +140,32 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x4] - GLOBAL - Global control register for the entropy source
+-- [0x4] - CONTROL - Global control register for the entropy source
 --------------------------------------------------------------------------------
-csr_global_rdata(31 downto 1) <= (others => '0');
+csr_control_rdata(31 downto 1) <= (others => '0');
 
-csr_global_wen <= wen when (waddr = std_logic_vector(to_unsigned(4, ADDR_W))) else '0'; -- 0x4
+csr_control_wen <= wen when (waddr = std_logic_vector(to_unsigned(4, ADDR_W))) else '0'; -- 0x4
 
 -----------------------
 -- Bit field:
--- GLOBAL(0) - RESET - Synchronous reset active to `'1'`
+-- CONTROL(0) - RESET - Synchronous reset active to `'1'`
 -- access: wosc, hardware: o
 -----------------------
 
-csr_global_rdata(0) <= '0';
+csr_control_rdata(0) <= '0';
 
-csr_global_reset_out <= csr_global_reset_ff;
+csr_control_reset_out <= csr_control_reset_ff;
 
 process (clk, rst) begin
 if (rst = '1') then
-    csr_global_reset_ff <= '0'; -- 0x0
+    csr_control_reset_ff <= '0'; -- 0x0
 elsif rising_edge(clk) then
-        if (csr_global_wen = '1') then
+        if (csr_control_wen = '1') then
             if (wstrb(0) = '1') then
-                csr_global_reset_ff <= wdata(0);
+                csr_control_reset_ff <= wdata(0);
             end if;
         else
-            csr_global_reset_ff <= '0';
+            csr_control_reset_ff <= '0';
         end if;
 end if;
 end process;
@@ -390,7 +390,7 @@ elsif rising_edge(clk) then
         if raddr = std_logic_vector(to_unsigned(0, ADDR_W)) then -- 0x0
             rdata_ff <= csr_id_rdata;
         elsif raddr = std_logic_vector(to_unsigned(4, ADDR_W)) then -- 0x4
-            rdata_ff <= csr_global_rdata;
+            rdata_ff <= csr_control_rdata;
         elsif raddr = std_logic_vector(to_unsigned(8, ADDR_W)) then -- 0x8
             rdata_ff <= csr_ring_rdata;
         elsif raddr = std_logic_vector(to_unsigned(12, ADDR_W)) then -- 0xc
