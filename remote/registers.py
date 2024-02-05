@@ -24,7 +24,7 @@ class _RegId:
         return (rdata >> self._rmap.ID_REV_POS) & self._rmap.ID_REV_MSK
 
 
-class _RegGlobal:
+class _RegControl:
     def __init__(self, rmap):
         self._rmap = rmap
 
@@ -35,10 +35,10 @@ class _RegGlobal:
 
     @reset.setter
     def reset(self, val):
-        rdata = self._rmap._if.read(self._rmap.GLOBAL_ADDR)
-        rdata = rdata & (~(self._rmap.GLOBAL_RESET_MSK << self._rmap.GLOBAL_RESET_POS))
-        rdata = rdata | (val << self._rmap.GLOBAL_RESET_POS)
-        self._rmap._if.write(self._rmap.GLOBAL_ADDR, rdata)
+        rdata = self._rmap._if.read(self._rmap.CONTROL_ADDR)
+        rdata = rdata & (~(self._rmap.CONTROL_RESET_MSK << self._rmap.CONTROL_RESET_POS))
+        rdata = rdata | (val << self._rmap.CONTROL_RESET_POS)
+        self._rmap._if.write(self._rmap.CONTROL_ADDR, rdata)
 
 
 class _RegRing:
@@ -130,10 +130,10 @@ class RegMap:
     ID_REV_POS = 16
     ID_REV_MSK = 0xffff
 
-    # GLOBAL - Global control register for the entropy source
-    GLOBAL_ADDR = 0x0004
-    GLOBAL_RESET_POS = 0
-    GLOBAL_RESET_MSK = 0x1
+    # CONTROL - Global control register for the entropy source
+    CONTROL_ADDR = 0x0004
+    CONTROL_RESET_POS = 0
+    CONTROL_RESET_MSK = 0x1
 
     # RING - Ring-oscillator enable register (enable bits are active at `'1'`).
     RING_ADDR = 0x0008
@@ -168,17 +168,17 @@ class RegMap:
         return _RegId(self)
 
     @property
-    def global(self):
+    def control(self):
         """Global control register for the entropy source"""
         return 0
 
-    @global.setter
-    def global(self, val):
-        self._if.write(self.GLOBAL_ADDR, val)
+    @control.setter
+    def control(self, val):
+        self._if.write(self.CONTROL_ADDR, val)
 
     @property
-    def global_bf(self):
-        return _RegGlobal(self)
+    def control_bf(self):
+        return _RegControl(self)
 
     @property
     def ring(self):

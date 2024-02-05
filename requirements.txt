@@ -4,3 +4,4 @@ colorednoise
 cocotb
 pytest
 corsair
+pyserial

@@ -13,9 +13,9 @@ __pycache__
 
 # Ignore Xilinx files
 .Xil
-vivado*.log
-vivado*.jou
-vivado_pid*.str
+*.log
+*.jou
+*.str
 /hardware/target/fpga/*/*.cache
 /hardware/target/fpga/*/*.hw
 /hardware/target/fpga/*/*.ip_user_files

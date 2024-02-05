@@ -18,14 +18,14 @@ set partnumber [lindex $argv 1]
 
 # Set VHDL source files into a list
 source "hdl_files.tcl"
-lappend hdl_files [file normalize "${boardname}/supertop.vhd"]
+lappend hdl_files [file normalize "${boardname}/target.vhd"]
 lappend hdl_files [file normalize "../common/xilinx/ring.vhd"]
 
 # Set constraints files into a list
 set constraints_files [list \
 	[file normalize "${boardname}/pinout.xdc"] \
-	[file normalize "${boardname}/rings.tcl"] \
-	[file normalize "../../target/common/xilinx/global.tcl"] \
+	[file normalize "${boardname}/constraints.xdc"] \
+	[file normalize "${boardname}/rings.xdc"] \
 ]
 
 # Create an empty projet for given partnumber
@@ -47,7 +47,7 @@ foreach hdl_file $hdl_files {
 
 # Set the top manually
 set obj [get_filesets sources_1]
-set_property -name "top" -value "supertop" -objects $obj
+set_property -name "top" -value "target" -objects $obj
 set_property -name "top_auto_set" -value "0" -objects $obj
 
 # Create a fileset for constraint files and load them

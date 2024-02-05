@@ -43,17 +43,15 @@ architecture rtl of freqcounter is
 begin
 
 	-- Count the number of periods of 'osc'
-	process (osc, reset)
+	process (osc, start)
 	begin
-		if reset = '1' then
+		if start = '1' then
 			counter <= (others => '0');
 		elsif rising_edge(osc) then
 			if enable = '1' and counting = '1' then
 				if counter < MAX then
 					counter <= counter + 1;
 				end if;
-			else
-				counter <= (others => '0');
 			end if;
 		end if;
 	end process;
@@ -92,7 +90,7 @@ begin
 						finished <= '0';
 						done <= '1';
 						result <= counter;
-						if counter = MAX or duration >= N or N >= MAX then
+						if counter >= MAX or duration > N or N >= MAX then
 							overflow <= '1';
 						end if;
 					end if;
