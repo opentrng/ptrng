@@ -55,4 +55,8 @@ begin
 		end if;
 	end process;
 
+	-- Placeholders
+	ja <= (others => '0');
+	jb <= (others => '0');
+
 end;

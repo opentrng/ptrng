@@ -16,6 +16,7 @@ __pycache__
 *.log
 *.jou
 *.str
+hd_visual/
 /hardware/target/fpga/*/*.cache
 /hardware/target/fpga/*/*.hw
 /hardware/target/fpga/*/*.ip_user_files

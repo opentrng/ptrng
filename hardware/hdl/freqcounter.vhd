@@ -16,7 +16,7 @@ entity freqcounter is
 		-- Asynchronous reset
 		reset: in std_logic;
 		-- Signal to estimate its frequency
-		osc: in std_logic;
+		source: in std_logic;
 		-- Global enable for the entity
 		enable: in std_logic;
 		-- Pulse '1' to start the frequency measure
@@ -42,12 +42,12 @@ architecture rtl of freqcounter is
 
 begin
 
-	-- Count the number of periods of 'osc'
-	process (osc, start)
+	-- Count the number of periods of 'source'
+	process (source, start)
 	begin
 		if start = '1' then
 			counter <= (others => '0');
-		elsif rising_edge(osc) then
+		elsif rising_edge(source) then
 			if enable = '1' and counting = '1' then
 				if counter < MAX then
 					counter <= counter + 1;

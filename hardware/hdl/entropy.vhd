@@ -45,23 +45,25 @@ end entity;
 architecture rtl of entropy is
 
 	signal ro: std_logic_vector (T downto 0);
+	signal monitor: std_logic_vector (T downto 0);
 
 begin
 
 	-- Instantiate ring-oscillators from 0 to T
-	generate_rings: for I in 0 to T generate
+	osc: for I in 0 to T generate
 		ring: entity work.ring
 		generic map (
 			LEN => RO_LEN(I)
 		)
 		port map (
 			enable => ring_enable(I),
-			osc => ro(I)
+			osc => ro(I),
+			mon => monitor(I)
 		);
 	end generate;
 
-	-- Ring frequency counters
-	freqcounter: entity work.freqcounter
+	-- Frequency counters
+	freq: entity work.freqcounter
 	generic map (
 		W => freqcount_result'Length,
 		N => 1_000_000
@@ -69,7 +71,7 @@ begin
 	port map (
 		clk => clk,
 		reset => reset,
-		osc => ro(conv_integer(freqcount_select)),
+		source => monitor(conv_integer(freqcount_select)),
 		enable => freqcount_en,
 		start => freqcount_start,
 		done => freqcount_done,
