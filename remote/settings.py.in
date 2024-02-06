@@ -1,0 +1,5 @@
+# Copy this file and rename it to settings.py
+
+# Set the tty variable for the USB-UART to OpenTRNG target board
+tty = "COM1" # Windows
+tty = "/dev/ttyUSB1" #Linux

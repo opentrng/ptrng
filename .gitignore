@@ -1,6 +1,9 @@
 # Ignore data
 /data/*
 
+# Ingore remote config file
+/remote/settings.py
+
 # Ignore python bins
 *.pyc
 .venv
