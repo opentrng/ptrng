@@ -1,6 +1,6 @@
 # Introduction
 
-This directory contain all python files related to ring-oscillator and entropy source emulation. Emulators can be called directly with proposed scripts (see sections below).
+This directory contain all python files related to [ring-oscillator](#emulate-noisy-ring-oscillators) and [raw random number](#emulate-raw-random-numbers) emulation. Emulators can be called directly with proposed scripts (see sections below).
 
 > [!TIP]
 > To obtain additional information about all script parameters, use the `-h` option.
@@ -39,17 +39,17 @@ By default thermal and flicker noise amplitude coefficients respectively `a1` an
 $ python ro.py -a1 1.42e-13 -a2 1.15e-25 10e6 100e6 ro.txt
 ```
 
-# Emulate entropy source
+# Emulate raw random numbers
 
-Emulation of the ERO, MURO, and COSO entropy sources is achievable through Python scripts utilizing [noisy ring-oscillator emulation](#emulate-noisy-ring-oscillators). Select an entropy source, specify the frequencies of the desired ring oscillators, and the script will generate a file containing the raw random output.
+Emulation of raw random number (RRN) is achievable through Python scripts utilizing [noisy ring-oscillator emulation](#emulate-noisy-ring-oscillators). Specify the frequencies of the desired ring oscillators, select a sampling architecture in ERO, MURO or COSO, and the script will generate a file containing the raw random output.
 
-For example, to produce a stream of 10,000 bits using the ERO entropy source, with a first ring-oscillator set at 120MHz along with a divisor of 500 that samples the second ring-oscillator at 122MHz, run the following command:
+For example, to produce a stream of 10,000 bits using the ERO, with a first ring-oscillator set at 120MHz along with a divisor of 500 that samples the second ring-oscillator at 122MHz, run the following command:
 
 ```
 $ python ero.py 10000 500 120e6 122e6 ero.txt
 ```
 
-The MURO entropy source employs more than two ring oscillators. For instance, to generate a stream of 10,000 bits with a sampling frequency at 111MHz divided by 200 that samples a tuple of ring oscillators at frequencies of 98, 109, and 120MHz, utilize the following command:
+The MURO employs more than two ring oscillators. For instance, to generate a stream of 10,000 bits with a sampling frequency at 111MHz divided by 200 that samples a tuple of ring oscillators at frequencies of 98, 109, and 120MHz, utilize the following command:
 
 ```
 $ python muro.py 10000 200 111e6 98e6 109e6 120e6 muro.txt
@@ -61,10 +61,10 @@ In a simpler configuration, the COSO requires only two ring-oscillator frequenci
 $ python coso.py 10000 121e6 122e6 coso.txt
 ```
 
-Below is an illustration of the raw binary output for the COSO entropy source.
+Below is an illustration of the raw random output for the COSO.
 
-![An example of raw binary output for the COSO entropy source](../images/cosorawbinary.png)
+![An example of raw binary output for the COSO](../images/cosorawbinary.png)
 
 Optionnaly, as explained in the previous section, noise amplitudes `a1` and `a2` can be specified for custom thermal and flicker noise model.
 
-The entropy source emulators are used as golden model for HDL simulation.
+The RRN emulators are used as golden model for HDL simulation.

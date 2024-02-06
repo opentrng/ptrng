@@ -1,25 +1,26 @@
 # Introduction
 
-Welcome to **OpenTRNG/entropy**! This project is dedicated to delivering the community open-source implementations of reference entropy sources based on ring oscillators for a Physical True Random Number Generator (TRNG or PTRNG). Through **OpenTRNG/entropy**, you have the capability to:
+Welcome to **OpenTRNG**! This project is dedicated to delivering the community open-source implementations of reference Physical True Random Number Generator (TRNG or PTRNG) based on ring oscillators. Through **OpenTRNG**, you have the ability to:
 
 1. [Emulate noisy ring oscillators](emulator/#emulate-noisy-ring-oscillators)
-2. [Emulate entropy sources](emulator/#emulate-entropy-source)
-3. [Simulate entropy source HDL](hardware/#simulate-entropy-source-hdl)
-4. [Compile](hardware/#compile-entropy-sources-on-fpga) and [run](remote/) entropy sources on FPGA
-5. [Analyze and evaluate their outcomes](analysis/#analyze-and-evaluate-outputs)
+2. [Emulate raw random number](emulator/#emulate-raw-random-numbers)
+3. [Simulate](hardware/#simulate-hdl-sources), [compile](hardware/#compile-for-fpga) and [run](remote/) the PTRNG on FPGA
+4. [Analyze and evaluate their outcomes](analysis/#analyze-and-evaluate-outputs)
 
-**OpenTRNG/entropy** is fully compatible with [OpenTitan](https://opentitan.org), our entropy source implementations can be used as PTRNG or CSRNG input for OpenTitan's hardware IP blocks.
+**OpenTRNG** is fully compatible with [OpenTitan](https://opentitan.org), our PTRNG can be used as input for OpenTitan's hardware IP blocks. Please find more information in the [hardware section](hardware/#opentitan-compatibility).
 
 > [!WARNING]
-> The **OpenTRNG** project implements reference implementations for entropy sources and TRNG as found in the scientific litterature, the source code is made available for accademic purposes only. As compliance with verification and certification standards cannot be guarantee, it shall not be deployed "as is" in a product. Please be aware that any misuse or unintended application of this project is beyond the responsibility of CEA. If you plan to integrate a Random Number Generator (RNG) into a product, feel free to contact us.
+> The **OpenTRNG** project implements reference TRNG or PTRNG implementations as found in the scientific litterature, the source code is made available for accademic purposes only. As compliance with verification and certification standards cannot be guarantee, it shall not be deployed "as is" in a product. Please be aware that any misuse or unintended application of this project is beyond the responsibility of CEA. If you plan to integrate a Random Number Generator (RNG) into a product, feel free to contact us.
 
 # Why OpenTRNG?
 
-_TODO_
+The objective of **OpenTRNG** is to offer reference architectures of ring-oscillator based True Random Number Generators (TRNG), also known as PTRNG, to the community. With the advancement of certification standards like [BSI AIS20/31](https://www.bsi.bund.de/dok/randomnumbergenerators) (used in the Common Criteria) and [NIST SP 800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final), the stochastic model of the entropy source is increasingly crucial in relation to validating statistical tests on output data. Here, we publish straightforward yet effective entropy sources for PTRNG to facilitate the validation of their stochastic models across various FPGA and ASIC targets.
 
-## Available entropy sources
+## Available architectures
 
-As of now, **OpenTRNG/entropy** includes the following reference architectures:
+In RO-based True Random Number Generators (TRNGs), the RO serves as the entropy source. Specifically, the inherent jitter between two (or more) ROs generates relative phase noise, which is known random, uncontrollable, and unpredictable. This relative phase noise is then converted into random bits through a sampling mechanism.
+
+As of now, **OpenTRNG** includes the following reference sampling architectures:
 
 * Elementary based Ring Oscilator (ERO),
 * Multi Ring Oscilator (MURO),
@@ -33,9 +34,10 @@ Take a look at repository organization and, based on your requirements, navigate
 
 The repository structure contains these main directories:
 
-* `emulator`: includes the [ring oscillator time series emulator](emulator/#emulate-noisy-ring-oscillators) and [entropy sources emulator](emulator/#emulate-entropy-source),
-* `hardware`: contains VHDL for [simulation](hardware/#simulate-entropy-source-hdl), [FPGA implementation](hardware/#compile-entropy-sources-on-fpga) and **OpenTRNG** plateform remote control from a PC,
-* `analysis`: inclues the tools for the [analysis](analysis/#analyze-and-evaluate-outputs) of the resulting random binary sequences (such as entropy estimators and auto-correlations).
+* `analysis`: contains the tools for the [analysis](analysis/#analyze-and-evaluate-outputs) of the resulting random binary sequences (such as entropy estimators and auto-correlations),
+* `emulator`: includes the [ring oscillator time series emulator](emulator/#emulate-noisy-ring-oscillators) and the [raw random number emulators](emulator/#emulate-raw-random-numbers),
+* `hardware`: encloses HDL sources for [simulation](hardware/#simulate-hdl-sources) and [FPGA implementation](hardware/#compile-for-fpga) of the PTRNG,
+* `remote`: include scripts for remote control the **OpenTRNG** FPGA target from a PC.
 
 ## Prerequisites
 

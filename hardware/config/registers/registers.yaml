@@ -1,10 +1,10 @@
 regmap:
 -   name: ID
-    description: Entropy source identification register for UID and revision number.
+    description: OpenTRNG's PTRNG identification register for UID and revision number.
     address: 0
     bitfields:
     -   name: UID
-        description: Unique ID for OpenTRNG entropy source
+        description: Unique ID for OpenTRNG's PTRNG
         reset: 0xCEA3
         width: 16
         lsb: 0
@@ -18,7 +18,7 @@ regmap:
         access: ro
         hardware: f
 -   name: CONTROL
-    description: Global control register for the entropy source
+    description: Global control register for the OpenTRNG's PTRNG
     bitfields:
     -   name: RESET
         description: Synchronous reset active to `'1'`
@@ -75,7 +75,7 @@ regmap:
         access: ro
         hardware: i
 # -   name: REG_TYPE
-#     description: Register to select the type of entropy source.
+#     description: Register to select the type of sampling.
 #     bitfields:
 #     -   name : TYPE
 #         width: 8
@@ -84,19 +84,19 @@ regmap:
 #         hardware: o
 #         enums:
 #         -   name: NONE
-#             description: No entropy source
+#             description: No sampling
 #             value: 0
 #         -   name: TEST_LFSR
 #             description: LFSR for test purpose only
 #             value: 1
 #         -   name: ERO
-#             description: Elementary Ring-Oscillator entropy source
+#             description: Elementary Ring-Oscillato
 #             value: 2
 #         -   name: MURO
-#             description: Multi Ring-Oscillator entropy source
+#             description: Multi Ring-Oscillator
 #             value: 3
 #         -   name: COSO
-#             description: Coherent Sampling Ring-Oscillator entropy source
+#             description: Coherent Sampling Ring-Oscillator
 #             value: 4
 # -   name: DIVIDER
 # -   name: ACCUMULATOR

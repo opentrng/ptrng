@@ -13,7 +13,7 @@ class _RegId:
 
     @property
     def uid(self):
-        """Unique ID for OpenTRNG entropy source"""
+        """Unique ID for OpenTRNG's PTRNG"""
         rdata = self._rmap._if.read(self._rmap.ID_ADDR)
         return (rdata >> self._rmap.ID_UID_POS) & self._rmap.ID_UID_MSK
 
@@ -123,14 +123,14 @@ class _RegFreqcount:
 class RegMap:
     """Control/Status register map"""
 
-    # ID - Entropy source identification register for UID and revision number.
+    # ID - OpenTRNG's PTRNG identification register for UID and revision number.
     ID_ADDR = 0x0000
     ID_UID_POS = 0
     ID_UID_MSK = 0xffff
     ID_REV_POS = 16
     ID_REV_MSK = 0xffff
 
-    # CONTROL - Global control register for the entropy source
+    # CONTROL - Global control register for the OpenTRNG's PTRNG
     CONTROL_ADDR = 0x0004
     CONTROL_RESET_POS = 0
     CONTROL_RESET_MSK = 0x1
@@ -160,7 +160,7 @@ class RegMap:
 
     @property
     def id(self):
-        """Entropy source identification register for UID and revision number."""
+        """OpenTRNG's PTRNG identification register for UID and revision number."""
         return self._if.read(self.ID_ADDR)
 
     @property
@@ -169,7 +169,7 @@ class RegMap:
 
     @property
     def control(self):
-        """Global control register for the entropy source"""
+        """Global control register for the OpenTRNG's PTRNG"""
         return 0
 
     @control.setter

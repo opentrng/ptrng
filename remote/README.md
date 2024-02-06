@@ -1,1 +1,2 @@
-# Remote control entropy source on FPGA
+# Remote control of OpenTRNG
+

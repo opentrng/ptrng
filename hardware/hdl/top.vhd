@@ -114,8 +114,8 @@ begin
 		csr_freqcount_overflow_in => freqcount_overflow
 	);
 
-	-- ENTROPY
-	entropy: entity work.entropy
+	-- PTRNG
+	ptrng: entity work.ptrng
 	generic map (
 		DATA_WIDTH => 32
 	)

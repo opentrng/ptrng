@@ -2,9 +2,9 @@
 set hdl_files [list \
 	[file normalize "../../hdl/clkdiv.vhd"] \
 	[file normalize "../../hdl/coso.vhd"] \
-	[file normalize "../../hdl/entropy.vhd"] \
 	[file normalize "../../hdl/ero.vhd"] \
 	[file normalize "../../hdl/freqcounter.vhd"] \
+	[file normalize "../../hdl/ptrng.vhd"] \
 	[file normalize "../../hdl/registers.vhd"] \
 	[file normalize "../../hdl/settings.vhd"] \
 	[file normalize "../../hdl/top.vhd"] \

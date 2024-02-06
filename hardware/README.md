@@ -1,19 +1,19 @@
-# HDL architecture
+# Hardware architecture
 
 ## Dependencies
 
-# Simulate entropy source HDL
+# Simulate HDL sources
 
-Testbenches for simulating entropy sources are scripted using [cocotb](https://www.cocotb.org) in Python, and they are located in the `hardware/sim` directory. Each testbench comprises multiple test cases. The ring-oscillator emulator is used in the testcases to generate noisy clock signals.
+Testbenches for simulating HDL sources are scripted using [cocotb](https://www.cocotb.org) in Python, and they are located in the `hardware/sim` directory. Each testbench comprises multiple test cases. The ring-oscillator emulator is used to generate noisy clock signals in the testcases.
 
-For example, to execute the simulation of the COSO testbench, use the following commands:
+For example, to run the simulation of the COSO testbench, use the following commands:
 
 ```
 cd hardware/sim/test_coso
 make
 ```
 
-The summary of the testbench execution is displayed in the terminal:
+The summary of the testbench simulation is displayed in the terminal:
 
 ```
 ********************************************************************************************
@@ -30,8 +30,12 @@ Thanks to `ghdl` simulator, all testbenches record their waveform data in the `w
 
 ![COSO testbench waves](../images/cosowaves.png)
 
-# Compile entropy sources on FPGA
+# Compile for FPGA
+
+The provided VHDL is target agnostic (it can also be synthetized for ASIC) at the exception of the ring.vhd that describes a configuatble ring-oscillator. For ASIC
 
 ## FPGA targets
 
 ## Synthetize, place route and program device
+
+# OpenTitan compatibility

@@ -1,4 +1,4 @@
-import registers as Entropy
+import registers as OpenTRNG
 import fluart as Fluart
 import argparse
 
@@ -8,18 +8,19 @@ parser.add_argument("ro", type=int, help="index of the ring-oscillator (from 0 t
 args=parser.parse_args()
 assert args.ro in range(32)
 
-# Open the UART to the registermap
+# Open the UART to the register map
 interface = Fluart.CmdProc()
-reg = Entropy.RegMap(interface)
+reg = OpenTRNG.RegMap(interface)
 
-# Check the board
+# Reset and check the board
+reg.control_bf.reset = 1
 interface.check(reg.id_bf.uid, reg.id_bf.rev)
 
 # Enable the RO
 reg.ring_bf.enable = 1 << args.ro
 
 # Reset and enable the frequency counter
-reg.control_bf.reset = 1
+reg.freqcount_bf.reset = 1
 reg.freqcount_bf.en = 1
 
 # Select the ring and start the measurement
@@ -34,5 +35,5 @@ while reg.freqcount_bf.done==0:
 print("Measured frequency for RO{:d}: {:f}MHz".format(args.ro, reg.freqcount_bf.result/10000))
 print("Overflow: {:}".format(reg.freqcount_bf.overflow==1 if True else False))
 
-# Disable the RO
+# Disable all the ROs
 reg.ring_bf.enable = 0x00000000

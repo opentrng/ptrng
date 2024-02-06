@@ -3,13 +3,13 @@ library unisim;
 use ieee.std_logic_1164.all;
 use unisim.vcomponents.all;
 
--- Ring-oscillator entity composed of LEN elements. Takes an enable signal as input. Ouputs a periodic oscillating signal.
+-- Ring-oscillator entity composed of N elements. Takes an enable signal as input. Ouputs a periodic oscillating signal.
 entity ring is
 	generic (
 		-- Element LUT1 table of truth ("01" for inverters, "10" for identity)
 		INIT: bit_vector (1 downto 0) := "01";
 		-- Number of elements in the ring (NAND excluded)
-		LEN: natural
+		N: natural
 	);
 	port (
 		-- Enable signal (active '1')
@@ -24,7 +24,7 @@ end entity;
 -- Xilinx specific implementation of the RO.
 architecture xilinx of ring is
 
-	signal net: std_logic_vector (LEN downto 0) := (others => '0');
+	signal net: std_logic_vector (N downto 0) := (others => '0');
 	attribute DONT_TOUCH: string;
 	attribute DONT_TOUCH of net: signal is "true";
 	attribute ALLOW_COMBINATORIAL_LOOPS: string;
@@ -38,13 +38,13 @@ begin
 		INIT => "0111"
 	)
 	port map (
-		I0 => net(LEN),
+		I0 => net(N),
 		I1 => enable,
 		O => net(0)
 	);
 
 	-- Generate all elements (buffers or inverters)
-	element: for I in 0 to LEN-1 generate
+	element: for I in 0 to N-1 generate
 		inverter: LUT1
 		generic map (
 			INIT => INIT

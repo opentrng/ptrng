@@ -85,7 +85,7 @@ begin
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x0] - ID - Entropy source identification register for UID and revision number.
+-- [0x0] - ID - OpenTRNG's PTRNG identification register for UID and revision number.
 --------------------------------------------------------------------------------
 
 
@@ -100,7 +100,7 @@ end process;
 
 -----------------------
 -- Bit field:
--- ID(15 downto 0) - UID - Unique ID for OpenTRNG entropy source
+-- ID(15 downto 0) - UID - Unique ID for OpenTRNG's PTRNG
 -- access: ro, hardware: f
 -----------------------
 
@@ -140,7 +140,7 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x4] - CONTROL - Global control register for the entropy source
+-- [0x4] - CONTROL - Global control register for the OpenTRNG's PTRNG
 --------------------------------------------------------------------------------
 csr_control_rdata(31 downto 1) <= (others => '0');
 

@@ -22,14 +22,14 @@ Base address: 0x00000000
 
 | Name                     | Address    | Description |
 | :---                     | :---       | :---        |
-| [ID](#id)                | 0x0000     | Entropy source identification register for UID and revision number. |
-| [CONTROL](#control)      | 0x0004     | Global control register for the entropy source |
+| [ID](#id)                | 0x0000     | OpenTRNG's PTRNG identification register for UID and revision number. |
+| [CONTROL](#control)      | 0x0004     | Global control register for the OpenTRNG's PTRNG |
 | [RING](#ring)            | 0x0008     | Ring-oscillator enable register (enable bits are active at `'1'`). |
 | [FREQCOUNT](#freqcount)  | 0x000c     | Frequency counter control register. |
 
 ## ID
 
-Entropy source identification register for UID and revision number.
+OpenTRNG's PTRNG identification register for UID and revision number.
 
 Address offset: 0x0000
 
@@ -39,13 +39,13 @@ Reset value: 0x0001cea3
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
 | REV              | 31:16  | ro              | 0x0001     | Revision number |
-| UID              | 15:0   | ro              | 0xcea3     | Unique ID for OpenTRNG entropy source |
+| UID              | 15:0   | ro              | 0xcea3     | Unique ID for OpenTRNG's PTRNG |
 
 Back to [Register map](#register-map-summary).
 
 ## CONTROL
 
-Global control register for the entropy source
+Global control register for the OpenTRNG's PTRNG
 
 Address offset: 0x0004
 

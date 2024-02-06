@@ -3,10 +3,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use work.settings.all;
 
--- OpenTRNG entropy base entity.
-entity entropy is
+-- OpenTRNG's PTRNG base entity.
+entity ptrng is
 	generic (
-		-- Width of the source output randomness
+		-- Output width for the randomness
 		DATA_WIDTH: natural := 32
 	);
 	port (
@@ -41,8 +41,8 @@ entity entropy is
 	);
 end entity;
 
--- RTL description of OpenTRNG entropy source
-architecture rtl of entropy is
+-- RTL description of OpenTRNG's PTRNG
+architecture rtl of ptrng is
 
 	signal ro: std_logic_vector (T downto 0);
 	signal monitor: std_logic_vector (T downto 0);
@@ -53,7 +53,7 @@ begin
 	osc: for I in 0 to T generate
 		ring: entity work.ring
 		generic map (
-			LEN => RO_LEN(I)
+			N => RO_LEN(I)
 		)
 		port map (
 			enable => ring_enable(I),
@@ -79,7 +79,7 @@ begin
 		result => freqcount_result
 	);
 
-	-- SOURCE ero/muro/coso
+	-- SAMPLING ero/muro/coso
 
 	-- CDC
 
