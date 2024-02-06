@@ -32,10 +32,30 @@ Thanks to `ghdl` simulator, all testbenches record their waveform data in the `w
 
 # Compile for FPGA
 
-The provided VHDL is target agnostic (it can also be synthetized for ASIC) at the exception of the ring.vhd that describes a configuatble ring-oscillator. For ASIC
+The provided VHDL is target agnostic, it can be synthetized for all FPGA vendors (even ASIC), at the exception of `ring.vhd` that describes a ring-oscillator. Specific versions of this file are provided for Xilinx FPGAs and ASIC in the directory `target/common`.
+
+Scaffold for generating Xilinx Vivado projects is provided here `target/common/generate_vivado_project.tcl`.
 
 ## FPGA targets
 
+As of now, 
+
+Add new target
+
 ## Synthetize, place route and program device
+
+Generate project
+
+Open vivado
+
+Program
+
+Scripting
+
+## Custom configurations
+
+### Register map
+
+### Ring oscillators
 
 # OpenTitan compatibility

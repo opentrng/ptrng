@@ -16,8 +16,6 @@ Welcome to **OpenTRNG**! This project is dedicated to delivering the community o
 
 The objective of **OpenTRNG** is to offer reference architectures of ring-oscillator based True Random Number Generators (TRNG), also known as PTRNG, to the community. With the advancement of certification standards like [BSI AIS20/31](https://www.bsi.bund.de/dok/randomnumbergenerators) (used in the Common Criteria) and [NIST SP 800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final), the stochastic model of the entropy source is increasingly crucial in relation to validating statistical tests on output data. Here, we publish straightforward yet effective entropy sources for PTRNG to facilitate the validation of their stochastic models across various FPGA and ASIC targets.
 
-## Available architectures
-
 In RO-based True Random Number Generators (TRNGs), the RO serves as the entropy source. Specifically, the inherent jitter between two (or more) ROs generates relative phase noise, which is known random, uncontrollable, and unpredictable. This relative phase noise is then converted into random bits through a sampling mechanism.
 
 As of now, **OpenTRNG** includes the following reference sampling architectures:
@@ -37,7 +35,7 @@ The repository structure contains these main directories:
 * `analysis`: contains the tools for the [analysis](analysis/#analyze-and-evaluate-outputs) of the resulting random binary sequences (such as entropy estimators and auto-correlations),
 * `emulator`: includes the [ring oscillator time series emulator](emulator/#emulate-noisy-ring-oscillators) and the [raw random number emulators](emulator/#emulate-raw-random-numbers),
 * `hardware`: encloses HDL sources for [simulation](hardware/#simulate-hdl-sources) and [FPGA implementation](hardware/#compile-for-fpga) of the PTRNG,
-* `remote`: include scripts for remote control the **OpenTRNG** FPGA target from a PC.
+* `remote`: include scripts for [remote control](remote) the **OpenTRNG** FPGA target from a PC.
 
 ## Prerequisites
 

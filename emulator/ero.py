@@ -4,7 +4,7 @@ import argparse
 import emulator
 
 # Get command line arguments
-parser = argparse.ArgumentParser(description="Emulates the ERO entropy source and generate a series of bits.")
+parser = argparse.ArgumentParser(description="Emulates the ERO and generate a series of bits.")
 parser.add_argument("size", type=float, help="numer of bits to generate")
 parser.add_argument("div", type=int, help="divisor for the sampling clock (freq0/div)")
 parser.add_argument("freq0", type=float, help="base frequency (in Hz) of the sampling ring-oscillator")

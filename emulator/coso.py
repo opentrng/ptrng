@@ -4,7 +4,7 @@ import argparse
 import emulator
 
 # Get command line arguments
-parser = argparse.ArgumentParser(description="Emulates the COSO entropy source and generate a series of counter values.")
+parser = argparse.ArgumentParser(description="Emulates the COSO and generate a series of counter values.")
 parser.add_argument("size", type=float, help="numer of values to generate")
 parser.add_argument("freq0", type=float, help="frequency (in Hz) of the sampling ring-oscillator")
 parser.add_argument("freq1", type=float, help="frequency (in Hz) of the sampled ring-oscillator")
