@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
 -- This entity is a simple linear clock divider. The 'factor' input can be in another clock domain than 'original' clock.
-entity clkdiv is
+entity clkdivider is
 	generic (
 		-- Maximum division factor width (default 32 bits)
 		FACTOR_WIDTH: natural := 32
@@ -19,7 +19,7 @@ entity clkdiv is
 end entity;
 
 -- The linear divider can divide the clock by factors in interval [1, 2^FACTOR_WIDTH[.
-architecture rtl of clkdiv is
+architecture rtl of clkdivider is
 
 	signal resync: std_logic_vector (FACTOR_WIDTH-1 downto 0) := (others => '0');
 	signal divider: std_logic_vector (FACTOR_WIDTH-1 downto 0) := (others => '0');

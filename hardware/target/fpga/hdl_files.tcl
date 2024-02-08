@@ -1,6 +1,6 @@
 # Add design HDL source files to the list
 set hdl_files [list \
-	[file normalize "../../hdl/clkdiv.vhd"] \
+	[file normalize "../../hdl/clkdivider.vhd"] \
 	[file normalize "../../hdl/coso.vhd"] \
 	[file normalize "../../hdl/ero.vhd"] \
 	[file normalize "../../hdl/freqcounter.vhd"] \
