@@ -42,7 +42,7 @@ You can estimate entropy of the generated binary streams with the script `entrop
 Estimators can be computed for different samples size from 1 to 32 bits.
 
 ```
-$ python entropy.py -b 8 mcv ero.bin
+$ python entropy.py -e mcv -b 8 ero.bin
 ```
 
 The provided example computes the MCV estimator on 8 bits samples read from the `ero.bin` binary file.

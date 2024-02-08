@@ -5,9 +5,9 @@ import lsne
 
 # Get command line arguments
 parser = argparse.ArgumentParser(description="Generate a normalized Allan Variance plot for a RO time serie or for COSO counter values.")
+parser.add_argument("-t", dest="title", type=str, default="", help="plot title")
 parser.add_argument("datafile", type=str, help="data input file (text format, should contain one sample per line)")
 parser.add_argument("plotfile", type=str, help="plot output file (possibles extensions png, jpg, pdf)")
-parser.add_argument("-t", dest="title", type=str, default="", help="plot title")
 args=parser.parse_args()
 
 # Load the data file

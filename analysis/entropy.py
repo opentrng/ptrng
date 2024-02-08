@@ -68,8 +68,8 @@ def t8(bits):
 
 # Get command line arguments
 parser = argparse.ArgumentParser(description="Compute the entropy for a binary file.")
-parser.add_argument("-b", dest="n", type=int, default=1, help="estimate with N bits samples")
-parser.add_argument("estimator", type=str, choices=['shannon', 'mcv', 'markov', 't8'], help="entropy estimator")
+parser.add_argument("-e", required=True, dest="estimator", type=str, choices=['shannon', 'mcv', 'markov', 't8'], help="entropy estimator")
+parser.add_argument("-b", dest="n", type=int, default=1, help="estimate with N bits samples (default 1)")
 parser.add_argument("file", type=str, help="data input file (binary)")
 args=parser.parse_args()
 
