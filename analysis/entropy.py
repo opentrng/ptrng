@@ -4,6 +4,21 @@ import argparse
 import math
 import binutils
 
+# Get command line arguments
+parser = argparse.ArgumentParser(description="Compute the entropy for a binary file.")
+parser.add_argument("-e", required=True, dest="estimator", type=str, choices=['shannon', 'mcv', 'markov', 't8'], help="entropy estimator")
+parser.add_argument("-b", dest="n", type=int, default=1, help="estimate with N bits samples (default 1)")
+parser.add_argument("file", type=str, help="data input file (binary)")
+args=parser.parse_args()
+
+# Test arguments
+if args.estimator=="markov" and args.n>1:
+	print("ERROR: cannot compute Markov estimator on n>1 bit words")
+	exit(-1)
+if args.estimator=="t8" and args.n!=8:
+	print("ERROR: can compute T8 estimator on 8 bit words only")
+	exit(-1)
+
 # Shannon entropy
 def shannon(samples):
 	values, counts = np.unique(samples, return_counts=True)
@@ -65,21 +80,6 @@ def t8(bits):
 	if index+1 != (Q+K):
 		raise ValueError("Not enough data to perform entropy estimation")
 	return T/K
-
-# Get command line arguments
-parser = argparse.ArgumentParser(description="Compute the entropy for a binary file.")
-parser.add_argument("-e", required=True, dest="estimator", type=str, choices=['shannon', 'mcv', 'markov', 't8'], help="entropy estimator")
-parser.add_argument("-b", dest="n", type=int, default=1, help="estimate with N bits samples (default 1)")
-parser.add_argument("file", type=str, help="data input file (binary)")
-args=parser.parse_args()
-
-# Test arguments
-if args.estimator=="markov" and args.n>1:
-	print("ERROR: cannot compute Markov estimator on n>1 bit words")
-	exit(-1)
-if args.estimator=="t8" and args.n!=8:
-	print("ERROR: can compute T8 estimator on 8 bit words only")
-	exit(-1)
 
 # Load the data file and unpack bytes to bits
 data = np.fromfile(args.file, dtype='uint8')
