@@ -10,7 +10,7 @@ regmap_path = registers.yaml
 
 [vhd]
 generator = Vhdl
-path = ../../hdl/registers.vhd
+path = registers.vhd
 read_filler = 0xBAADBEEF
 interface = lb
 

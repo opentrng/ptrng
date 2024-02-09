@@ -35,12 +35,12 @@ architecture rtl of top is
 	-- Registers
 	signal sw_reset: std_logic;
 	signal ring_enable: std_logic_vector (31 downto 0);
-	signal freqcount_en: std_logic;
-	signal freqcount_start: std_logic;
-	signal freqcount_done: std_logic;
-	signal freqcount_overflow: std_logic;
-	signal freqcount_select: std_logic_vector (4 downto 0);
-	signal freqcount_result: std_logic_vector (22 downto 0);
+	signal freq_en: std_logic;
+	signal freq_start: std_logic;
+	signal freq_done: std_logic;
+	signal freq_overflow: std_logic;
+	signal freq_select: std_logic_vector (4 downto 0);
+	signal freq_value: std_logic_vector (22 downto 0);
 
 begin
 
@@ -106,29 +106,31 @@ begin
 
 		csr_control_reset_out => sw_reset,
 		csr_ring_enable_out => ring_enable,
-		csr_freqcount_en_out => freqcount_en,
-		csr_freqcount_start_out => freqcount_start,
-		csr_freqcount_done_in => freqcount_done,
-		csr_freqcount_select_out => freqcount_select,
-		csr_freqcount_result_in => freqcount_result,
-		csr_freqcount_overflow_in => freqcount_overflow
+		csr_freq_en_out => freq_en,
+		csr_freq_start_out => freq_start,
+		csr_freq_done_in => freq_done,
+		csr_freq_select_out => freq_select,
+		csr_freq_value_in => freq_value,
+		csr_freq_overflow_in => freq_overflow
 	);
 
 	-- PTRNG
 	ptrng: entity work.ptrng
 	generic map (
-		DATA_WIDTH => 32
+		REG_WIDTH => 32,
+		RAND_WIDTH => 32
 	)
 	port map (
 		clk => clk,
 		reset => sw_reset,
 		ring_enable => ring_enable,
-		freqcount_en => freqcount_en,
-		freqcount_select => freqcount_select,
-		freqcount_start => freqcount_start,
-		freqcount_done => freqcount_done,
-		freqcount_overflow => freqcount_overflow,
-		freqcount_result => freqcount_result
+		freq_en => freq_en,
+		freq_select => freq_select,
+		freq_start => freq_start,
+		freq_done => freq_done,
+		freq_overflow => freq_overflow,
+		freq_value => freq_value,
+		divider => (others => '0')
 	);
 
 	-- FIFO

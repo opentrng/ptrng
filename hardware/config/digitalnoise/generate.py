@@ -1,8 +1,10 @@
+from jinja2 import Environment, FileSystemLoader
 import argparse
 import math
 
 # Get command line arguments
-parser = argparse.ArgumentParser(description="Generate the ring-oscillator configuration. ?????????????")
+parser = argparse.ArgumentParser(description="Generate the digital noise source configuration files. More specifically it generates: a 'settings.vhd' file located in 'hardware/hdl' that contains HDL generic variables, ????")
+parser.add_argument("-vendor", required=True, type=str, choices=['xilinx'], help="target vendor (for selecting the templates)")
 parser.add_argument("-luts", required=True, type=int, help="number of LUT per slice")
 parser.add_argument("-x", required=True, type=int, help="reserved area for rings placement, row of the first slice")
 parser.add_argument("-y", required=True, type=int, help="reserved area for rings placement, column of the first slice")
@@ -10,13 +12,16 @@ parser.add_argument("-width", required=True, type=int, help="width of the reserv
 parser.add_argument("-height", required=True, type=int, help="height of the reserved area for rings placement (in slice count)")
 parser.add_argument("-hpad", type=int, default=1, required=False, help="horizontal padding between ring-oscillators")
 parser.add_argument("-vpad", type=int, default=1, required=False, help="vertical padding between ring-oscillators")
-parser.add_argument("-len", type=int, nargs='+', help="number of elements in the ring-oscillator")
+parser.add_argument("-len", required=True, type=int, nargs='+', help="number of elements in the ring-oscillator")
 args=parser.parse_args()
+
+# Arguments post-processing
+t = len(args.len)-1
 
 # Command line argument summary
 print("Reserved area for rings: (X{:d},Y{:d}) to (X{:d},Y{:d})".format(args.x, args.y, args.x+args.width-1, args.y+args.height-1))
 print("LUTs per slice: {:d}".format(args.luts))
-print("Number of ring-oscillators: {:d} (T={:d})".format(len(args.len), len(args.len)-1))
+print("Number of ring-oscillators: {:d} (T={:d})".format(len(args.len), t))
 print("Lengths of ROs: [{:s}]".format(', '.join(map("{:d}".format, args.len))))
 
 # Add a reserved area for a frequency counter at given position (slice)
@@ -26,8 +31,8 @@ def add_freqcounter(x, y):
 	print("- freqcounter_{:02d} origin=({:d},{:d}) size=({:d},{:d})".format(index, x, y, width, height))
 	return width, height
 
-# Add a reserved area for a clock divider at given position (slice)
-def add_clkdivider(x, y):
+# Add a reserved area for the sampler at given position (slice)
+def add_sampler(x, y):
 	width = 2
 	height = 1
 	print("- clkdivider_{:02d} origin=({:d},{:d}) size=({:d},{:d})".format(index, x, y, width, height))
@@ -71,8 +76,8 @@ for index in range(len(args.len)):
 	width, height = add_freqcounter(x, y)
 	y += height
 
-	# Add the clock divider
-	width, height = add_clkdivider(x, y)
+	# Add the sampler
+	width, height = add_sampler(x, y)
 	y += height
 
 	# Add the RO
@@ -93,3 +98,16 @@ for index in range(len(args.len)):
 		ymax = 0
 	else:
 		y = ystart
+
+# Init Jijna templating environement
+environment = Environment(loader=FileSystemLoader("templates"))
+
+# Generate the VHDL setting package
+template = environment.get_template("settings.vhd.jinja")
+content = template.render(
+		t = t,
+		ro_len = ', '.join(map("{:d}".format, args.len))
+	)
+settings = open("settings.vhd", "w")
+settings.write(content)
+settings.close()

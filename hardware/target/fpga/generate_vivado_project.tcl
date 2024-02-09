@@ -19,13 +19,15 @@ set partnumber [lindex $argv 1]
 # Set VHDL source files into a list
 source "hdl_files.tcl"
 lappend hdl_files [file normalize "${boardname}/target.vhd"]
-lappend hdl_files [file normalize "../common/xilinx/ring.vhd"]
+lappend hdl_files [file normalize "../common/xilinx/inverter.vhd"]
+lappend hdl_files [file normalize "../common/xilinx/buffer.vhd"]
+lappend hdl_files [file normalize "../common/xilinx/nand.vhd"]
 
 # Set constraints files into a list
 set constraints_files [list \
-	[file normalize "${boardname}/pinout.xdc"] \
-	[file normalize "${boardname}/constraints.xdc"] \
-	[file normalize "${boardname}/rings.xdc"] \
+	[file normalize "${boardname}/generic.xdc"] \
+	[file normalize "../common/xilinx/pinout.xdc"] \
+	[file normalize "$../../config/digitalnoise/placeroute.xdc"] \
 ]
 
 # Create an empty projet for given partnumber
