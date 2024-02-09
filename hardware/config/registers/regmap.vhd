@@ -6,7 +6,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity registers is
+entity regmap is
 generic(
     ADDR_W : integer := 16;
     DATA_W : integer := 32;
@@ -21,8 +21,8 @@ port(
     -- CONTROL.RESET
     csr_control_reset_out : out std_logic;
 
-    -- RING.ENABLE
-    csr_ring_enable_out : out std_logic_vector(31 downto 0);
+    -- RING.EN
+    csr_ring_en_out : out std_logic_vector(31 downto 0);
 
     -- FREQ.EN
     csr_freq_en_out : out std_logic;
@@ -50,7 +50,7 @@ port(
 );
 end entity;
 
-architecture rtl of registers is
+architecture rtl of regmap is
 
 signal csr_id_rdata : std_logic_vector(31 downto 0);
 signal csr_id_ren : std_logic;
@@ -66,7 +66,7 @@ signal csr_ring_rdata : std_logic_vector(31 downto 0);
 signal csr_ring_wen : std_logic;
 signal csr_ring_ren : std_logic;
 signal csr_ring_ren_ff : std_logic;
-signal csr_ring_enable_ff : std_logic_vector(31 downto 0);
+signal csr_ring_en_ff : std_logic_vector(31 downto 0);
 
 signal csr_freq_rdata : std_logic_vector(31 downto 0);
 signal csr_freq_wen : std_logic;
@@ -190,33 +190,33 @@ end process;
 
 -----------------------
 -- Bit field:
--- RING(31 downto 0) - ENABLE - The bit at index _i_ in the bitfield enables the RO number _i_
+-- RING(31 downto 0) - EN - The bit at index _i_ in the bitfield enables the RO number _i_
 -- access: rw, hardware: o
 -----------------------
 
-csr_ring_rdata(31 downto 0) <= csr_ring_enable_ff;
+csr_ring_rdata(31 downto 0) <= csr_ring_en_ff;
 
-csr_ring_enable_out <= csr_ring_enable_ff;
+csr_ring_en_out <= csr_ring_en_ff;
 
 process (clk, rst) begin
 if (rst = '1') then
-    csr_ring_enable_ff <= "00000000000000000000000000000000"; -- 0x0
+    csr_ring_en_ff <= "00000000000000000000000000000000"; -- 0x0
 elsif rising_edge(clk) then
         if (csr_ring_wen = '1') then
             if (wstrb(0) = '1') then
-                csr_ring_enable_ff(7 downto 0) <= wdata(7 downto 0);
+                csr_ring_en_ff(7 downto 0) <= wdata(7 downto 0);
             end if;
             if (wstrb(1) = '1') then
-                csr_ring_enable_ff(15 downto 8) <= wdata(15 downto 8);
+                csr_ring_en_ff(15 downto 8) <= wdata(15 downto 8);
             end if;
             if (wstrb(2) = '1') then
-                csr_ring_enable_ff(23 downto 16) <= wdata(23 downto 16);
+                csr_ring_en_ff(23 downto 16) <= wdata(23 downto 16);
             end if;
             if (wstrb(3) = '1') then
-                csr_ring_enable_ff(31 downto 24) <= wdata(31 downto 24);
+                csr_ring_en_ff(31 downto 24) <= wdata(31 downto 24);
             end if;
         else
-            csr_ring_enable_ff <= csr_ring_enable_ff;
+            csr_ring_en_ff <= csr_ring_en_ff;
         end if;
 end if;
 end process;

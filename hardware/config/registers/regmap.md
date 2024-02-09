@@ -70,7 +70,7 @@ Reset value: 0x00000000
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
-| ENABLE           | 31:0   | rw              | 0x00000000 | The bit at index _i_ in the bitfield enables the RO number _i_ |
+| EN               | 31:0   | rw              | 0x00000000 | The bit at index _i_ in the bitfield enables the RO number _i_ |
 
 Back to [Register map](#register-map-summary).
 

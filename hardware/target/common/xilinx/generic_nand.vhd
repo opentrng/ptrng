@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 use unisim.vcomponents.all;
 
 -- LUT based NAND implementation for Xilinx
-entity nand is
+entity generic_nand is
 	port (
 		-- First input signal
 		i0: in std_logic;
@@ -16,7 +16,8 @@ entity nand is
 end entity;
 
 -- Architecture for the LUT NAND gate
-architecture lut of nand is
+architecture lut of generic_nand is
+begin
 
 	-- LUT2 instantation with NAND table of truth
 	lut_nand: LUT2

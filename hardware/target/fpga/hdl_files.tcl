@@ -11,7 +11,7 @@ set hdl_files [list \
 ]
 
 # Add configuration files
-lappend hdl_files [file normalize "../../config/registers/registers.vhd"]
+lappend hdl_files [file normalize "../../config/registers/regmap.vhd"]
 lappend hdl_files [file normalize "../../config/digitalnoise/settings.vhd"]
 
 # Add required HDL sources files from libraries

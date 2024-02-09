@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 use unisim.vcomponents.all;
 
 -- LUT based inverter implementation for Xilinx to introduce a delay in the signal
-entity inverter is
+entity generic_inverter is
 	port (
 		-- Input signal to invert
 		i: in std_logic;
@@ -14,7 +14,8 @@ entity inverter is
 end entity;
 
 -- Architecture for the LUT inverter gate
-architecture lut of inverter is
+architecture lut of generic_inverter is
+begin
 
 	-- LUT1 instantation with inverter table of truth
 	lut_inverter: LUT1

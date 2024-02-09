@@ -32,9 +32,9 @@ architecture rtl of top is
 	signal read_req: std_logic;
 	signal write_req: std_logic;
 
-	-- Registers
+	-- Register map
 	signal sw_reset: std_logic;
-	signal ring_enable: std_logic_vector (31 downto 0);
+	signal ring_en: std_logic_vector (31 downto 0);
 	signal freq_en: std_logic;
 	signal freq_start: std_logic;
 	signal freq_done: std_logic;
@@ -88,7 +88,7 @@ begin
 	);
 
 	-- Register map
-	registers: entity work.registers
+	regmap: entity work.regmap
 	port map (
 		clk => clk,
 		rst => hw_reset,
@@ -105,7 +105,7 @@ begin
 		--rvalid : out std_logic;
 
 		csr_control_reset_out => sw_reset,
-		csr_ring_enable_out => ring_enable,
+		csr_ring_en_out => ring_en,
 		csr_freq_en_out => freq_en,
 		csr_freq_start_out => freq_start,
 		csr_freq_done_in => freq_done,
@@ -123,7 +123,7 @@ begin
 	port map (
 		clk => clk,
 		reset => sw_reset,
-		ring_enable => ring_enable,
+		ring_en => ring_en,
 		freq_en => freq_en,
 		freq_select => freq_select,
 		freq_start => freq_start,

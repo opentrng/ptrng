@@ -6,21 +6,21 @@ register_reset = async_pos
 address_increment = data_width
 address_alignment = data_width
 force_name_case = upper
-regmap_path = registers.yaml
+regmap_path = regmap.yaml
 
 [vhd]
 generator = Vhdl
-path = registers.vhd
+path = regmap.vhd
 read_filler = 0xBAADBEEF
 interface = lb
 
 [py]
 generator = Python
-path = ../../../remote/registers.py
+path = ../../../remote/regmap.py
 
 [md]
 generator = Markdown
-path = registers.md
+path = regmap.md
 title = OpenTRNG entropy source register map
 image_dir = images
 print_images = False

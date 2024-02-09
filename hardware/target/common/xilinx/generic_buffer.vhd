@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 use unisim.vcomponents.all;
 
 -- LUT based buffer implementation for Xilinx to introduce a delay in the signal
-entity buffer is
+entity generic_buffer is
 	port (
 		-- Input signal
 		i: in std_logic;
@@ -14,10 +14,11 @@ entity buffer is
 end entity;
 
 -- Architecture for the LUT buffer gate
-architecture lut of buffer is
+architecture lut of generic_buffer is
+begin
 
 	-- LUT1 instantation with identity table of truth
-	lut_buffer: LUT1
+	lut_delay: LUT1
 	generic map (
 		INIT => "10"
 	)

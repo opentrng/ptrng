@@ -46,16 +46,16 @@ class _RegRing:
         self._rmap = rmap
 
     @property
-    def enable(self):
+    def en(self):
         """The bit at index _i_ in the bitfield enables the RO number _i_"""
         rdata = self._rmap._if.read(self._rmap.RING_ADDR)
-        return (rdata >> self._rmap.RING_ENABLE_POS) & self._rmap.RING_ENABLE_MSK
+        return (rdata >> self._rmap.RING_EN_POS) & self._rmap.RING_EN_MSK
 
-    @enable.setter
-    def enable(self, val):
+    @en.setter
+    def en(self, val):
         rdata = self._rmap._if.read(self._rmap.RING_ADDR)
-        rdata = rdata & (~(self._rmap.RING_ENABLE_MSK << self._rmap.RING_ENABLE_POS))
-        rdata = rdata | (val << self._rmap.RING_ENABLE_POS)
+        rdata = rdata & (~(self._rmap.RING_EN_MSK << self._rmap.RING_EN_POS))
+        rdata = rdata | (val << self._rmap.RING_EN_POS)
         self._rmap._if.write(self._rmap.RING_ADDR, rdata)
 
 
@@ -137,8 +137,8 @@ class RegMap:
 
     # RING - Ring-oscillator enable register (enable bits are active at `'1'`).
     RING_ADDR = 0x0008
-    RING_ENABLE_POS = 0
-    RING_ENABLE_MSK = 0xffffffff
+    RING_EN_POS = 0
+    RING_EN_MSK = 0xffffffff
 
     # FREQ - Frequency counter control register.
     FREQ_ADDR = 0x000c

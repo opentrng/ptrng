@@ -29,7 +29,7 @@ regmap:
 -   name: RING
     description: Ring-oscillator enable register (enable bits are active at `'1'`).
     bitfields:
-    -   name: ENABLE
+    -   name: EN
         description: The bit at index _i_ in the bitfield enables the RO number _i_
         width: 32
         lsb: 0

@@ -1,4 +1,4 @@
-import registers as OpenTRNG
+import regmap as OpenTRNG
 import fluart as Fluart
 import argparse
 

@@ -62,7 +62,7 @@ begin
 		-- One frequency counter per RO
 		freq: entity work.freqcounter
 		generic map (
-			W => freqcount_result'Length,
+			W => freq_value'Length,
 			N => 1_000_000
 		)
 		port map (
