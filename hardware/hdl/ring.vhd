@@ -37,7 +37,7 @@ begin
 	);
 
 	-- Generate all elements (buffers or inverters)
-	generate_elements: for I in 0 to N-1 generate
+	element: for I in 0 to N-1 generate
 		--delay: entity work.generic_buffer
 		delay: entity work.generic_inverter
 		port map (
