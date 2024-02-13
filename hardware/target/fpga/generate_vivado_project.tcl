@@ -23,9 +23,9 @@ lappend hdl_files [file normalize "../common/xilinx/generic_inverter.vhd"]
 lappend hdl_files [file normalize "../common/xilinx/generic_buffer.vhd"]
 lappend hdl_files [file normalize "../common/xilinx/generic_nand.vhd"]
 
-# Set constraints files into a list
+# Set constraints files into a list (first file will be defined as target constraint file)
 set constraints_files [list \
-	[file normalize "${boardname}/pinout.xdc"] \
+	[file normalize "${boardname}/target.xdc"] \
 	[file normalize "../common/xilinx/generic.xdc"] \
 	[file normalize "../../config/digitalnoise/placeroute.xdc"] \
 ]
@@ -52,13 +52,19 @@ set obj [get_filesets sources_1]
 set_property -name "top" -value "target" -objects $obj
 set_property -name "top_auto_set" -value "0" -objects $obj
 
-# Create a fileset for constraint files and load them
+# Create a fileset for constraints
 if {[string equal [get_filesets -quiet constrs_1] ""]} {
  	create_fileset -constrset constrs_1
 }
+
+# Load the constraint files (only for implementation, not for synthesis)
 foreach constraints_file $constraints_files {	
 	add_files -fileset constrs_1 $constraints_file
+	set_property used_in_synthesis false [get_files  $constraints_file]
 }
+
+# Set the target contraint file
+set_property target_constrs_file [lindex $constraints_files 0] [current_fileset -constrset]
 
 # End, then load the project with this command: vivado -mode gui arty_a7_35t/opentrng_arty_a7_35t.xpr
 quit

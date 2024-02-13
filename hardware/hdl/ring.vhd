@@ -23,8 +23,6 @@ architecture rtl of ring is
 	signal net: std_logic_vector (N downto 0) := (others => '0');
 	attribute DONT_TOUCH: string;
 	attribute DONT_TOUCH of net: signal is "true";
-	attribute ALLOW_COMBINATORIAL_LOOPS: string;
-	attribute ALLOW_COMBINATORIAL_LOOPS of net: signal is "true";
 
 begin
 
