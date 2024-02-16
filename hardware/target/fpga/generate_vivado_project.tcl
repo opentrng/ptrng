@@ -19,15 +19,13 @@ set partnumber [lindex $argv 1]
 # Set VHDL source files into a list
 source "hdl_files.tcl"
 lappend hdl_files [file normalize "${boardname}/target.vhd"]
-lappend hdl_files [file normalize "../common/xilinx/generic_inverter.vhd"]
-lappend hdl_files [file normalize "../common/xilinx/generic_buffer.vhd"]
-lappend hdl_files [file normalize "../common/xilinx/generic_nand.vhd"]
+lappend hdl_files [file normalize "../common/xilinx/ring.vhd"]
 
 # Set constraints files into a list (first file will be defined as target constraint file)
 set constraints_files [list \
 	[file normalize "${boardname}/target.xdc"] \
-	[file normalize "../common/xilinx/generic.xdc"] \
-	[file normalize "../../config/digitalnoise/placeroute.xdc"] \
+	[file normalize "../common/xilinx/top.xdc"] \
+	[file normalize "../../config/digitalnoise/constraints.xdc"] \
 ]
 
 # Create an empty projet for given partnumber
@@ -60,7 +58,6 @@ if {[string equal [get_filesets -quiet constrs_1] ""]} {
 # Load the constraint files (only for implementation, not for synthesis)
 foreach constraints_file $constraints_files {	
 	add_files -fileset constrs_1 $constraints_file
-	set_property used_in_synthesis false [get_files  $constraints_file]
 }
 
 # Set the target contraint file

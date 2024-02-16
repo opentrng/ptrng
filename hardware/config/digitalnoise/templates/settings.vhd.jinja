@@ -1,7 +1,9 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
--- This file has been automatically generated, for more information look into the directory 'hardware/config/digitalnoise'.
+-- This file has been automatically generated with the command line:
+-- $ {{ cmd }}
+-- For more information look into the directory 'hardware/config/digitalnoise'.
 package settings is
 	constant T: natural := {{ banks|length-1 }};
 	type len_array is array (0 to T) of natural;

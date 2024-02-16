@@ -1,6 +1,7 @@
 from jinja2 import Environment, FileSystemLoader
 import argparse
 import math
+import sys
 
 # Get command line arguments
 parser = argparse.ArgumentParser(description="Generate configuration files for the digitalnoise entity. More specifically it generates: 'settings.vhd' that contains HDL constants, 'placeroute.*' that contains all timing/place/route constraints for digitalnoise (extension depending on vendor).")
@@ -18,7 +19,8 @@ parser.add_argument("-fmax", required=True, type=float, help="maximum estimated 
 parser.add_argument("-len", required=True, type=int, nargs='+', help="number of elements in each ring-oscillator")
 args=parser.parse_args()
 
-# Arguments post-processing
+# Arguments post-processingc
+cmd = "python "+" ".join(sys.argv)
 t = len(args.len)-1
 
 # Command line argument summary
@@ -35,45 +37,75 @@ print("Maximum estimated frequency: {:e} Hz".format(args.fmax))
 
 # Add a reserved area for a frequency counter at given position (slice)
 def add_freqcounter(x, y, width, height):
+	# Print base info
+	print("- freqcounter origin=({:d},{:d}) size=({:d},{:d})".format(x, y, width, height))
+
+	# Return a dictionnary entry for the area
 	freq = {}
-	freq['name'] = "freq{:d}".format(index)
-	freq['block'] = {}
-	freq['block']['xilinx'] = xilinx_slice_area(x, y, width, height)
-	print("- freqcounter_{:02d} origin=({:d},{:d}) size=({:d},{:d})".format(index, x, y, width, height))
+	freq['area'] = {}
+	freq['area']['xilinx'] = xilinx_slice_area(x, y, width, height)
 	return freq
 
 # Add a reserved area for the digitizer at given position (slice)
 def add_digitizer(x, y, width, height):
+	# Print base info
+	print("- clkdivider_{:02d} origin=({:d},{:d}) size=({:d},{:d})".format(index, x, y, width, height))
+
+	# Return a dictionnary entry for the name and area
 	digit = {}
 	digit['name'] = "sampler{:d}".format(index)
-	digit['block'] = {}
-	digit['block']['xilinx'] = xilinx_slice_area(x, y, width, height)
-	print("- clkdivider_{:02d} origin=({:d},{:d}) size=({:d},{:d})".format(index, x, y, width, height))
+	digit['area'] = {}
+	digit['area']['xilinx'] = xilinx_slice_area(x, y, width, height)
 	return digit
 
 # Add a reserved area for a ring-oscillator at given position (slice)
 def add_ring(x, y, width, index, length):
-	height = math.ceil(length/(width*args.luts))
-	half = math.ceil(length/height)
-	print("- RO_{:02d} len={:d} half={:d} origin=({:d},{:d}) size=({:d},{:d})".format(index, length, half, x, y, width, height))
-	for element in range(length):
-		if 2*element <= length:
+	# Calculate base properties
+	count = length+2 # (+2 for the loopback 'nand' and monitor 'and')
+	height = math.ceil(count/(width*args.luts))
+	half = math.ceil(count/height)
+	print("- RO_{:02d} elements={:d} half={:d} origin=({:d},{:d}) size=({:d},{:d})".format(index, count, half, x, y, width, height))
+
+	# Create the base dictionnary entry with name, len and fax
+	ring = {}
+	ring['name'] = "ring{:d}".format(index)
+	ring['len'] = count
+	ring['fmax'] = args.fmax
+
+	# Create the elements entries
+	ring['elements'] = {}
+	ring['elements']['xilinx'] = []
+
+	# Iterate for all elements 
+	for element in range(count):
+		# Increment i, j indexes by rows then columns
+		if 2*element < count:
 			i = 0
 			j = element
 			lut = j%args.luts
 		else:
 			i = 1
-			j = length-1-element
+			j = count-1-element
 		slice_i = i
 		slice_j = int(j/args.luts)
 		lut_i = j%args.luts
+
+		# Create a dictionnary entry for the element
+		entry = {}
+		entry['slice'] = xilinx_slice(x+slice_i, y+slice_j)
+		entry['lut'] = lut_i
+		if element == 0:
+			entry['name'] = "lut_nand"
+		elif element == count-1:
+			entry['name'] = "lut_and"
+		else:
+			entry['name'] = "element[{:d}].lut_buffer".format(element-1)
+		ring['elements']['xilinx'].append(entry)
 		print("  - element={:d} slice=({:d},{:d}) lut={:d}".format(element, x+slice_i, y+slice_j, lut_i))
-	ring = {}
-	ring['name'] = "ring{:d}".format(index)
-	ring['len'] = length
-	ring['fmax'] = args.fmax
-	ring['block'] = {}
-	ring['block']['xilinx'] = xilinx_slice_area(x, y, width, height)
+
+	# Add a dictionnary entry for the area and return the whole dict
+	ring['area'] = {}
+	ring['area']['xilinx'] = xilinx_slice_area(x, y, width, height)
 	return ring, height
 
 # Returns the string to locate a slice for Xilinx XDC syntax
@@ -84,9 +116,12 @@ def xilinx_slice(x, y):
 def xilinx_slice_area(x, y, width, height):
 	return "{:s}:{:s}".format(xilinx_slice(x, y), xilinx_slice(x+width-1, y+height-1))
 
-# Start at the lower left corner of the reserved area
+# Add the frequency counter
+freq = add_freqcounter(args.x, args.y, args.width, args.freqheight)
+
+# Start first bank at the left corner of the reserved area, just after the frequency counter
 x = args.x
-y = args.y
+y = args.y + args.freqheight
 xstart = x
 ystart = y
 ymax = 0
@@ -105,15 +140,11 @@ for index in range(len(args.len)):
 	x += args.hpad
 	y += args.vpad
 
-	# Add the frequency counter
-	bank['freq'] = add_freqcounter(x, y, args.colwidth, args.freqheight)
-	y += args.freqheight
-
 	# Add the digitizer
-	# bank['digit'] = add_sampler(x, y, args.colwidth, args.splheight)
-	# y += args.splheight
+	bank['digit'] = add_digitizer(x, y, args.colwidth, args.digitheight)
+	y += args.digitheight
 
-	# Add the RO
+	# Add the ring-oscillator
 	bank['ring'], ringheight = add_ring(x, y, args.colwidth, index, args.len[index])
 	y += ringheight
 	x += args.colwidth
@@ -135,14 +166,13 @@ for index in range(len(args.len)):
 	# Append the bank to the dictionnary
 	banks.append(bank)
 
-print(banks)
-
 # Init Jijna templating environement
 environment = Environment(loader=FileSystemLoader("templates"))
 
 # Generate the VHDL setting package
 template = environment.get_template("settings.vhd.jinja")
 content = template.render(
+		cmd = cmd,
 		banks = banks
 	)
 settings = open("settings.vhd", "w")
@@ -150,11 +180,13 @@ settings.write(content)
 settings.close()
 
 # Generate the Xilinx constraints file
-template = environment.get_template("placeroute.xdc.jinja")
+template = environment.get_template("constraints.xdc.jinja")
 content = template.render(
+		cmd = cmd,
 		reserved = xilinx_slice_area(args.x, args.y, args.width, args.height),
+		freq = freq,
 		banks = banks
 	)
-settings = open("placeroute.xdc", "w")
+settings = open("constraints.xdc", "w")
 settings.write(content)
 settings.close()

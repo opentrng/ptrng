@@ -37,11 +37,8 @@ end entity;
 architecture rtl of digitalnoise is
 
 	signal osc: std_logic_vector (T downto 0);
-	signal mon: std_logic_vector (T downto 0);
-	signal done: std_logic_vector (T downto 0);
-	signal overflow: std_logic_vector (T downto 0);
-	type array_of_values is array (0 to T) of std_logic_vector (freq_value'Length-1 downto 0); 
-	signal value: array_of_values;
+	signal mon_en: std_logic_vector (T downto 0);
+	signal mon_osc: std_logic_vector (T downto 0);
 
 begin
 
@@ -56,45 +53,41 @@ begin
 		port map (
 			enable => ring_en(I),
 			osc => osc(I),
-			mon => mon(I)
+			mon_en => mon_en(I),
+			mon_osc => mon_osc(I)
 		);
 
-		-- One frequency counter per RO
-		freq: entity work.freqcounter
-		generic map (
-			W => freq_value'Length,
-			N => 1_000_000
-		)
-		port map (
-			clk => clk,
-			reset => reset,
-			source => mon(I),
-			enable => freq_en,
-			start => freq_start and ring_en(conv_integer(freq_select)),
-			done => done(I),
-			overflow => overflow(I),
-			result => value(I)
-		);
-
+		-- Enable for the RO monitoring output
+		process (clk, reset)
+		begin
+			if reset = '1' then
+				mon_en(I) <= '0';
+			elsif rising_edge(clk) then
+				if freq_select = I then
+					mon_en(I) <= freq_en;
+				else
+					mon_en(I) <= '0';
+				end if;
+			end if;
+		end process;
 	end generate;
 
-	-- Registering the frequency counter output multiplexer
-	process (clk, reset)
-	begin
-		if reset = '1' then
-			freq_done <= '0';
-			freq_overflow <= '0';
-		elsif rising_edge(clk) then
-			if freq_en = '1' then
-				freq_done <= done(conv_integer(freq_select));
-				freq_value <= value(conv_integer(freq_select));
-				freq_overflow <= overflow(conv_integer(freq_select));
-			else
-				freq_done <= '0';
-				freq_overflow <= '0';
-			end if;
-		end if;
-	end process;
+	-- One frequency counter for all ROs
+	freq: entity work.freqcounter
+	generic map (
+		W => freq_value'Length,
+		N => 1_000_000
+	)
+	port map (
+		clk => clk,
+		reset => reset,
+		source => mon_osc(conv_integer(freq_select)),
+		enable => freq_en,
+		start => freq_start,
+		done => freq_done,
+		overflow => freq_overflow,
+		result => freq_value
+	);
 
 	-- Sampling
 

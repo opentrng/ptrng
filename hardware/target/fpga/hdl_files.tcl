@@ -6,7 +6,6 @@ set hdl_files [list \
 	[file normalize "../../hdl/ero.vhd"] \
 	[file normalize "../../hdl/freqcounter.vhd"] \
 	[file normalize "../../hdl/ptrng.vhd"] \
-	[file normalize "../../hdl/ring.vhd"] \
 	[file normalize "../../hdl/top.vhd"] \
 ]
 
