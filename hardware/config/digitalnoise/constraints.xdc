@@ -13,10 +13,7 @@ create_clock -name ring0_clk -period 5.0 -waveform { 0.0 2.5 } -add [get_nets to
 create_clock -name ring1_clk -period 5.0 -waveform { 0.0 2.5 } -add [get_nets top/ptrng/source/bank[1].ring/net[0]]
 
 # No timing check between system clock and ring clocks
-set_false_path -from [get_clocks ring0_clk] -to [get_clocks sys_clk]
-set_false_path -from [get_clocks sys_clk] -to [get_clocks ring0_clk]
-set_false_path -from [get_clocks ring1_clk] -to [get_clocks sys_clk]
-set_false_path -from [get_clocks sys_clk] -to [get_clocks ring1_clk]
+set_clock_groups -name asynchronous_clocks -asynchronous -group [get_clocks sys_clk] -group [get_clocks ring0_clk] -group [get_clocks ring1_clk]
 
 # General pblock for the reserved area
 create_pblock digitalnoise
