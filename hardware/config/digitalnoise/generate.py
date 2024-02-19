@@ -9,8 +9,8 @@ parser.add_argument("-vendor", required=True, type=str, choices=['xilinx'], help
 parser.add_argument("-luts", required=True, type=int, help="number of LUT per item (per slice for Xilinx, per LE for Intel Altera)")
 parser.add_argument("-x", required=True, type=int, help="start row for the reserved area ")
 parser.add_argument("-y", required=True, type=int, help="start comlumn for the reserved area")
-parser.add_argument("-width", required=True, type=int, help="width of the reserved area")
-parser.add_argument("-height", required=True, type=int, help="height of the reserved area")
+parser.add_argument("-maxwidth", required=True, type=int, help="maximum width for the reserved area")
+parser.add_argument("-maxheight", required=True, type=int, help="maximum height for the reserved area")
 parser.add_argument("-border", type=int, required=True, help="border width inside the reserved area before DMZ")
 parser.add_argument("-ringwidth", type=int, required=True, help="column width for a ring-oscillator")
 parser.add_argument("-digitheight", type=int, required=True, help="height for the digitizer block")
@@ -26,7 +26,7 @@ t = len(args.len)-1
 
 # Command line argument summary
 print("LUTs per item: {:d}".format(args.luts))
-print("Reserved area for rings: (X{:d},Y{:d}) to (X{:d},Y{:d})".format(args.x, args.y, args.x+args.width-1, args.y+args.height-1))
+print("Reserved area for rings: (X{:d},Y{:d}) to max (X{:d},Y{:d})".format(args.x, args.y, args.x+args.maxwidth-1, args.y+args.maxheight-1))
 print("Border inside the reserved area before DMZ: {:d}".format(args.border))
 print("Padding between rows and colums: ({:d},{:d})".format(args.hpad, args.vpad))
 print("Width for a ring-oscillator: {:d}".format(args.ringwidth))
@@ -80,16 +80,16 @@ def add_ring(x, y, width, index, length):
 		lut_i = j%args.luts
 
 		# Create a dictionnary entry for the element
-		xilinx_entry = {}
-		xilinx_entry['slice'] = xilinx_slice(x+item_i, y+item_j)
-		xilinx_entry['lut'] = xilinx_lut(lut_i)
+		xilinx_element = {}
+		xilinx_element['slice'] = xilinx_slice(x+item_i, y+item_j)
+		xilinx_element['lut'] = xilinx_lut(lut_i)
 		if element == 0:
-			xilinx_entry['name'] = "element_0_lut_nand"
+			xilinx_element['name'] = "element_0_lut_nand"
 		elif element == count-1:
-			xilinx_entry['name'] = "monitor_lut_and"
+			xilinx_element['name'] = "monitor_lut_and"
 		else:
-			xilinx_entry['name'] = "element[{:d}].lut_buffer".format(element)
-		ring['elements']['xilinx'].append(xilinx_entry)
+			xilinx_element['name'] = "element[{:d}].lut_buffer".format(element)
+		ring['elements']['xilinx'].append(xilinx_element)
 		print("  - element={:d} item=({:d},{:d}) lut={:d}".format(element, x+item_i, y+item_j, lut_i))
 
 	# Add a dictionnary entry for the area and return the whole dict
@@ -117,16 +117,12 @@ def xilinx_lut(index):
 	elif index==3:
 		return "D5LUT"
 
-# Define the DMZ (reserved area minus the border)
-dmz = {}
-dmz['area'] = {}
-dmz['area']['xilinx'] = xilinx_slice_area(args.x+args.border, args.y+args.border, args.width-2*args.border, args.height-2*args.border)
-
-# Start first bank at the left corner of the reserved area, just after the border
+# Start first bank at the left corner of the DMZ area
 x = args.x + args.border
 y = args.y + args.border
 xstart = x
 ystart = y
+xmax = 0
 ymax = 0
 
 # Prepare an empty dictionnary for the banks calculated parameters
@@ -153,21 +149,33 @@ for index in range(len(args.len)):
 	x += args.ringwidth
 
 	# Check if it fits the reserved area
-	assert x <= args.x+args.width-args.hpad-args.border, "Placement error for ring-oscillator {:d}, {:d} does not fit in the reserved width".format(index, x)
-	assert y <= args.y+args.height-args.vpad-args.border, "Placement error for ring-oscillator {:d}, {:d} does not fit in the reserved height".format(index, y)
+	assert x <= args.x+args.maxwidth-args.hpad-args.border, "Placement error for ring-oscillator {:d}, {:d} does not fit in the reserved width".format(index, x)
+	assert y <= args.y+args.maxheight-args.vpad-args.border, "Placement error for ring-oscillator {:d}, {:d} does not fit in the reserved height".format(index, y)
+	xmax = max(x, xmax)
 	ymax = max(y, ymax)
 
 	# Check if the next RO will fit in the remaining width in the current row, or start a new row
-	if x+args.hpad+2+args.hpad > args.x+args.width:
+	if x+args.hpad+2+args.hpad > args.x+args.maxwidth:
 		x = xstart
 		y = ymax
 		ystart = ymax
-		ymax = 0
+		if index < len(args.len)-1:
+			ymax = 0
 	else:
 		y = ystart
 
 	# Append the bank to the dictionnary
 	banks.append(bank)
+
+# Set the final reserved area
+final_width = xmax-args.x
+final_height = ymax-args.y
+reserved = xilinx_slice_area(args.x, args.y, final_width, final_height)
+
+# Define the DMZ (equals to reserved area without the border)
+dmz = {}
+dmz['area'] = {}
+dmz['area']['xilinx'] = xilinx_slice_area(args.x+args.border, args.y+args.border, final_width-2*args.border, final_height-2*args.border)
 
 # Init Jijna templating environement
 environment = Environment(loader=FileSystemLoader("templates"))
@@ -186,7 +194,7 @@ settings.close()
 template = environment.get_template("constraints.xdc.jinja")
 content = template.render(
 		cmd = cmd,
-		reserved = xilinx_slice_area(args.x, args.y, args.width, args.height),
+		reserved = reserved,
 		dmz = dmz,
 		banks = banks
 	)
