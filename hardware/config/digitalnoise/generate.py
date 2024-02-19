@@ -36,13 +36,13 @@ print("Lengths of ROs: [{:s}]".format(', '.join(map("{:d}".format, args.len))))
 print("Maximum estimated frequency: {:e} Hz".format(args.fmax))
 
 # Add a reserved area for the digitizer at given position
-def add_digitizer(x, y, width, height):
+def add_digit(x, y, width, height):
 	# Print base info
 	print("- clkdivider_{:02d} origin=({:d},{:d}) size=({:d},{:d})".format(index, x, y, width, height))
 
 	# Return a dictionnary entry for the name and area
 	digit = {}
-	digit['name'] = "sampler{:d}".format(index)
+	digit['name'] = "digit{:d}".format(index)
 	digit['area'] = {}
 	digit['area']['xilinx'] = xilinx_slice_area(x, y, width, height)
 	return digit
@@ -140,7 +140,7 @@ for index in range(len(args.len)):
 	y += args.vpad
 
 	# Add the digitizer
-	bank['digit'] = add_digitizer(x, y, args.ringwidth, args.digitheight)
+	bank['digit'] = add_digit(x, y, args.ringwidth, args.digitheight)
 	y += args.digitheight
 
 	# Add the ring-oscillator
@@ -168,8 +168,8 @@ for index in range(len(args.len)):
 	banks.append(bank)
 
 # Set the final reserved area
-final_width = xmax-args.x
-final_height = ymax-args.y
+final_width = xmax-args.x+args.hpad+args.border
+final_height = ymax-args.y+args.vpad+args.border
 reserved = xilinx_slice_area(args.x, args.y, final_width, final_height)
 
 # Define the DMZ (equals to reserved area without the border)

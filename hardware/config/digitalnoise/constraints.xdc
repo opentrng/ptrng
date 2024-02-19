@@ -18,16 +18,30 @@ set_clock_groups -name asynchronous_clocks -asynchronous -group [get_clocks sys_
 # General pblock for the reserved area
 create_pblock digitalnoise
 	add_cells_to_pblock [get_pblocks digitalnoise] [get_cells top/ptrng/source]
-	resize_pblock [get_pblocks digitalnoise] -add { SLICE_X12Y102:SLICE_X21Y118 }
+	resize_pblock [get_pblocks digitalnoise] -add { SLICE_X12Y102:SLICE_X25Y122 }
 	set_property CONTAIN_ROUTING 1 [get_pblocks digitalnoise]
 	set_property EXCLUDE_PLACEMENT 1 [get_pblocks digitalnoise]
 
 # Pblock for the DMZ
 create_pblock dmz
-	resize_pblock [get_pblocks dmz] -add { SLICE_X14Y104:SLICE_X19Y116 }
+	resize_pblock [get_pblocks dmz] -add { SLICE_X14Y104:SLICE_X23Y120 }
 	set_property CONTAIN_ROUTING 1 [get_pblocks dmz]
 	set_property EXCLUDE_PLACEMENT 1 [get_pblocks dmz]
 
+
+# Pblock for ring-oscillator digit0
+create_pblock digit0
+	add_cells_to_pblock [get_pblocks digit0] [get_cells top/ptrng/source/bank[0].digit]
+	resize_pblock [get_pblocks digit0] -add { SLICE_X16Y106:SLICE_X17Y107 }
+	set_property CONTAIN_ROUTING 1 [get_pblocks digit0]
+	set_property EXCLUDE_PLACEMENT 1 [get_pblocks digit0]
+
+# Pblock for ring-oscillator digit1
+create_pblock digit1
+	add_cells_to_pblock [get_pblocks digit1] [get_cells top/ptrng/source/bank[1].digit]
+	resize_pblock [get_pblocks digit1] -add { SLICE_X20Y106:SLICE_X21Y107 }
+	set_property CONTAIN_ROUTING 1 [get_pblocks digit1]
+	set_property EXCLUDE_PLACEMENT 1 [get_pblocks digit1]
 
 # Pblock for ring-oscillator ring0
 create_pblock ring0

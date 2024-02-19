@@ -30,7 +30,7 @@ create_pblock dmz
 	set_property CONTAIN_ROUTING 1 [get_pblocks dmz]
 	set_property EXCLUDE_PLACEMENT 1 [get_pblocks dmz]
 
-{% for entity in ['ring'] %}
+{% for entity in ['digit', 'ring'] %}
 {%- for bank in banks %}
 # Pblock for ring-oscillator {{ bank[entity]['name'] }}
 create_pblock {{ bank[entity]['name'] }}

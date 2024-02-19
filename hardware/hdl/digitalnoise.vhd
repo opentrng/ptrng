@@ -89,7 +89,7 @@ begin
 		result => freq_value
 	);
 
-	-- Sampling
+	-- Digitizer
 
 	-- CDC
 
