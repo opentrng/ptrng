@@ -7,6 +7,10 @@
 set_property CONFIG_VOLTAGE 3.3 [current_design]
 set_property CFGBVS VCCO [current_design]
 
+## UART no in/out delay since its asynchronous
+set_false_path -from [get_ports uart_txd_in]
+set_false_path -to [get_ports uart_rxd_out]
+
 ## Clock signal
 set_property -dict { PACKAGE_PIN E3    IOSTANDARD LVCMOS33 } [get_ports { CLK100MHZ }]; #IO_L12P_T1_MRCC_35 Sch=gclk[100]
 create_clock -name sys_clk -period 10.00 -waveform {0 5} -add [get_ports { CLK100MHZ }]

@@ -9,7 +9,12 @@
 set_property ALLOW_COMBINATORIAL_LOOPS TRUE [get_nets top/ptrng/source/bank[{{ bank['index'] }}].ring/net[0]]
 {%- endfor %}
 
-# Ring-oscillator maximal output frequency (for proper timing verifications)
+# Avoid any timing warnings into the ring-oscillators
+{%- for bank in banks %}
+set_disable_timing -from I0 -to O -objects [get_cells top/ptrng/source/bank[{{ bank['index'] }}].ring/element_0_lut_nand]
+{%- endfor %}
+
+# Ring-oscillator maximal output frequency (for proper timing verifications on ROs clock output)
 {%- for bank in banks %}
 create_clock -name ring{{ bank['index'] }}_clk -period {{ 1e9/bank['ring']['fmax'] }} -waveform { 0.0 {{1e9/(2*bank['ring']['fmax'])}} } -add [get_nets top/ptrng/source/bank[{{ bank['index'] }}].ring/net[0]]
 {%- endfor %}

@@ -8,7 +8,11 @@
 set_property ALLOW_COMBINATORIAL_LOOPS TRUE [get_nets top/ptrng/source/bank[0].ring/net[0]]
 set_property ALLOW_COMBINATORIAL_LOOPS TRUE [get_nets top/ptrng/source/bank[1].ring/net[0]]
 
-# Ring-oscillator maximal output frequency (for proper timing verifications)
+# Avoid any timing warnings into the ring-oscillators
+set_disable_timing -from I0 -to O -objects [get_cells top/ptrng/source/bank[0].ring/element_0_lut_nand]
+set_disable_timing -from I0 -to O -objects [get_cells top/ptrng/source/bank[1].ring/element_0_lut_nand]
+
+# Ring-oscillator maximal output frequency (for proper timing verifications on ROs clock output)
 create_clock -name ring0_clk -period 5.0 -waveform { 0.0 2.5 } -add [get_nets top/ptrng/source/bank[0].ring/net[0]]
 create_clock -name ring1_clk -period 5.0 -waveform { 0.0 2.5 } -add [get_nets top/ptrng/source/bank[1].ring/net[0]]
 
