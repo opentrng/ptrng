@@ -6,15 +6,15 @@ import sys
 # Get command line arguments
 parser = argparse.ArgumentParser(description="Generate configuration files for the digitalnoise entity. More specifically it generates: 'settings.vhd' that contains HDL constants, 'placeroute.*' that contains all timing/place/route constraints for digitalnoise (extension depending on vendor).")
 parser.add_argument("-luts", required=True, type=int, help="number of LUT per slice")
-parser.add_argument("-x", required=True, type=int, help="reserved area for placement (row of the first slice)")
-parser.add_argument("-y", required=True, type=int, help="reserved area for placement (column of the first slice)")
-parser.add_argument("-width", required=True, type=int, help="width of the reserved area for placement (in slice count)")
-parser.add_argument("-height", required=True, type=int, help="height of the reserved area for placement (in slice count)")
-parser.add_argument("-colwidth", type=int, required=True, help="column width (in slice count)")
-parser.add_argument("-freqheight", type=int, required=True, help="height for the frequency counter block (in slice count)")
-parser.add_argument("-digitheight", type=int, required=True, help="height for the digitizer block (in slice count)")
-parser.add_argument("-hpad", type=int, required=True, help="horizontal padding between rows and colums (in slice count)")
-parser.add_argument("-vpad", type=int, required=True, help="vertical padding between rows and colums (in slice count)")
+parser.add_argument("-x", required=True, type=int, help="start row for the reserved area ")
+parser.add_argument("-y", required=True, type=int, help="start comlumn for the reserved area")
+parser.add_argument("-width", required=True, type=int, help="width of the reserved area")
+parser.add_argument("-height", required=True, type=int, help="height of the reserved area")
+parser.add_argument("-border", type=int, required=True, help="border width inside the reserved area before DMZ")
+parser.add_argument("-ringwidth", type=int, required=True, help="column width for a ring-oscillator")
+parser.add_argument("-digitheight", type=int, required=True, help="height for the digitizer block")
+parser.add_argument("-hpad", type=int, required=True, help="horizontal padding between rows and colums")
+parser.add_argument("-vpad", type=int, required=True, help="vertical padding between rows and colums")
 parser.add_argument("-fmax", required=True, type=float, help="maximum estimated frequency for all ring-oscillators (Hz)")
 parser.add_argument("-len", required=True, type=int, nargs='+', help="number of elements in each ring-oscillator")
 args=parser.parse_args()
@@ -24,27 +24,15 @@ cmd = "python "+" ".join(sys.argv)
 t = len(args.len)-1
 
 # Command line argument summary
-print("Reserved area for rings: (X{:d},Y{:d}) to (X{:d},Y{:d})".format(args.x, args.y, args.x+args.width-1, args.y+args.height-1))
 print("LUTs per slice: {:d}".format(args.luts))
+print("Reserved area for rings: (X{:d},Y{:d}) to (X{:d},Y{:d})".format(args.x, args.y, args.x+args.width-1, args.y+args.height-1))
+print("Border inside the reserved area before DMZ: {:d}".format(args.border))
 print("Padding between rows and colums: ({:d},{:d})".format(args.hpad, args.vpad))
-print("Width for all blocks: {:d}".format(args.colwidth))
-print("Height for blocks:")
-print(" - frequency counters: {:d}".format(args.freqheight))
-print(" - digitizer: {:d}".format(args.digitheight))
+print("Width for a ring-oscillator: {:d}".format(args.ringwidth))
+print("Height for a digitizer: {:d}".format(args.digitheight))
 print("Number of ring-oscillators: {:d} (T={:d})".format(len(args.len), t))
 print("Lengths of ROs: [{:s}]".format(', '.join(map("{:d}".format, args.len))))
 print("Maximum estimated frequency: {:e} Hz".format(args.fmax))
-
-# Add a reserved area for a frequency counter at given position (slice)
-def add_freqcounter(x, y, width, height):
-	# Print base info
-	print("- freqcounter origin=({:d},{:d}) size=({:d},{:d})".format(x, y, width, height))
-
-	# Return a dictionnary entry for the area
-	freq = {}
-	freq['area'] = {}
-	freq['area']['xilinx'] = xilinx_slice_area(x, y, width, height)
-	return freq
 
 # Add a reserved area for the digitizer at given position (slice)
 def add_digitizer(x, y, width, height):
@@ -116,12 +104,14 @@ def xilinx_slice(x, y):
 def xilinx_slice_area(x, y, width, height):
 	return "{:s}:{:s}".format(xilinx_slice(x, y), xilinx_slice(x+width-1, y+height-1))
 
-# Add the frequency counter
-freq = add_freqcounter(args.x, args.y, args.width, args.freqheight)
+# Define the DMZ (reserved area minus the border)
+dmz = {}
+dmz['area'] = {}
+dmz['area']['xilinx'] = xilinx_slice_area(args.x+args.border, args.y+args.border, args.width-2*args.border, args.height-2*args.border)
 
-# Start first bank at the left corner of the reserved area, just after the frequency counter
-x = args.x
-y = args.y + args.freqheight
+# Start first bank at the left corner of the reserved area, just after the border
+x = args.x + args.border
+y = args.y + args.border
 xstart = x
 ystart = y
 ymax = 0
@@ -141,17 +131,17 @@ for index in range(len(args.len)):
 	y += args.vpad
 
 	# Add the digitizer
-	bank['digit'] = add_digitizer(x, y, args.colwidth, args.digitheight)
+	bank['digit'] = add_digitizer(x, y, args.ringwidth, args.digitheight)
 	y += args.digitheight
 
 	# Add the ring-oscillator
-	bank['ring'], ringheight = add_ring(x, y, args.colwidth, index, args.len[index])
+	bank['ring'], ringheight = add_ring(x, y, args.ringwidth, index, args.len[index])
 	y += ringheight
-	x += args.colwidth
+	x += args.ringwidth
 
 	# Check if it fits the reserved area
-	assert x+args.hpad <= args.x+args.width, "Placement error for ring-oscillator {:d}, does not fit in the reserved width".format(index)
-	assert y+args.vpad <= args.y+args.height, "Placement error for ring-oscillator {:d}, does not fit in the reserved height".format(index)
+	assert x <= args.x+args.width-args.hpad-args.border, "Placement error for ring-oscillator {:d}, {:d} does not fit in the reserved width".format(index, x)
+	assert y <= args.y+args.height-args.vpad-args.border, "Placement error for ring-oscillator {:d}, {:d} does not fit in the reserved height".format(index, y)
 	ymax = max(y, ymax)
 
 	# Check if the next RO will fit in the remaining width in the current row, or start a new row
@@ -184,7 +174,7 @@ template = environment.get_template("constraints.xdc.jinja")
 content = template.render(
 		cmd = cmd,
 		reserved = xilinx_slice_area(args.x, args.y, args.width, args.height),
-		freq = freq,
+		dmz = dmz,
 		banks = banks
 	)
 settings = open("constraints.xdc", "w")
