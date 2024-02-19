@@ -82,7 +82,7 @@ def add_ring(x, y, width, index, length):
 		# Create a dictionnary entry for the element
 		xilinx_entry = {}
 		xilinx_entry['slice'] = xilinx_slice(x+item_i, y+item_j)
-		xilinx_entry['lut'] = lut_i
+		xilinx_entry['lut'] = xilinx_lut(lut_i)
 		if element == 0:
 			xilinx_entry['name'] = "element_0_lut_nand"
 		elif element == count-1:
@@ -104,6 +104,18 @@ def xilinx_slice(x, y):
 # Returns the string for an area of slices for Xilinx XDC syntax
 def xilinx_slice_area(x, y, width, height):
 	return "{:s}:{:s}".format(xilinx_slice(x, y), xilinx_slice(x+width-1, y+height-1))
+
+# Returns the name of the LUT based on its index
+def xilinx_lut(index):
+	assert index <= 3
+	if index==0:
+		return "A5LUT"
+	elif index==1:
+		return "B5LUT"
+	elif index==2:
+		return "C5LUT"
+	elif index==3:
+		return "D5LUT"
 
 # Define the DMZ (reserved area minus the border)
 dmz = {}

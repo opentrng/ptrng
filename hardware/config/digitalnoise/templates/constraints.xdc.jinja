@@ -47,7 +47,9 @@ create_pblock {{ bank[entity]['name'] }}
 {%- for bank in banks %}
 # Ring-oscillator {{ bank['index'] }} manual placement into slices
 {%- for element in bank['ring']['elements']['xilinx'] %}
+set_property BEL {{ element['lut'] }} [get_cells top/ptrng/source/bank[{{ bank['index'] }}].ring/{{ element['name'] }}]
 set_property LOC {{ element['slice'] }} [get_cells top/ptrng/source/bank[{{ bank['index'] }}].ring/{{ element['name'] }}]
+set_property LOCK_PINS {I0:A1} [get_cells top/ptrng/source/bank[{{ bank['index'] }}].ring/{{ element['name'] }}]
 {%- endfor %}
 {% endfor %}
 
