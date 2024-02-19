@@ -4,16 +4,16 @@ import math
 import sys
 
 # Get command line arguments
-parser = argparse.ArgumentParser(description="Generate configuration files for the digitalnoise entity. More specifically it generates: 'settings.vhd' that contains HDL constants, 'placeroute.*' that contains all timing/place/route constraints for digitalnoise (extension depending on vendor).")
+parser = argparse.ArgumentParser(description="Generate configuration files for the digitalnoise entity. More specifically it generates: 'settings.vhd' that contains HDL constants and 'constraints.*' that contains all timing/placement/route constraints for the digitalnoise block (file extension depends on target vendor).")
 parser.add_argument("-vendor", required=True, type=str, choices=['xilinx'], help="target vendor (for selecting the templates)")
 parser.add_argument("-luts", required=True, type=int, help="number of LUT per item (per slice for Xilinx, per LE for Intel Altera)")
-parser.add_argument("-x", required=True, type=int, help="start row for the reserved area ")
-parser.add_argument("-y", required=True, type=int, help="start comlumn for the reserved area")
+parser.add_argument("-x", required=True, type=int, help="lower left corner (x) of the reserved area")
+parser.add_argument("-y", required=True, type=int, help="lower left corner (y) of the reserved area")
 parser.add_argument("-maxwidth", required=True, type=int, help="maximum width for the reserved area")
 parser.add_argument("-maxheight", required=True, type=int, help="maximum height for the reserved area")
-parser.add_argument("-border", type=int, required=True, help="border width inside the reserved area before DMZ")
-parser.add_argument("-ringwidth", type=int, required=True, help="column width for a ring-oscillator")
-parser.add_argument("-digitheight", type=int, required=True, help="height for the digitizer block")
+parser.add_argument("-border", type=int, required=True, help="border size outside the DMZ for the placement of CDC and frequency counter")
+parser.add_argument("-ringwidth", type=int, required=True, help="column width for each ring-oscillator")
+parser.add_argument("-digitheight", type=int, required=True, help="height for each digitizer block")
 parser.add_argument("-hpad", type=int, required=True, help="horizontal padding between rows and colums")
 parser.add_argument("-vpad", type=int, required=True, help="vertical padding between rows and colums")
 parser.add_argument("-fmax", required=True, type=float, help="maximum estimated frequency for all ring-oscillators (Hz)")
@@ -25,12 +25,14 @@ cmd = "python "+" ".join(sys.argv)
 t = len(args.len)-1
 
 # Command line argument summary
+print("Reserved area for the whole digitalnoise block:")
+print(" - start ({:d},{:d}) to ({:d},{:d}) maximum".format(args.x, args.y, args.x+args.maxwidth-1, args.y+args.maxheight-1))
+print(" - maximum size ({:d},{:d})".format(args.maxwidth, args.maxheight))
 print("LUTs per item: {:d}".format(args.luts))
-print("Reserved area for rings: (X{:d},Y{:d}) to max (X{:d},Y{:d})".format(args.x, args.y, args.x+args.maxwidth-1, args.y+args.maxheight-1))
-print("Border inside the reserved area before DMZ: {:d}".format(args.border))
+print("Border size outside the DMZ for CDC and frequency counter: {:d}".format(args.border))
 print("Padding between rows and colums: ({:d},{:d})".format(args.hpad, args.vpad))
-print("Width for a ring-oscillator: {:d}".format(args.ringwidth))
-print("Height for a digitizer: {:d}".format(args.digitheight))
+print("Column width for each ring-oscillator: {:d}".format(args.ringwidth))
+print("Row height for each digitizer: {:d}".format(args.digitheight))
 print("Number of ring-oscillators: {:d} (T={:d})".format(len(args.len), t))
 print("Lengths of ROs: [{:s}]".format(', '.join(map("{:d}".format, args.len))))
 print("Maximum estimated frequency: {:e} Hz".format(args.fmax))
@@ -38,7 +40,7 @@ print("Maximum estimated frequency: {:e} Hz".format(args.fmax))
 # Add a reserved area for the digitizer at given position
 def add_digit(x, y, width, height):
 	# Print base info
-	print("- clkdivider_{:02d} origin=({:d},{:d}) size=({:d},{:d})".format(index, x, y, width, height))
+	print("- [digit{:d}] origin=({:d},{:d}) size=({:d},{:d})".format(index, x, y, width, height))
 
 	# Return a dictionnary entry for the name and area
 	digit = {}
@@ -53,7 +55,7 @@ def add_ring(x, y, width, index, length):
 	count = length+1 # (+1 for the monitoring 'and' gate)
 	height = math.ceil(count/(width*args.luts))
 	half = math.ceil(count/height)
-	print("- RO_{:02d} length={:d} elements={:d} half={:d} origin=({:d},{:d}) size=({:d},{:d})".format(index, length, count, half, x, y, width, height))
+	print("- [ring{:d}] length={:d} elements={:d} half={:d} origin=({:d},{:d}) size=({:d},{:d})".format(index, length, count, half, x, y, width, height))
 
 	# Create the base dictionnary entry with name, len and fax
 	ring = {}
