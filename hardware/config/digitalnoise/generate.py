@@ -49,15 +49,15 @@ def add_digitizer(x, y, width, height):
 # Add a reserved area for a ring-oscillator at given position (slice)
 def add_ring(x, y, width, index, length):
 	# Calculate base properties
-	count = length+2 # (+2 for the loopback 'nand' and monitor 'and')
+	count = length+1 # (+1 for the monitoring 'and' gate)
 	height = math.ceil(count/(width*args.luts))
 	half = math.ceil(count/height)
-	print("- RO_{:02d} elements={:d} half={:d} origin=({:d},{:d}) size=({:d},{:d})".format(index, count, half, x, y, width, height))
+	print("- RO_{:02d} length={:d} elements={:d} half={:d} origin=({:d},{:d}) size=({:d},{:d})".format(index, length, count, half, x, y, width, height))
 
 	# Create the base dictionnary entry with name, len and fax
 	ring = {}
 	ring['name'] = "ring{:d}".format(index)
-	ring['len'] = count
+	ring['length'] = length
 	ring['fmax'] = args.fmax
 
 	# Create the elements entries
@@ -83,11 +83,11 @@ def add_ring(x, y, width, index, length):
 		entry['slice'] = xilinx_slice(x+slice_i, y+slice_j)
 		entry['lut'] = lut_i
 		if element == 0:
-			entry['name'] = "lut_nand"
+			entry['name'] = "element_0_lut_nand"
 		elif element == count-1:
-			entry['name'] = "lut_and"
+			entry['name'] = "monitor_lut_and"
 		else:
-			entry['name'] = "element[{:d}].lut_buffer".format(element-1)
+			entry['name'] = "element[{:d}].lut_buffer".format(element)
 		ring['elements']['xilinx'].append(entry)
 		print("  - element={:d} slice=({:d},{:d}) lut={:d}".format(element, x+slice_i, y+slice_j, lut_i))
 

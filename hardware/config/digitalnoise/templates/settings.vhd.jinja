@@ -8,5 +8,5 @@ package settings is
 	constant T: natural := {{ banks|length-1 }};
 	type len_array is array (0 to T) of natural;
 	{%- set join = joiner(", ") %}
-	constant RO_LEN: len_array := ({% for bank in banks %}{{ join() }}{{ bank['ring']['len'] }}{% endfor %});
+	constant RO_LEN: len_array := ({% for bank in banks %}{{ join() }}{{ bank['ring']['length'] }}{% endfor %});
 end package;

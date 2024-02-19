@@ -7,5 +7,5 @@ use ieee.std_logic_1164.all;
 package settings is
 	constant T: natural := 1;
 	type len_array is array (0 to T) of natural;
-	constant RO_LEN: len_array := (22, 23);
+	constant RO_LEN: len_array := (20, 21);
 end package;
