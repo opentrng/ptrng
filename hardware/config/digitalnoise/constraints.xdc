@@ -1,5 +1,5 @@
 # This file has been automatically generated with the command line:
-# $ python generate.py -luts 1 -x 12 -y 102 -width 15 -height 22 -border 2 -ringwidth 2 -digitheight 2 -hpad 2 -vpad 2 -fmax 200e6 -len 20 21
+# $ python generate.py -vendor xilinx -luts 1 -x 12 -y 102 -width 15 -height 22 -border 2 -ringwidth 2 -digitheight 2 -hpad 2 -vpad 2 -fmax 200e6 -len 20 21
 # For more information look into the directory 'hardware/config/digitalnoise'.
 
 # Constraints for the digital noise source

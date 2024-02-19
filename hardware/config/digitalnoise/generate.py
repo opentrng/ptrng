@@ -5,7 +5,8 @@ import sys
 
 # Get command line arguments
 parser = argparse.ArgumentParser(description="Generate configuration files for the digitalnoise entity. More specifically it generates: 'settings.vhd' that contains HDL constants, 'placeroute.*' that contains all timing/place/route constraints for digitalnoise (extension depending on vendor).")
-parser.add_argument("-luts", required=True, type=int, help="number of LUT per slice")
+parser.add_argument("-vendor", required=True, type=str, choices=['xilinx'], help="target vendor (for selecting the templates)")
+parser.add_argument("-luts", required=True, type=int, help="number of LUT per item (per slice for Xilinx, per LE for Intel Altera)")
 parser.add_argument("-x", required=True, type=int, help="start row for the reserved area ")
 parser.add_argument("-y", required=True, type=int, help="start comlumn for the reserved area")
 parser.add_argument("-width", required=True, type=int, help="width of the reserved area")
@@ -24,7 +25,7 @@ cmd = "python "+" ".join(sys.argv)
 t = len(args.len)-1
 
 # Command line argument summary
-print("LUTs per slice: {:d}".format(args.luts))
+print("LUTs per item: {:d}".format(args.luts))
 print("Reserved area for rings: (X{:d},Y{:d}) to (X{:d},Y{:d})".format(args.x, args.y, args.x+args.width-1, args.y+args.height-1))
 print("Border inside the reserved area before DMZ: {:d}".format(args.border))
 print("Padding between rows and colums: ({:d},{:d})".format(args.hpad, args.vpad))
@@ -34,7 +35,7 @@ print("Number of ring-oscillators: {:d} (T={:d})".format(len(args.len), t))
 print("Lengths of ROs: [{:s}]".format(', '.join(map("{:d}".format, args.len))))
 print("Maximum estimated frequency: {:e} Hz".format(args.fmax))
 
-# Add a reserved area for the digitizer at given position (slice)
+# Add a reserved area for the digitizer at given position
 def add_digitizer(x, y, width, height):
 	# Print base info
 	print("- clkdivider_{:02d} origin=({:d},{:d}) size=({:d},{:d})".format(index, x, y, width, height))
@@ -46,7 +47,7 @@ def add_digitizer(x, y, width, height):
 	digit['area']['xilinx'] = xilinx_slice_area(x, y, width, height)
 	return digit
 
-# Add a reserved area for a ring-oscillator at given position (slice)
+# Add a reserved area for a ring-oscillator at given position
 def add_ring(x, y, width, index, length):
 	# Calculate base properties
 	count = length+1 # (+1 for the monitoring 'and' gate)
@@ -74,22 +75,22 @@ def add_ring(x, y, width, index, length):
 		else:
 			i = 1
 			j = count-1-element
-		slice_i = i
-		slice_j = int(j/args.luts)
+		item_i = i
+		item_j = int(j/args.luts)
 		lut_i = j%args.luts
 
 		# Create a dictionnary entry for the element
-		entry = {}
-		entry['slice'] = xilinx_slice(x+slice_i, y+slice_j)
-		entry['lut'] = lut_i
+		xilinx_entry = {}
+		xilinx_entry['slice'] = xilinx_slice(x+item_i, y+item_j)
+		xilinx_entry['lut'] = lut_i
 		if element == 0:
-			entry['name'] = "element_0_lut_nand"
+			xilinx_entry['name'] = "element_0_lut_nand"
 		elif element == count-1:
-			entry['name'] = "monitor_lut_and"
+			xilinx_entry['name'] = "monitor_lut_and"
 		else:
-			entry['name'] = "element[{:d}].lut_buffer".format(element)
-		ring['elements']['xilinx'].append(entry)
-		print("  - element={:d} slice=({:d},{:d}) lut={:d}".format(element, x+slice_i, y+slice_j, lut_i))
+			xilinx_entry['name'] = "element[{:d}].lut_buffer".format(element)
+		ring['elements']['xilinx'].append(xilinx_entry)
+		print("  - element={:d} item=({:d},{:d}) lut={:d}".format(element, x+item_i, y+item_j, lut_i))
 
 	# Add a dictionnary entry for the area and return the whole dict
 	ring['area'] = {}
