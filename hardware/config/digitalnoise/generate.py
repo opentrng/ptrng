@@ -4,9 +4,10 @@ import math
 import sys
 
 # Get command line arguments
-parser = argparse.ArgumentParser(description="Generate configuration files for the digitalnoise entity. More specifically it generates: 'settings.vhd' that contains HDL constants, 'placeroute.*' that contains all timing/place/route constraints for digitalnoise (extension depending on vendor).")
+parser = argparse.ArgumentParser(description="Generate configuration files for the digitalnoise entity. More specifically it generates: 'settings.vhd' that contains HDL constants and 'placeroute.*' that contains all timing/place/route constraints for digitalnoise (extension depending on vendor).")
 parser.add_argument("-vendor", required=True, type=str, choices=['xilinx'], help="target vendor (for selecting the templates)")
 parser.add_argument("-luts", required=True, type=int, help="number of LUT per item (per slice for Xilinx, per LE for Intel Altera)")
+parser.add_argument("-fixedlutpin", required=False, type=str, default='', help="optional parameter to fix the input pin for all LUTs (the value is the name of the pin)")
 parser.add_argument("-x", required=True, type=int, help="start row for the reserved area ")
 parser.add_argument("-y", required=True, type=int, help="start comlumn for the reserved area")
 parser.add_argument("-maxwidth", required=True, type=int, help="maximum width for the reserved area")
@@ -83,6 +84,8 @@ def add_ring(x, y, width, index, length):
 		xilinx_element = {}
 		xilinx_element['slice'] = xilinx_slice(x+item_i, y+item_j)
 		xilinx_element['lut'] = xilinx_lut(lut_i)
+		if args.fixedlutpin:
+			xilinx_element['fixedlutpin'] = args.fixedlutpin
 		if element == 0:
 			xilinx_element['name'] = "element_0_lut_nand"
 		elif element == count-1:
@@ -109,13 +112,13 @@ def xilinx_slice_area(x, y, width, height):
 def xilinx_lut(index):
 	assert index <= 3
 	if index==0:
-		return "A5LUT"
+		return "A6LUT"
 	elif index==1:
-		return "B5LUT"
+		return "B6LUT"
 	elif index==2:
-		return "C5LUT"
+		return "C6LUT"
 	elif index==3:
-		return "D5LUT"
+		return "D6LUT"
 
 # Start first bank at the left corner of the DMZ area
 x = args.x + args.border
