@@ -37,8 +37,8 @@ end entity;
 architecture rtl of digitalnoise is
 
 	signal osc: std_logic_vector (T downto 0);
+	signal mon: std_logic_vector (T downto 0);
 	signal mon_en: std_logic_vector (T downto 0);
-	signal mon_osc: std_logic_vector (T downto 0);
 
 begin
 
@@ -54,7 +54,7 @@ begin
 			enable => ring_en(I),
 			osc => osc(I),
 			mon_en => mon_en(I),
-			mon_osc => mon_osc(I)
+			mon => mon(I)
 		);
 
 		-- Enable for the RO monitoring output
@@ -81,7 +81,7 @@ begin
 	port map (
 		clk => clk,
 		reset => reset,
-		source => mon_osc(conv_integer(freq_select)),
+		source => mon(conv_integer(freq_select)),
 		enable => freq_en,
 		start => freq_start,
 		done => freq_done,

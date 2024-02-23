@@ -17,7 +17,7 @@ entity ring is
 		-- Enable the monitoring signal
 		mon_en: in std_logic;
 		-- Output signal for monitoring
-		mon_osc: out std_logic
+		mon: out std_logic
 	);
 end entity;
 
@@ -27,6 +27,7 @@ architecture xilinx of ring is
 	signal net: std_logic_vector (N-1 downto 0);
 	attribute DONT_TOUCH: string;
 	attribute DONT_TOUCH of net: signal is "true";
+	attribute DONT_TOUCH of mon: signal is "true";
 
 begin
 
@@ -64,7 +65,7 @@ begin
 	port map (
 		I0 => net(0),
 		I1 => mon_en,
-		O => mon_osc
+		O => mon
 
 	);
 
