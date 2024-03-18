@@ -18,8 +18,8 @@ set partnumber [lindex $argv 1]
 
 # Set VHDL source files into a list
 source "hdl_files.tcl"
-lappend hdl_files [file normalize "${boardname}/target.vhd"]
-lappend hdl_files [file normalize "../common/xilinx/ring.vhd"]
+lappend hdl_files [list "work" [file normalize "${boardname}/target.vhd"]]
+lappend hdl_files [list "work" [file normalize "../common/xilinx/ring.vhd"]]
 
 # Set constraints files into a list (first file will be defined as target constraint file)
 set constraints_files [list \
@@ -42,7 +42,7 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 
 # Link all VHDL files into project
 foreach hdl_file $hdl_files {	
-	read_vhdl -vhdl2008 $hdl_file
+	read_vhdl -library [lindex $hdl_file 0] -vhdl2008 [lindex $hdl_file 1]
 }
 
 # Set the top manually
@@ -63,5 +63,5 @@ foreach constraints_file $constraints_files {
 # Set the target contraint file
 set_property target_constrs_file [lindex $constraints_files 0] [current_fileset -constrset]
 
-# End, then load the project with this command: vivado -mode gui arty_a7_35t/opentrng_arty_a7_35t.xpr
+# Load the project with this command: vivado -mode gui ${boardname}/opentrng_${boardname}.xpr"
 quit
