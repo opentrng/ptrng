@@ -4,6 +4,9 @@ use ieee.std_logic_unsigned.all;
 
 -- This entity defines the Coherent Sampling Ring Oscillator entropy source, where the first ring oscillator RO0 is used to sample RO1, resulting in the generation of a beat signal. A counter, incremented by RO0, measures the period of the beat signal. The COSO's random output bit is derived from the counter least significant bit (LSB). Additionally, the raw counter value is accessible on output port. Both of these signals are synchronized with the output clock 'clk'.
 entity coso is
+	generic (
+		DATA_WIDTH : natural := 32
+	);
 	port (
 		-- Sampling ring-oscillator input
 		ro0: in std_logic;
@@ -11,10 +14,10 @@ entity coso is
 		ro1: in std_logic;
 		-- Clock output (aka the beat signal)
 		clk: out std_logic;
-		-- Entropy source data output (counter LSB)
+		-- Bit data output (LSB of the counter)
 		lsb: out std_logic;
 		-- Raw value of the counter
-		raw: out std_logic_vector (31 downto 0)
+		data: out std_logic_vector (DATA_WIDTH-1 downto 0)
 	);
 end entity;
 
@@ -24,8 +27,9 @@ architecture rtl of coso is
 	signal beat: std_logic := '0';
 	signal prev: std_logic := '0';
 	signal reset: std_logic := '0';
-	signal counter: std_logic_vector (31 downto 0) := (others => '0');
-	signal value: std_logic_vector (31 downto 0) := (others => '0');
+	constant MAX: std_logic_vector (DATA_WIDTH-1 downto 0) := (others => '1');
+	signal counter: std_logic_vector (DATA_WIDTH-1 downto 0) := (others => '0');
+	signal value: std_logic_vector (DATA_WIDTH-1 downto 0) := (others => '0');
 
 begin
 
@@ -47,7 +51,9 @@ begin
 		if reset = '1' then
 			counter <= (others => '0');
 		elsif rising_edge(ro0) then
-			counter <= counter + 1;
+			if counter /= MAX then
+				counter <= counter + 1;
+			end if;
 		end if;
 	end process;
 
@@ -62,6 +68,6 @@ begin
 	-- Output LSB and raw signals synchronized to the beat
 	clk <= beat;
 	lsb <= value(0);
-	raw <= value;
+	data <= value;
 
 end architecture;
