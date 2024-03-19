@@ -102,5 +102,45 @@ regmap:
 # -   name: ACCUMULATOR
 # -   name: ENTROPY
 # -   name: ONLINETESTS
-# -   name: FIFOCTRL
-# -   name: FIFODATA
+-   name: FIFOCTRL
+    description: Control register for the FIFO to read the PTRNG random data output
+    bitfields:
+    -   name: CLEAR
+        description: Clear the FIFO
+        width: 1
+        lsb: 0
+        access: wosc
+        hardware: o
+    -   name: EMPTY
+        description: Empty flag
+        width: 1
+        lsb: 1
+        access: ro
+        hardware: i
+    -   name: FULL
+        description: Full flag
+        width: 1
+        lsb: 2
+        access: ro
+        hardware: i
+    -   name: ALMOSTEMPTY
+        description: Almost empty flag
+        width: 1
+        lsb: 3
+        access: ro
+        hardware: i
+    -   name: ALMOSTFULL
+        description: Almost full flag
+        width: 1
+        lsb: 4
+        access: ro
+        hardware: i
+-   name: FIFODATA
+    description: Data register for the FIFO to read the PTRNG random data output
+    bitfields:
+    -   name: DATA
+        description: 32 bits word from the PTRNG
+        width: 32
+        lsb: 0
+        access: ro
+        hardware: q

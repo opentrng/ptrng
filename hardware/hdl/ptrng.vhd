@@ -5,9 +5,9 @@ use ieee.std_logic_unsigned.all;
 -- OpenTRNG's PTRNG base entity.
 entity ptrng is
 	generic (
-		-- Size of the configuration registers
+		-- Width for the configuration registers
 		REG_WIDTH: natural;
-		-- Output width for the randomness
+		-- Width for the random output
 		RAND_WIDTH: natural
 	);
 	port (
@@ -41,21 +41,27 @@ entity ptrng is
 		--low: out std_logic;
 		-- Entropy estimation
 		--estimator: out std_logic_vector (31 downto 0);
-		-- Entropy source randomness output
-		--data: out std_logic_vector (DATA_WIDTH-1 downto 0);
-		-- Output valid (active when a new random word is available on 'data' port)
+		-- Random data output
+		data: out std_logic_vector (RAND_WIDTH-1 downto 0);
+		-- Random data output valid
 		valid: out std_logic
 	);
 end entity;
 
 -- RTL description of OpenTRNG's PTRNG
 architecture rtl of ptrng is
+
+	-- RRN from entropy source
+	signal raw_random_number: std_logic_vector (RAND_WIDTH-1 downto 0);
+	signal raw_random_valid: std_logic;
+
 begin
 
 	-- Digital noise source (no signal syncrhonized to rings outside of this block)
 	source: entity work.digitalnoise
 	generic map (
-		REG_WIDTH => REG_WIDTH
+		REG_WIDTH => REG_WIDTH,
+		RAND_WIDTH => RAND_WIDTH
 	)
 	port map (
 		clk => clk,
@@ -67,13 +73,22 @@ begin
 		freq_done => freq_done,
 		freq_overflow => freq_overflow,
 		freq_value => freq_value,
-		divider => divider
+		divider => divider,
+		data => raw_random_number,
+		valid => raw_random_valid
 	);
 
-	-- TOTAL FAILURE
+	-- Total failure test
+	-- TODO
 
-	-- ONLINE TESTS
+	-- Online test
+	-- TODO
 
-	-- CONDITIONER
+	-- Conditioner
+	-- TODO
+
+	-- Output selection
+	data <= raw_random_number;
+	valid <= raw_random_valid;
 
 end architecture;

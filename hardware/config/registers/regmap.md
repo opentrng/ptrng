@@ -26,6 +26,8 @@ Base address: 0x00000000
 | [CONTROL](#control)      | 0x0004     | Global control register for the OpenTRNG's PTRNG |
 | [RING](#ring)            | 0x0008     | Ring-oscillator enable register (enable bits are active at `'1'`). |
 | [FREQ](#freq)            | 0x000c     | Frequency counter control register. |
+| [FIFOCTRL](#fifoctrl)    | 0x0010     | Control register for the FIFO to read the PTRNG random data output |
+| [FIFODATA](#fifodata)    | 0x0014     | Data register for the FIFO to read the PTRNG random data output |
 
 ## ID
 
@@ -91,5 +93,40 @@ Reset value: 0x00000000
 | DONE             | 2      | ro              | 0x0        | This field is set to `'1'` when the measure is done and ready to be read |
 | START            | 1      | wosc            | 0x0        | Write `'1'` to start the frequency counter measure |
 | EN               | 0      | rw              | 0x0        | Enable the frequency counter (active at `'1'`) |
+
+Back to [Register map](#register-map-summary).
+
+## FIFOCTRL
+
+Control register for the FIFO to read the PTRNG random data output
+
+Address offset: 0x0010
+
+Reset value: 0x00000000
+
+
+| Name             | Bits   | Mode            | Reset      | Description |
+| :---             | :---   | :---            | :---       | :---        |
+| -                | 31:5   | -               | 0x000000   | Reserved |
+| ALMOSTFULL       | 4      | ro              | 0x0        | Almost full flag |
+| ALMOSTEMPTY      | 3      | ro              | 0x0        | Almost empty flag |
+| FULL             | 2      | ro              | 0x0        | Full flag |
+| EMPTY            | 1      | ro              | 0x0        | Empty flag |
+| CLEAR            | 0      | wosc            | 0x0        | Clear the FIFO |
+
+Back to [Register map](#register-map-summary).
+
+## FIFODATA
+
+Data register for the FIFO to read the PTRNG random data output
+
+Address offset: 0x0014
+
+Reset value: 0x00000000
+
+
+| Name             | Bits   | Mode            | Reset      | Description |
+| :---             | :---   | :---            | :---       | :---        |
+| DATA             | 31:0   | ro              | 0x00000000 | 32 bits word from the PTRNG |
 
 Back to [Register map](#register-map-summary).

@@ -3,11 +3,16 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use work.settings.all;
 
+library extras;
+use extras.synchronizing.all;
+
 -- 
 entity digitalnoise is
 	generic (
-		-- Size of the configuration registers
-		REG_WIDTH: natural
+		-- Width for the configuration registers
+		REG_WIDTH: natural;
+		-- Width for the RRN output
+		RAND_WIDTH: natural
 	);
 	port (
 		-- Base clock
@@ -29,20 +34,29 @@ entity digitalnoise is
 		-- Frequency estimation output (for the selected ROs)
 		freq_value: out std_logic_vector (REG_WIDTH-5-4-1 downto 0);
 		-- Sampling clock divider (applies on RO0 for ERO and MURO)
-		divider: in std_logic_vector (REG_WIDTH-1 downto 0)
+		divider: in std_logic_vector (REG_WIDTH-1 downto 0);
+		-- Raw Random Number output data (RRN)
+		data: out std_logic_vector (RAND_WIDTH-1 downto 0);
+		-- RRN data output valid
+		valid: out std_logic
 	);
 end entity;
 
 -- 
 architecture rtl of digitalnoise is
 
+	-- Ring oscillators
 	signal osc: std_logic_vector (T downto 0);
 	signal mon: std_logic_vector (T downto 0);
 	signal mon_en: std_logic_vector (T downto 0);
 
+	-- Digitizer
+	signal digit_clk: std_logic;
+	signal digit_data: std_logic_vector (RAND_WIDTH-1 downto 0) := (others => '0');
+
 begin
 
-	-- Instantiate ring-oscillators from 0 to T and their respective frequency counter
+	-- Instantiate ring-oscillators from 0 to T with their respective frequency monitor enable
 	bank: for I in 0 to T generate
 
 		-- Each RO of the bank
@@ -89,8 +103,48 @@ begin
 		result => freq_value
 	);
 
-	-- Digitizer
+	-- Digitizer (see settings.vhd)
+	digit: if DIGITIZER = ERO generate
+		digit_clk <= '0';
+		digit_data <= (others => '0');
+	elsif DIGITIZER = MURO generate
+		digit_clk <= '0';
+		digit_data <= (others => '0');
+	elsif DIGITIZER = COSO generate
+		constant COSO_WIDTH: natural := 16;
+	begin
+		coso: entity work.coso
+		generic map (
+			DATA_WIDTH => COSO_WIDTH
+		)
+		port map (
+			ro0 => osc(0),
+			ro1 => osc(1),
+			clk => digit_clk,
+			data => digit_data(COSO_WIDTH-1 downto 0)
+		);
+	else generate
+		digit_clk <= '0';
+		digit_data <= (others => '0');
+	end generate;
 
-	-- CDC
+	-- Clock domain crossing from osc(0) to system clock (clk)
+	cdc: entity extras.handshake_synchronizer
+	generic map (
+		STAGES => 2
+	)
+	port map (
+		clock_tx => digit_clk,
+		reset_tx => '0',
+		tx_data => digit_data,
+		send_data => '1',
+		clock_rx => clk,
+		reset_rx => reset,
+		rx_data => data,
+		new_data => valid
+	);
+
+	-- Pack bits to 32 bits
+	-- TODO later; as of now, no need to pack bits
 
 end architecture;

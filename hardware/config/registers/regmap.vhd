@@ -37,6 +37,22 @@ port(
     -- FREQ.OVERFLOW
     csr_freq_overflow_in : in std_logic;
 
+    -- FIFOCTRL.CLEAR
+    csr_fifoctrl_clear_out : out std_logic;
+    -- FIFOCTRL.EMPTY
+    csr_fifoctrl_empty_in : in std_logic;
+    -- FIFOCTRL.FULL
+    csr_fifoctrl_full_in : in std_logic;
+    -- FIFOCTRL.ALMOSTEMPTY
+    csr_fifoctrl_almostempty_in : in std_logic;
+    -- FIFOCTRL.ALMOSTFULL
+    csr_fifoctrl_almostfull_in : in std_logic;
+
+    -- FIFODATA.DATA
+    csr_fifodata_data_rvalid : in std_logic;
+    csr_fifodata_data_ren : out std_logic;
+    csr_fifodata_data_in : in std_logic_vector(31 downto 0);
+
     -- Local Bus
     waddr  : in  std_logic_vector(ADDR_W-1 downto 0);
     wdata  : in  std_logic_vector(DATA_W-1 downto 0);
@@ -79,6 +95,23 @@ signal csr_freq_select_ff : std_logic_vector(4 downto 0);
 signal csr_freq_value_ff : std_logic_vector(22 downto 0);
 signal csr_freq_overflow_ff : std_logic;
 
+signal csr_fifoctrl_rdata : std_logic_vector(31 downto 0);
+signal csr_fifoctrl_wen : std_logic;
+signal csr_fifoctrl_ren : std_logic;
+signal csr_fifoctrl_ren_ff : std_logic;
+signal csr_fifoctrl_clear_ff : std_logic;
+signal csr_fifoctrl_empty_ff : std_logic;
+signal csr_fifoctrl_full_ff : std_logic;
+signal csr_fifoctrl_almostempty_ff : std_logic;
+signal csr_fifoctrl_almostfull_ff : std_logic;
+
+signal csr_fifodata_rdata : std_logic_vector(31 downto 0);
+signal csr_fifodata_ren : std_logic;
+signal csr_fifodata_ren_ff : std_logic;
+signal csr_fifodata_data_ff : std_logic_vector(31 downto 0);
+signal csr_fifodata_data_rvalid_ff : std_logic;
+
+signal rvalid_drv : std_logic;
 signal rdata_ff : std_logic_vector(31 downto 0);
 signal rvalid_ff : std_logic;
 begin
@@ -375,6 +408,169 @@ end process;
 
 
 --------------------------------------------------------------------------------
+-- CSR:
+-- [0x10] - FIFOCTRL - Control register for the FIFO to read the PTRNG random data output
+--------------------------------------------------------------------------------
+csr_fifoctrl_rdata(31 downto 5) <= (others => '0');
+
+csr_fifoctrl_wen <= wen when (waddr = std_logic_vector(to_unsigned(16, ADDR_W))) else '0'; -- 0x10
+
+csr_fifoctrl_ren <= ren when (raddr = std_logic_vector(to_unsigned(16, ADDR_W))) else '0'; -- 0x10
+process (clk, rst) begin
+if (rst = '1') then
+    csr_fifoctrl_ren_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+        csr_fifoctrl_ren_ff <= csr_fifoctrl_ren;
+end if;
+end process;
+
+-----------------------
+-- Bit field:
+-- FIFOCTRL(0) - CLEAR - Clear the FIFO
+-- access: wosc, hardware: o
+-----------------------
+
+csr_fifoctrl_rdata(0) <= '0';
+
+csr_fifoctrl_clear_out <= csr_fifoctrl_clear_ff;
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_fifoctrl_clear_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+        if (csr_fifoctrl_wen = '1') then
+            if (wstrb(0) = '1') then
+                csr_fifoctrl_clear_ff <= wdata(0);
+            end if;
+        else
+            csr_fifoctrl_clear_ff <= '0';
+        end if;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- FIFOCTRL(1) - EMPTY - Empty flag
+-- access: ro, hardware: i
+-----------------------
+
+csr_fifoctrl_rdata(1) <= csr_fifoctrl_empty_ff;
+
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_fifoctrl_empty_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+            csr_fifoctrl_empty_ff <= csr_fifoctrl_empty_in;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- FIFOCTRL(2) - FULL - Full flag
+-- access: ro, hardware: i
+-----------------------
+
+csr_fifoctrl_rdata(2) <= csr_fifoctrl_full_ff;
+
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_fifoctrl_full_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+            csr_fifoctrl_full_ff <= csr_fifoctrl_full_in;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- FIFOCTRL(3) - ALMOSTEMPTY - Almost empty flag
+-- access: ro, hardware: i
+-----------------------
+
+csr_fifoctrl_rdata(3) <= csr_fifoctrl_almostempty_ff;
+
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_fifoctrl_almostempty_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+            csr_fifoctrl_almostempty_ff <= csr_fifoctrl_almostempty_in;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- FIFOCTRL(4) - ALMOSTFULL - Almost full flag
+-- access: ro, hardware: i
+-----------------------
+
+csr_fifoctrl_rdata(4) <= csr_fifoctrl_almostfull_ff;
+
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_fifoctrl_almostfull_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+            csr_fifoctrl_almostfull_ff <= csr_fifoctrl_almostfull_in;
+end if;
+end process;
+
+
+
+--------------------------------------------------------------------------------
+-- CSR:
+-- [0x14] - FIFODATA - Data register for the FIFO to read the PTRNG random data output
+--------------------------------------------------------------------------------
+
+
+csr_fifodata_ren <= ren when (raddr = std_logic_vector(to_unsigned(20, ADDR_W))) else '0'; -- 0x14
+process (clk, rst) begin
+if (rst = '1') then
+    csr_fifodata_ren_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+        csr_fifodata_ren_ff <= csr_fifodata_ren;
+end if;
+end process;
+
+-----------------------
+-- Bit field:
+-- FIFODATA(31 downto 0) - DATA - 32 bits word from the PTRNG
+-- access: ro, hardware: q
+-----------------------
+
+csr_fifodata_rdata(31 downto 0) <= csr_fifodata_data_in;
+
+csr_fifodata_data_ren <= csr_fifodata_ren and (not csr_fifodata_ren_ff);
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_fifodata_data_ff <= "00000000000000000000000000000000"; -- 0x0
+elsif rising_edge(clk) then
+        
+            csr_fifodata_data_ff <= csr_fifodata_data_ff;
+end if;
+end process;
+
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_fifodata_data_rvalid_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+        csr_fifodata_data_rvalid_ff <= csr_fifodata_data_rvalid;
+end if;
+end process;
+
+
+--------------------------------------------------------------------------------
 -- Write ready
 --------------------------------------------------------------------------------
 wready <= '1';
@@ -395,6 +591,10 @@ elsif rising_edge(clk) then
             rdata_ff <= csr_ring_rdata;
         elsif raddr = std_logic_vector(to_unsigned(12, ADDR_W)) then -- 0xc
             rdata_ff <= csr_freq_rdata;
+        elsif raddr = std_logic_vector(to_unsigned(16, ADDR_W)) then -- 0x10
+            rdata_ff <= csr_fifoctrl_rdata;
+        elsif raddr = std_logic_vector(to_unsigned(20, ADDR_W)) then -- 0x14
+            rdata_ff <= csr_fifodata_rdata;
         else 
             rdata_ff <= "10111010101011011011111011101111"; -- 0xbaadbeef
         end if;
@@ -422,6 +622,10 @@ end if;
 end process;
 
 
-rvalid <= rvalid_ff;
+rvalid_drv <=
+    csr_fifodata_data_rvalid_ff when (csr_fifodata_ren_ff = '1') else
+    rvalid_ff;
+
+rvalid <= rvalid_drv;
 
 end architecture;

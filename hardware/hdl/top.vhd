@@ -1,6 +1,9 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
+library extras;
+use extras.fifos.all;
+
 entity top is
 	generic (
 		CLK_REF: natural
@@ -41,6 +44,20 @@ architecture rtl of top is
 	signal freq_overflow: std_logic;
 	signal freq_select: std_logic_vector (4 downto 0);
 	signal freq_value: std_logic_vector (22 downto 0);
+
+	-- FIFO
+	constant FRAME_SIZE: natural := 256;
+	constant FIFO_ALMOST: natural := FRAME_SIZE;
+	constant FIFO_SIZE: natural := FIFO_ALMOST*4;
+	signal fifo_clear: std_logic;
+	signal fifo_empty: std_logic;
+	signal fifo_full: std_logic;
+	signal fifo_almost_empty: std_logic;
+	signal fifo_almost_full: std_logic;
+	signal fifo_read_en: std_logic;
+	signal fifo_write_en: std_logic;
+	signal fifo_data_read: std_logic_vector (31 downto 0);
+	signal fifo_data_write: std_logic_vector (31 downto 0);
 
 begin
 
@@ -94,16 +111,17 @@ begin
 		rst => hw_reset,
 
 		-- Local Bus
-		waddr => address,--  : in  std_logic_vector(ADDR_W-1 downto 0);
-		wdata => wr_data,--  : in  std_logic_vector(DATA_W-1 downto 0);
-		wen => write_req,--    : in  std_logic;
-		wstrb => "1111",--  : in  std_logic_vector(STRB_W-1 downto 0);
-		--wready : out std_logic;
-		raddr => address,--  : in  std_logic_vector(ADDR_W-1 downto 0);
-		ren => read_req,--    : in  std_logic;
-		rdata => rd_data,--  : out std_logic_vector(DATA_W-1 downto 0);
-		--rvalid : out std_logic;
+		waddr => address,
+		wdata => wr_data,
+		wen => write_req,
+		wstrb => "1111",
+		--wready
+		raddr => address,
+		ren => read_req,
+		rdata => rd_data,
+		--rvalid
 
+		-- Registers for the user
 		csr_control_reset_out => sw_reset,
 		csr_ring_en_out => ring_en,
 		csr_freq_en_out => freq_en,
@@ -111,10 +129,18 @@ begin
 		csr_freq_done_in => freq_done,
 		csr_freq_select_out => freq_select,
 		csr_freq_value_in => freq_value,
-		csr_freq_overflow_in => freq_overflow
+		csr_freq_overflow_in => freq_overflow,
+		csr_fifoctrl_clear_out => fifo_clear,
+	    csr_fifoctrl_empty_in => fifo_empty,
+	    csr_fifoctrl_full_in => fifo_full,
+	    csr_fifoctrl_almostempty_in => fifo_almost_empty,
+	    csr_fifoctrl_almostfull_in => fifo_almost_full,
+		csr_fifodata_data_rvalid => '1', --FIXME?
+		csr_fifodata_data_ren => fifo_read_en,
+		csr_fifodata_data_in => fifo_data_read
 	);
 
-	-- PTRNG
+	-- Physical True Random Number Generator wrapped on the register map
 	ptrng: entity work.ptrng
 	generic map (
 		REG_WIDTH => 32,
@@ -130,9 +156,29 @@ begin
 		freq_done => freq_done,
 		freq_overflow => freq_overflow,
 		freq_value => freq_value,
-		divider => (others => '0')
+		divider => (others => '0'),
+		data => fifo_data_write,
+		valid => fifo_write_en
 	);
 
 	-- FIFO
+	fifo_to_uart: entity extras.simple_fifo
+	generic map (
+		mem_size => FIFO_SIZE
+	)
+	port map (
+		clock => clk,
+		reset => sw_reset or fifo_clear,
+		wr_data => fifo_data_write,
+		we => fifo_write_en,
+		rd_data => fifo_data_read,
+		re => fifo_read_en,
+		empty => fifo_empty,
+		full => fifo_full,
+		almost_empty_thresh => FIFO_ALMOST,
+		almost_full_thresh => FIFO_ALMOST,
+		almost_empty => fifo_almost_empty,
+		almost_full => fifo_almost_full
+	);
 
 end architecture;

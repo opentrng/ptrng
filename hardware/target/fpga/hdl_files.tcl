@@ -17,3 +17,6 @@ lappend hdl_files [list "work" [file normalize "../../config/digitalnoise/settin
 lappend hdl_files [list "work" [file normalize "../../lib/fluart/fluart.vhdl"]]
 lappend hdl_files [list "work" [file normalize "../../lib/cmd_proc/cmd_proc.vhdl"]]
 lappend hdl_files [list "extras" [file normalize "../../lib/vhdl-extras/rtl/extras/synchronizing.vhdl"]]
+lappend hdl_files [list "extras" [file normalize "../../lib/vhdl-extras/rtl/extras_2008/sizing_2008.vhdl"]]
+lappend hdl_files [list "extras" [file normalize "../../lib/vhdl-extras/rtl/extras/memory.vhdl"]]
+lappend hdl_files [list "extras" [file normalize "../../lib/vhdl-extras/rtl/extras/fifos.vhdl"]]
