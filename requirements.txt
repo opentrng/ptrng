@@ -5,3 +5,4 @@ cocotb
 pytest
 corsair
 pyserial
+jinja2
