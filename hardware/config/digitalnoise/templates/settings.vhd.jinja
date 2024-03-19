@@ -5,8 +5,17 @@ use ieee.std_logic_1164.all;
 -- $ {{ cmd }}
 -- For more information look into the directory 'hardware/config/digitalnoise'.
 package settings is
-	constant T: natural := {{ banks|length-1 }};
+
+	-- Ring-oscillators settings
+	constant T: natural := {{ rings|length-1 }};
 	type len_array is array (0 to T) of natural;
 	{%- set join = joiner(", ") %}
-	constant RO_LEN: len_array := ({% for bank in banks %}{{ join() }}{{ bank['ring']['length'] }}{% endfor %});
+	constant RO_LEN: len_array := ({% for ring in rings %}{{ join() }}{{ ring['parameters']['length'] }}{% endfor %});
+
+	-- Digitizer settings
+	constant ERO: natural := 1;
+	constant MURO: natural := 2;
+	constant COSO: natural := 3;
+	constant DIGITIZER: natural := COSO;
+
 end package;

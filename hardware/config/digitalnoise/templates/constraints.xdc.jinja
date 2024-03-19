@@ -5,54 +5,59 @@
 # Constraints for the digital noise source
 
 # Combinational loops for each ring-oscillator
-{%- for bank in banks %}
-set_property ALLOW_COMBINATORIAL_LOOPS true [get_nets top/ptrng/source/bank[{{ bank['index'] }}].ring/net[0]]
+{%- for ring in rings %}
+set_property ALLOW_COMBINATORIAL_LOOPS true [get_nets top/ptrng/source/bank[{{ ring['index'] }}].ring/net[0]]
 {%- endfor %}
 
 # Avoid any timing warnings into the ring-oscillators
-{%- for bank in banks %}
-#set_disable_timing -from I0 -to O -objects [get_cells top/ptrng/source/bank[{{ bank['index'] }}].ring/element_0_lut_nand]
+{%- for ring in rings %}
+#set_disable_timing -from I0 -to O -objects [get_cells top/ptrng/source/bank[{{ ring['index'] }}].ring/element_0_lut_nand]
 {%- endfor %}
 
 # Ring-oscillator maximal output frequency (for proper timing verifications on ROs clock output)
-{%- for bank in banks %}
-create_clock -name ring{{ bank['index'] }}_clk -period {{ 1e9/bank['ring']['fmax'] }} -waveform { 0.0 {{1e9/(2*bank['ring']['fmax'])}} } -add [get_nets top/ptrng/source/bank[{{ bank['index'] }}].ring/net[0]]
+{%- for ring in rings %}
+create_clock -name ring{{ ring['index'] }}_clk -period {{ 1e9/ring['parameters']['fmax'] }} -waveform { 0.0 {{1e9/(2*ring['parameters']['fmax'])}} } -add [get_nets top/ptrng/source/bank[{{ ring['index'] }}].ring/net[0]]
 {%- endfor %}
 
 # No timing check between system clock and ring clocks
-set_clock_groups -name asynchronous_clocks -asynchronous -group [get_clocks sys_clk] {%- for bank in banks %} -group [get_clocks ring{{ bank['index'] }}_clk] {%- endfor %}
+set_clock_groups -name asynchronous_clocks -asynchronous -group [get_clocks sys_clk] {%- for ring in rings %} -group [get_clocks ring{{ ring['index'] }}_clk] {%- endfor %}
 
 # General pblock for the reserved area
 create_pblock digitalnoise
-	add_cells_to_pblock [get_pblocks digitalnoise] [get_cells top/ptrng/source]
-	resize_pblock [get_pblocks digitalnoise] -add { {{ reserved }} }
-	set_property CONTAIN_ROUTING true [get_pblocks digitalnoise]
+	resize_pblock [get_pblocks digitalnoise] -add { {{ digitalnoise['area']['xilinx'] }} }
+	set_property CONTAIN_ROUTING false [get_pblocks digitalnoise]
 	set_property EXCLUDE_PLACEMENT true [get_pblocks digitalnoise]
 
-# Pblock for the DMZ
-create_pblock dmz
-	resize_pblock [get_pblocks dmz] -add { {{ dmz['area']['xilinx'] }} }
-	set_property CONTAIN_ROUTING false [get_pblocks dmz]
-	set_property EXCLUDE_PLACEMENT true [get_pblocks dmz]
+# Pblock for the digitizer
+create_pblock digitizer
+	add_cells_to_pblock [get_pblocks digitizer] [get_cells top/ptrng/source/digit.*]
+	add_cells_to_pblock [get_pblocks digitizer] [get_cells top/ptrng/source/cdc]
+	resize_pblock [get_pblocks digitizer] -add { {{ digitizer['area']['xilinx'] }} }
+	set_property CONTAIN_ROUTING false [get_pblocks digitizer]
+	set_property EXCLUDE_PLACEMENT true [get_pblocks digitizer]
 
-{% for entity in ['digit', 'ring'] %}
-{%- for bank in banks %}
-# Pblock for {{ bank[entity]['name'] }}
-create_pblock {{ bank[entity]['name'] }}
-	add_cells_to_pblock [get_pblocks {{ bank[entity]['name'] }}] [get_cells top/ptrng/source/bank[{{ bank['index'] }}].{{entity}}]
-	resize_pblock [get_pblocks {{ bank[entity]['name'] }}] -add { {{ bank[entity]['area']['xilinx'] }} }
-	set_property CONTAIN_ROUTING true [get_pblocks {{ bank[entity]['name'] }}]
-	set_property EXCLUDE_PLACEMENT true [get_pblocks {{ bank[entity]['name'] }}]
+# Pblock for the empty area all around the ROs
+create_pblock bank
+	resize_pblock [get_pblocks bank] -add { {{ bank['area']['xilinx'] }} }
+	set_property CONTAIN_ROUTING false [get_pblocks bank]
+	set_property EXCLUDE_PLACEMENT true [get_pblocks bank]
+
+{% for ring in rings %}
+# Pblock for {{ ring['parameters']['name'] }}
+create_pblock {{ ring['parameters']['name'] }}
+	add_cells_to_pblock [get_pblocks {{ ring['parameters']['name'] }}] [get_cells top/ptrng/source/bank[{{ ring['index'] }}].ring]
+	resize_pblock [get_pblocks {{ ring['parameters']['name'] }}] -add { {{ ring['parameters']['area']['xilinx'] }} }
+	set_property CONTAIN_ROUTING true [get_pblocks {{ ring['parameters']['name'] }}]
+	set_property EXCLUDE_PLACEMENT true [get_pblocks {{ ring['parameters']['name'] }}]
 {% endfor %}
-{%- endfor %}
 
-{%- for bank in banks %}
-# Ring-oscillator {{ bank['index'] }} manual placement into slices
-{%- for element in bank['ring']['elements']['xilinx'] %}
-set_property BEL {{ element['lut'] }} [get_cells top/ptrng/source/bank[{{ bank['index'] }}].ring/{{ element['name'] }}]
-set_property LOC {{ element['slice'] }} [get_cells top/ptrng/source/bank[{{ bank['index'] }}].ring/{{ element['name'] }}]
+{%- for ring in rings %}
+# Ring-oscillator {{ ring['index'] }} manual placement into slices
+{%- for element in ring['parameters']['elements']['xilinx'] %}
+set_property BEL {{ element['lut'] }} [get_cells top/ptrng/source/bank[{{ ring['index'] }}].ring/{{ element['name'] }}]
+set_property LOC {{ element['slice'] }} [get_cells top/ptrng/source/bank[{{ ring['index'] }}].ring/{{ element['name'] }}]
 {%- if element['fixedlutpin'] is defined %}
-set_property LOCK_PINS {I0:{{ element['fixedlutpin'] }}} [get_cells top/ptrng/source/bank[{{ bank['index'] }}].ring/{{ element['name'] }}]
+set_property LOCK_PINS {I0:{{ element['fixedlutpin'] }}} [get_cells top/ptrng/source/bank[{{ ring['index'] }}].ring/{{ element['name'] }}]
 {%- endif %}
 {%- endfor %}
 {% endfor %}
