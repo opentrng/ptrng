@@ -15,6 +15,7 @@ parser.add_argument("-maxheight", required=True, type=int, help="maximum height 
 parser.add_argument("-border", type=int, required=True, help="forbidden border all around inside the reserved area")
 parser.add_argument("-ringwidth", type=int, required=True, help="column width for a ring-oscillator")
 parser.add_argument("-digitheight", type=int, required=True, help="height for the digitizer block")
+parser.add_argument("-digittype", required=True, type=str, choices=['TEST', 'COSO'], help="choice of the sampling architecture for the digitizer")
 parser.add_argument("-hpad", type=int, required=True, help="horizontal padding between ROs")
 parser.add_argument("-vpad", type=int, required=True, help="vertical padding between ROs")
 parser.add_argument("-fmax", required=True, type=float, help="maximum estimated frequency for all ring-oscillators (Hz)")
@@ -176,6 +177,7 @@ digit_y = args.y + args.border
 digit_width = final_width - 2*args.border
 digit_height =  args.digitheight
 digitizer = {}
+digitizer['type'] = args.digittype
 digitizer['area'] = {}
 digitizer['area']['xilinx'] = xilinx_slice_area(digit_x, digit_y, digit_width, digit_height)
 print("- digitizer origin=({:d},{:d}) size=({:d},{:d})".format(digit_x, digit_y, digit_width, digit_height))
@@ -187,7 +189,8 @@ environment = Environment(loader=FileSystemLoader("templates"))
 template = environment.get_template("settings.vhd.jinja")
 content = template.render(
 		cmd = cmd,
-		rings = rings
+		rings = rings,
+		digitizer = digitizer
 	)
 settings = open("settings.vhd", "w")
 settings.write(content)

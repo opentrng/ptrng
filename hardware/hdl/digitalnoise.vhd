@@ -6,7 +6,7 @@ use work.settings.all;
 library extras;
 use extras.synchronizing.all;
 
--- 
+-- The digital noise block generates the raw random numbers (RRN). This block contains the ring-oscillators, their sampling architecture and the clock domain crossing to the system clock in order the RRN to be used in the upper design.
 entity digitalnoise is
 	generic (
 		-- Width for the configuration registers
@@ -42,7 +42,7 @@ entity digitalnoise is
 	);
 end entity;
 
--- 
+-- RTL implementation of digital noise
 architecture rtl of digitalnoise is
 
 	-- Ring oscillators
@@ -103,30 +103,16 @@ begin
 		result => freq_value
 	);
 
-	-- Digitizer (see settings.vhd)
-	digit: if DIGITIZER = ERO generate
-		digit_clk <= '0';
-		digit_data <= (others => '0');
-	elsif DIGITIZER = MURO generate
-		digit_clk <= '0';
-		digit_data <= (others => '0');
-	elsif DIGITIZER = COSO generate
-		constant COSO_WIDTH: natural := 16;
-	begin
-		coso: entity work.coso
-		generic map (
-			DATA_WIDTH => COSO_WIDTH
-		)
-		port map (
-			ro0 => osc(0),
-			ro1 => osc(1),
-			clk => digit_clk,
-			data => digit_data(COSO_WIDTH-1 downto 0)
-		);
-	else generate
-		digit_clk <= '0';
-		digit_data <= (others => '0');
-	end generate;
+	-- Digitizer 
+	digit: entity work.digitizer
+	generic map (
+		RAND_WIDTH => RAND_WIDTH
+	)
+	port map (
+		osc => osc,
+		digit_clk => digit_clk,
+		digit_data => digit_data
+	);
 
 	-- Clock domain crossing from osc(0) to system clock (clk)
 	cdc: entity extras.handshake_synchronizer

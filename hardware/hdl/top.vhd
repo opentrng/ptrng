@@ -4,6 +4,7 @@ use ieee.std_logic_1164.all;
 library extras;
 use extras.fifos.all;
 
+-- Top for testing the PTRNG by writing configuration registers and reading data into a FIFO through an UART.
 entity top is
 	generic (
 		CLK_REF: natural
@@ -16,7 +17,7 @@ entity top is
 	);
 end;
 
--- 
+-- RTL implementation of the FPGA test top
 architecture rtl of top is
 
 	-- UART interface
