@@ -35,7 +35,7 @@ regmap:
         lsb: 0
         access: rw
         hardware: o
--   name: FREQ
+-   name: FREQCOUNT
     description: Frequency counter control register.
     bitfields:
     -   name: EN
@@ -98,7 +98,15 @@ regmap:
 #         -   name: COSO
 #             description: Coherent Sampling Ring-Oscillator
 #             value: 4
-# -   name: DIVIDER
+-   name: FREQDIVIDER
+    description: Clock divider register, applies on oscillator RO0
+    bitfields:
+    -   name: VALUE
+        description: Clock divider value (1 means no division, 2 division by two, ...)
+        width: 32
+        lsb: 0
+        access: rw
+        hardware: o
 # -   name: ACCUMULATOR
 # -   name: ENTROPY
 # -   name: ONLINETESTS

@@ -22,19 +22,19 @@ entity digitalnoise is
 		-- Ring-oscillator enable signal (bit index i enables ROi)
 		ring_en: in std_logic_vector (REG_WIDTH-1 downto 0);
 		-- Enable the all the frequency counters
-		freq_en: in std_logic;
+		freqcount_en: in std_logic;
 		-- Select the RO number for frequency measurement
-		freq_select: in std_logic_vector (4 downto 0);
+		freqcount_select: in std_logic_vector (4 downto 0);
 		-- Pulse '1' to start the frequency measure (for the selected ROs)
-		freq_start: in std_logic;
+		freqcount_start: in std_logic;
 		-- Flag set to '1' when the result is ready (for the selected ROs)
-		freq_done: out std_logic;
+		freqcount_done: out std_logic;
 		-- Flag set to '1' if an overflow occured (for the selected ROs)
-		freq_overflow: out std_logic;
+		freqcount_overflow: out std_logic;
 		-- Frequency estimation output (for the selected ROs)
-		freq_value: out std_logic_vector (REG_WIDTH-5-4-1 downto 0);
+		freqcount_value: out std_logic_vector (REG_WIDTH-5-4-1 downto 0);
 		-- Sampling clock divider (applies on RO0 for ERO and MURO)
-		divider: in std_logic_vector (REG_WIDTH-1 downto 0);
+		freqdivider: in std_logic_vector (REG_WIDTH-1 downto 0);
 		-- Raw Random Number output data (RRN)
 		data: out std_logic_vector (RAND_WIDTH-1 downto 0);
 		-- RRN data output valid
@@ -77,8 +77,8 @@ begin
 			if reset = '1' then
 				mon_en(I) <= '0';
 			elsif rising_edge(clk) then
-				if freq_select = I then
-					mon_en(I) <= freq_en;
+				if freqcount_select = I then
+					mon_en(I) <= freqcount_en;
 				else
 					mon_en(I) <= '0';
 				end if;
@@ -87,50 +87,47 @@ begin
 	end generate;
 
 	-- One frequency counter for all ROs
-	freq: entity work.freqcounter
+	freqcounter: entity work.freqcounter
 	generic map (
-		W => freq_value'Length,
+		W => freqcount_value'Length,
 		N => 1_000_000
 	)
 	port map (
 		clk => clk,
 		reset => reset,
-		source => mon(conv_integer(freq_select)),
-		enable => freq_en,
-		start => freq_start,
-		done => freq_done,
-		overflow => freq_overflow,
-		result => freq_value
+		source => mon(conv_integer(freqcount_select)),
+		enable => freqcount_en,
+		start => freqcount_start,
+		done => freqcount_done,
+		overflow => freqcount_overflow,
+		result => freqcount_value
 	);
 
 	-- Digitizer 
-	digit: entity work.digitizer
+	digitizer: entity work.digitizer
 	generic map (
+		REG_WIDTH => REG_WIDTH,
 		RAND_WIDTH => RAND_WIDTH
 	)
 	port map (
 		osc => osc,
+		freqdivider => freqdivider,
 		digit_clk => digit_clk,
 		digit_data => digit_data
 	);
 
 	-- Clock domain crossing from osc(0) to system clock (clk)
-	cdc: entity extras.handshake_synchronizer
+	cdc: entity work.clockdomain
 	generic map (
-		STAGES => 2
+		DATA_WIDTH => RAND_WIDTH
 	)
 	port map (
-		clock_tx => digit_clk,
-		reset_tx => '0',
-		tx_data => digit_data,
-		send_data => '1',
-		clock_rx => clk,
-		reset_rx => reset,
-		rx_data => data,
-		new_data => valid
+		reset => reset,
+		clk_from => digit_clk,
+		data_in => digit_data,
+		clk_to => clk,
+		data_out => data,
+		data_en => valid
 	);
-
-	-- Pack bits to 32 bits
-	-- TODO later; as of now, no need to pack bits
 
 end architecture;

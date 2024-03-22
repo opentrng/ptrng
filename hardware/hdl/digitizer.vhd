@@ -9,12 +9,16 @@ use extras.synchronizing.all;
 -- The digitizer takes the ring-oscillator signals as input and instanciante the sampling architecture specified in 'settings.vhd'. It outputs the sampling clock and the sampled data.
 entity digitizer is
 	generic (
+		-- Width for the configuration registers
+		REG_WIDTH: natural;
 		-- Width for the RRN output
 		RAND_WIDTH: natural
 	);
 	port (
 		-- Ring-oscillator inputs
-		osc: std_logic_vector (T downto 0);
+		osc: in std_logic_vector (T downto 0);
+		-- Sampling clock divider (applies on RO0 for ERO and MURO)
+		freqdivider: in std_logic_vector (REG_WIDTH-1 downto 0);
 		-- Sampling clock (osc(0))
 		digit_clk: out std_logic;
 		-- Sampled data
@@ -26,22 +30,21 @@ end entity;
 architecture rtl of digitizer is
 begin
 
-	-- TEST digitizer is a 32bit counter clocked at osc(0)/2^(25+1)
+	-- TEST digitizer is a 32bit counter clocked at osc(0)/freqdivider
 	gen: if DIGITIZER_GEN = TEST generate
-		signal clkdiv: std_logic_vector (31 downto 0);
 		signal counter: std_logic_vector (RAND_WIDTH-1 downto 0);
 	begin
 		process (osc(0))
 		begin
 			if rising_edge(osc(0)) then
-				clkdiv <= clkdiv + 1;
-			end if;
-		end process;
-		digit_clk <= clkdiv(25);
-		process (digit_clk)
-		begin
-			if rising_edge(clkdiv(25)) then
-				digit_data <= digit_data + 1;
+				if counter < freqdivider-1 then
+					counter <= counter + 1;
+					digit_clk <= '0';
+				else
+					counter <= (others => '0');
+					digit_data <= digit_data + 1;
+					digit_clk <= '1';
+				end if;
 			end if;
 		end process;
 

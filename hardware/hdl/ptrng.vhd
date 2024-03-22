@@ -18,19 +18,19 @@ entity ptrng is
 		-- Ring-oscillator enable signal (bit index i enables ROi)
 		ring_en: in std_logic_vector (REG_WIDTH-1 downto 0);
 		-- Enable the all the frequency counters
-		freq_en: in std_logic;
+		freqcount_en: in std_logic;
 		-- Select the RO number for frequency measurement
-		freq_select: in std_logic_vector (4 downto 0);
+		freqcount_select: in std_logic_vector (4 downto 0);
 		-- Pulse '1' to start the frequency measure (for the selected ROs)
-		freq_start: in std_logic;
+		freqcount_start: in std_logic;
 		-- Flag set to '1' when the result is ready (for the selected ROs)
-		freq_done: out std_logic;
+		freqcount_done: out std_logic;
 		-- Flag set to '1' if an overflow occured (for the selected ROs)
-		freq_overflow: out std_logic;
+		freqcount_overflow: out std_logic;
 		-- Frequency estimation output (for the selected ROs)
-		freq_value: out std_logic_vector (REG_WIDTH-5-4-1 downto 0);
+		freqcount_value: out std_logic_vector (REG_WIDTH-5-4-1 downto 0);
 		-- Sampling clock divider (applies on RO0 for ERO and MURO)
-		divider: in std_logic_vector (REG_WIDTH-1 downto 0);
+		freqdivider: in std_logic_vector (REG_WIDTH-1 downto 0);
 		-- Lenght of the entropy accumulator
 		--accumulator: in std_logic_vector (31 downto 0);
 		-- Enable the raw signal conditionner
@@ -67,13 +67,13 @@ begin
 		clk => clk,
 		reset => reset,
 		ring_en => ring_en,
-		freq_en => freq_en,
-		freq_select => freq_select,
-		freq_start => freq_start,
-		freq_done => freq_done,
-		freq_overflow => freq_overflow,
-		freq_value => freq_value,
-		divider => divider,
+		freqcount_en => freqcount_en,
+		freqcount_select => freqcount_select,
+		freqcount_start => freqcount_start,
+		freqcount_done => freqcount_done,
+		freqcount_overflow => freqcount_overflow,
+		freqcount_value => freqcount_value,
+		freqdivider => freqdivider,
 		data => raw_random_number,
 		valid => raw_random_valid
 	);

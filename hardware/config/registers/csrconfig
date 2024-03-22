@@ -21,6 +21,6 @@ path = ../../../remote/regmap.py
 [md]
 generator = Markdown
 path = regmap.md
-title = OpenTRNG entropy source register map
+title = PTRNG register map
 image_dir = images
 print_images = False

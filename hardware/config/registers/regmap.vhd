@@ -24,18 +24,21 @@ port(
     -- RING.EN
     csr_ring_en_out : out std_logic_vector(31 downto 0);
 
-    -- FREQ.EN
-    csr_freq_en_out : out std_logic;
-    -- FREQ.START
-    csr_freq_start_out : out std_logic;
-    -- FREQ.DONE
-    csr_freq_done_in : in std_logic;
-    -- FREQ.SELECT
-    csr_freq_select_out : out std_logic_vector(4 downto 0);
-    -- FREQ.VALUE
-    csr_freq_value_in : in std_logic_vector(22 downto 0);
-    -- FREQ.OVERFLOW
-    csr_freq_overflow_in : in std_logic;
+    -- FREQCOUNT.EN
+    csr_freqcount_en_out : out std_logic;
+    -- FREQCOUNT.START
+    csr_freqcount_start_out : out std_logic;
+    -- FREQCOUNT.DONE
+    csr_freqcount_done_in : in std_logic;
+    -- FREQCOUNT.SELECT
+    csr_freqcount_select_out : out std_logic_vector(4 downto 0);
+    -- FREQCOUNT.VALUE
+    csr_freqcount_value_in : in std_logic_vector(22 downto 0);
+    -- FREQCOUNT.OVERFLOW
+    csr_freqcount_overflow_in : in std_logic;
+
+    -- FREQDIVIDER.VALUE
+    csr_freqdivider_value_out : out std_logic_vector(31 downto 0);
 
     -- FIFOCTRL.CLEAR
     csr_fifoctrl_clear_out : out std_logic;
@@ -84,16 +87,22 @@ signal csr_ring_ren : std_logic;
 signal csr_ring_ren_ff : std_logic;
 signal csr_ring_en_ff : std_logic_vector(31 downto 0);
 
-signal csr_freq_rdata : std_logic_vector(31 downto 0);
-signal csr_freq_wen : std_logic;
-signal csr_freq_ren : std_logic;
-signal csr_freq_ren_ff : std_logic;
-signal csr_freq_en_ff : std_logic;
-signal csr_freq_start_ff : std_logic;
-signal csr_freq_done_ff : std_logic;
-signal csr_freq_select_ff : std_logic_vector(4 downto 0);
-signal csr_freq_value_ff : std_logic_vector(22 downto 0);
-signal csr_freq_overflow_ff : std_logic;
+signal csr_freqcount_rdata : std_logic_vector(31 downto 0);
+signal csr_freqcount_wen : std_logic;
+signal csr_freqcount_ren : std_logic;
+signal csr_freqcount_ren_ff : std_logic;
+signal csr_freqcount_en_ff : std_logic;
+signal csr_freqcount_start_ff : std_logic;
+signal csr_freqcount_done_ff : std_logic;
+signal csr_freqcount_select_ff : std_logic_vector(4 downto 0);
+signal csr_freqcount_value_ff : std_logic_vector(22 downto 0);
+signal csr_freqcount_overflow_ff : std_logic;
+
+signal csr_freqdivider_rdata : std_logic_vector(31 downto 0);
+signal csr_freqdivider_wen : std_logic;
+signal csr_freqdivider_ren : std_logic;
+signal csr_freqdivider_ren_ff : std_logic;
+signal csr_freqdivider_value_ff : std_logic_vector(31 downto 0);
 
 signal csr_fifoctrl_rdata : std_logic_vector(31 downto 0);
 signal csr_fifoctrl_wen : std_logic;
@@ -258,40 +267,40 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0xc] - FREQ - Frequency counter control register.
+-- [0xc] - FREQCOUNT - Frequency counter control register.
 --------------------------------------------------------------------------------
 
-csr_freq_wen <= wen when (waddr = std_logic_vector(to_unsigned(12, ADDR_W))) else '0'; -- 0xc
+csr_freqcount_wen <= wen when (waddr = std_logic_vector(to_unsigned(12, ADDR_W))) else '0'; -- 0xc
 
-csr_freq_ren <= ren when (raddr = std_logic_vector(to_unsigned(12, ADDR_W))) else '0'; -- 0xc
+csr_freqcount_ren <= ren when (raddr = std_logic_vector(to_unsigned(12, ADDR_W))) else '0'; -- 0xc
 process (clk, rst) begin
 if (rst = '1') then
-    csr_freq_ren_ff <= '0'; -- 0x0
+    csr_freqcount_ren_ff <= '0'; -- 0x0
 elsif rising_edge(clk) then
-        csr_freq_ren_ff <= csr_freq_ren;
+        csr_freqcount_ren_ff <= csr_freqcount_ren;
 end if;
 end process;
 
 -----------------------
 -- Bit field:
--- FREQ(0) - EN - Enable the frequency counter (active at `'1'`)
+-- FREQCOUNT(0) - EN - Enable the frequency counter (active at `'1'`)
 -- access: rw, hardware: o
 -----------------------
 
-csr_freq_rdata(0) <= csr_freq_en_ff;
+csr_freqcount_rdata(0) <= csr_freqcount_en_ff;
 
-csr_freq_en_out <= csr_freq_en_ff;
+csr_freqcount_en_out <= csr_freqcount_en_ff;
 
 process (clk, rst) begin
 if (rst = '1') then
-    csr_freq_en_ff <= '0'; -- 0x0
+    csr_freqcount_en_ff <= '0'; -- 0x0
 elsif rising_edge(clk) then
-        if (csr_freq_wen = '1') then
+        if (csr_freqcount_wen = '1') then
             if (wstrb(0) = '1') then
-                csr_freq_en_ff <= wdata(0);
+                csr_freqcount_en_ff <= wdata(0);
             end if;
         else
-            csr_freq_en_ff <= csr_freq_en_ff;
+            csr_freqcount_en_ff <= csr_freqcount_en_ff;
         end if;
 end if;
 end process;
@@ -300,24 +309,24 @@ end process;
 
 -----------------------
 -- Bit field:
--- FREQ(1) - START - Write `'1'` to start the frequency counter measure
+-- FREQCOUNT(1) - START - Write `'1'` to start the frequency counter measure
 -- access: wosc, hardware: o
 -----------------------
 
-csr_freq_rdata(1) <= '0';
+csr_freqcount_rdata(1) <= '0';
 
-csr_freq_start_out <= csr_freq_start_ff;
+csr_freqcount_start_out <= csr_freqcount_start_ff;
 
 process (clk, rst) begin
 if (rst = '1') then
-    csr_freq_start_ff <= '0'; -- 0x0
+    csr_freqcount_start_ff <= '0'; -- 0x0
 elsif rising_edge(clk) then
-        if (csr_freq_wen = '1') then
+        if (csr_freqcount_wen = '1') then
             if (wstrb(0) = '1') then
-                csr_freq_start_ff <= wdata(1);
+                csr_freqcount_start_ff <= wdata(1);
             end if;
         else
-            csr_freq_start_ff <= '0';
+            csr_freqcount_start_ff <= '0';
         end if;
 end if;
 end process;
@@ -326,18 +335,18 @@ end process;
 
 -----------------------
 -- Bit field:
--- FREQ(2) - DONE - This field is set to `'1'` when the measure is done and ready to be read
+-- FREQCOUNT(2) - DONE - This field is set to `'1'` when the measure is done and ready to be read
 -- access: ro, hardware: i
 -----------------------
 
-csr_freq_rdata(2) <= csr_freq_done_ff;
+csr_freqcount_rdata(2) <= csr_freqcount_done_ff;
 
 
 process (clk, rst) begin
 if (rst = '1') then
-    csr_freq_done_ff <= '0'; -- 0x0
+    csr_freqcount_done_ff <= '0'; -- 0x0
 elsif rising_edge(clk) then
-            csr_freq_done_ff <= csr_freq_done_in;
+            csr_freqcount_done_ff <= csr_freqcount_done_in;
 end if;
 end process;
 
@@ -345,24 +354,24 @@ end process;
 
 -----------------------
 -- Bit field:
--- FREQ(7 downto 3) - SELECT - Select the index of the ring-oscillator for frequency measurement
+-- FREQCOUNT(7 downto 3) - SELECT - Select the index of the ring-oscillator for frequency measurement
 -- access: rw, hardware: o
 -----------------------
 
-csr_freq_rdata(7 downto 3) <= csr_freq_select_ff;
+csr_freqcount_rdata(7 downto 3) <= csr_freqcount_select_ff;
 
-csr_freq_select_out <= csr_freq_select_ff;
+csr_freqcount_select_out <= csr_freqcount_select_ff;
 
 process (clk, rst) begin
 if (rst = '1') then
-    csr_freq_select_ff <= "00000"; -- 0x0
+    csr_freqcount_select_ff <= "00000"; -- 0x0
 elsif rising_edge(clk) then
-        if (csr_freq_wen = '1') then
+        if (csr_freqcount_wen = '1') then
             if (wstrb(0) = '1') then
-                csr_freq_select_ff(4 downto 0) <= wdata(7 downto 3);
+                csr_freqcount_select_ff(4 downto 0) <= wdata(7 downto 3);
             end if;
         else
-            csr_freq_select_ff <= csr_freq_select_ff;
+            csr_freqcount_select_ff <= csr_freqcount_select_ff;
         end if;
 end if;
 end process;
@@ -371,18 +380,18 @@ end process;
 
 -----------------------
 -- Bit field:
--- FREQ(30 downto 8) - VALUE - Measured value (unit in cycles of the system clock)
+-- FREQCOUNT(30 downto 8) - VALUE - Measured value (unit in cycles of the system clock)
 -- access: ro, hardware: i
 -----------------------
 
-csr_freq_rdata(30 downto 8) <= csr_freq_value_ff;
+csr_freqcount_rdata(30 downto 8) <= csr_freqcount_value_ff;
 
 
 process (clk, rst) begin
 if (rst = '1') then
-    csr_freq_value_ff <= "00000000000000000000000"; -- 0x0
+    csr_freqcount_value_ff <= "00000000000000000000000"; -- 0x0
 elsif rising_edge(clk) then
-            csr_freq_value_ff <= csr_freq_value_in;
+            csr_freqcount_value_ff <= csr_freqcount_value_in;
 end if;
 end process;
 
@@ -390,18 +399,18 @@ end process;
 
 -----------------------
 -- Bit field:
--- FREQ(31) - OVERFLOW - Flag set to `'1'` if an overflow occurred during measurement
+-- FREQCOUNT(31) - OVERFLOW - Flag set to `'1'` if an overflow occurred during measurement
 -- access: ro, hardware: i
 -----------------------
 
-csr_freq_rdata(31) <= csr_freq_overflow_ff;
+csr_freqcount_rdata(31) <= csr_freqcount_overflow_ff;
 
 
 process (clk, rst) begin
 if (rst = '1') then
-    csr_freq_overflow_ff <= '0'; -- 0x0
+    csr_freqcount_overflow_ff <= '0'; -- 0x0
 elsif rising_edge(clk) then
-            csr_freq_overflow_ff <= csr_freq_overflow_in;
+            csr_freqcount_overflow_ff <= csr_freqcount_overflow_in;
 end if;
 end process;
 
@@ -409,13 +418,64 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x10] - FIFOCTRL - Control register for the FIFO to read the PTRNG random data output
+-- [0x10] - FREQDIVIDER - Clock divider register, applies on oscillator RO0
+--------------------------------------------------------------------------------
+
+csr_freqdivider_wen <= wen when (waddr = std_logic_vector(to_unsigned(16, ADDR_W))) else '0'; -- 0x10
+
+csr_freqdivider_ren <= ren when (raddr = std_logic_vector(to_unsigned(16, ADDR_W))) else '0'; -- 0x10
+process (clk, rst) begin
+if (rst = '1') then
+    csr_freqdivider_ren_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+        csr_freqdivider_ren_ff <= csr_freqdivider_ren;
+end if;
+end process;
+
+-----------------------
+-- Bit field:
+-- FREQDIVIDER(31 downto 0) - VALUE - Clock divider value (1 means no division, 2 division by two, ...)
+-- access: rw, hardware: o
+-----------------------
+
+csr_freqdivider_rdata(31 downto 0) <= csr_freqdivider_value_ff;
+
+csr_freqdivider_value_out <= csr_freqdivider_value_ff;
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_freqdivider_value_ff <= "00000000000000000000000000000000"; -- 0x0
+elsif rising_edge(clk) then
+        if (csr_freqdivider_wen = '1') then
+            if (wstrb(0) = '1') then
+                csr_freqdivider_value_ff(7 downto 0) <= wdata(7 downto 0);
+            end if;
+            if (wstrb(1) = '1') then
+                csr_freqdivider_value_ff(15 downto 8) <= wdata(15 downto 8);
+            end if;
+            if (wstrb(2) = '1') then
+                csr_freqdivider_value_ff(23 downto 16) <= wdata(23 downto 16);
+            end if;
+            if (wstrb(3) = '1') then
+                csr_freqdivider_value_ff(31 downto 24) <= wdata(31 downto 24);
+            end if;
+        else
+            csr_freqdivider_value_ff <= csr_freqdivider_value_ff;
+        end if;
+end if;
+end process;
+
+
+
+--------------------------------------------------------------------------------
+-- CSR:
+-- [0x14] - FIFOCTRL - Control register for the FIFO to read the PTRNG random data output
 --------------------------------------------------------------------------------
 csr_fifoctrl_rdata(31 downto 5) <= (others => '0');
 
-csr_fifoctrl_wen <= wen when (waddr = std_logic_vector(to_unsigned(16, ADDR_W))) else '0'; -- 0x10
+csr_fifoctrl_wen <= wen when (waddr = std_logic_vector(to_unsigned(20, ADDR_W))) else '0'; -- 0x14
 
-csr_fifoctrl_ren <= ren when (raddr = std_logic_vector(to_unsigned(16, ADDR_W))) else '0'; -- 0x10
+csr_fifoctrl_ren <= ren when (raddr = std_logic_vector(to_unsigned(20, ADDR_W))) else '0'; -- 0x14
 process (clk, rst) begin
 if (rst = '1') then
     csr_fifoctrl_ren_ff <= '0'; -- 0x0
@@ -528,11 +588,11 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x14] - FIFODATA - Data register for the FIFO to read the PTRNG random data output
+-- [0x18] - FIFODATA - Data register for the FIFO to read the PTRNG random data output
 --------------------------------------------------------------------------------
 
 
-csr_fifodata_ren <= ren when (raddr = std_logic_vector(to_unsigned(20, ADDR_W))) else '0'; -- 0x14
+csr_fifodata_ren <= ren when (raddr = std_logic_vector(to_unsigned(24, ADDR_W))) else '0'; -- 0x18
 process (clk, rst) begin
 if (rst = '1') then
     csr_fifodata_ren_ff <= '0'; -- 0x0
@@ -590,10 +650,12 @@ elsif rising_edge(clk) then
         elsif raddr = std_logic_vector(to_unsigned(8, ADDR_W)) then -- 0x8
             rdata_ff <= csr_ring_rdata;
         elsif raddr = std_logic_vector(to_unsigned(12, ADDR_W)) then -- 0xc
-            rdata_ff <= csr_freq_rdata;
+            rdata_ff <= csr_freqcount_rdata;
         elsif raddr = std_logic_vector(to_unsigned(16, ADDR_W)) then -- 0x10
-            rdata_ff <= csr_fifoctrl_rdata;
+            rdata_ff <= csr_freqdivider_rdata;
         elsif raddr = std_logic_vector(to_unsigned(20, ADDR_W)) then -- 0x14
+            rdata_ff <= csr_fifoctrl_rdata;
+        elsif raddr = std_logic_vector(to_unsigned(24, ADDR_W)) then -- 0x18
             rdata_ff <= csr_fifodata_rdata;
         else 
             rdata_ff <= "10111010101011011011111011101111"; -- 0xbaadbeef

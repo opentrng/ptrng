@@ -39,23 +39,27 @@ architecture rtl of top is
 	-- Register map
 	signal sw_reset: std_logic;
 	signal ring_en: std_logic_vector (31 downto 0);
-	signal freq_en: std_logic;
-	signal freq_start: std_logic;
-	signal freq_done: std_logic;
-	signal freq_overflow: std_logic;
-	signal freq_select: std_logic_vector (4 downto 0);
-	signal freq_value: std_logic_vector (22 downto 0);
+	signal freqcount_en: std_logic;
+	signal freqcount_start: std_logic;
+	signal freqcount_done: std_logic;
+	signal freqcount_overflow: std_logic;
+	signal freqcount_select: std_logic_vector (4 downto 0);
+	signal freqcount_value: std_logic_vector (22 downto 0);
+	signal freqdivider: std_logic_vector (31 downto 0);
 
 	-- FIFO
-	constant FRAME_SIZE: natural := 256;
-	constant FIFO_ALMOST: natural := FRAME_SIZE;
-	constant FIFO_SIZE: natural := FIFO_ALMOST*4;
+	constant FIFO_SIZE: natural := 256;
+	constant FIFO_SAFE: natural := 32;
+	constant FIFO_ALMOSTEMPTY: natural := FIFO_SAFE;
+	constant FIFO_ALMOSTFULL: natural := FIFO_SIZE-FIFO_SAFE;
+	signal fifo_reset: std_logic;
 	signal fifo_clear: std_logic;
 	signal fifo_empty: std_logic;
 	signal fifo_full: std_logic;
 	signal fifo_almost_empty: std_logic;
 	signal fifo_almost_full: std_logic;
 	signal fifo_read_en: std_logic;
+	signal fifo_read_valid: std_logic;
 	signal fifo_write_en: std_logic;
 	signal fifo_data_read: std_logic_vector (31 downto 0);
 	signal fifo_data_write: std_logic_vector (31 downto 0);
@@ -125,18 +129,19 @@ begin
 		-- Registers for the user
 		csr_control_reset_out => sw_reset,
 		csr_ring_en_out => ring_en,
-		csr_freq_en_out => freq_en,
-		csr_freq_start_out => freq_start,
-		csr_freq_done_in => freq_done,
-		csr_freq_select_out => freq_select,
-		csr_freq_value_in => freq_value,
-		csr_freq_overflow_in => freq_overflow,
+		csr_freqcount_en_out => freqcount_en,
+		csr_freqcount_start_out => freqcount_start,
+		csr_freqcount_done_in => freqcount_done,
+		csr_freqcount_select_out => freqcount_select,
+		csr_freqcount_value_in => freqcount_value,
+		csr_freqcount_overflow_in => freqcount_overflow,
+		csr_freqdivider_value_out => freqdivider,
 		csr_fifoctrl_clear_out => fifo_clear,
 	    csr_fifoctrl_empty_in => fifo_empty,
 	    csr_fifoctrl_full_in => fifo_full,
 	    csr_fifoctrl_almostempty_in => fifo_almost_empty,
 	    csr_fifoctrl_almostfull_in => fifo_almost_full,
-		csr_fifodata_data_rvalid => '1', --FIXME?
+		csr_fifodata_data_rvalid => fifo_read_valid,
 		csr_fifodata_data_ren => fifo_read_en,
 		csr_fifodata_data_in => fifo_data_read
 	);
@@ -151,13 +156,13 @@ begin
 		clk => clk,
 		reset => sw_reset,
 		ring_en => ring_en,
-		freq_en => freq_en,
-		freq_select => freq_select,
-		freq_start => freq_start,
-		freq_done => freq_done,
-		freq_overflow => freq_overflow,
-		freq_value => freq_value,
-		divider => (others => '0'),
+		freqcount_en => freqcount_en,
+		freqcount_select => freqcount_select,
+		freqcount_start => freqcount_start,
+		freqcount_done => freqcount_done,
+		freqcount_overflow => freqcount_overflow,
+		freqcount_value => freqcount_value,
+		freqdivider => freqdivider,
 		data => fifo_data_write,
 		valid => fifo_write_en
 	);
@@ -165,21 +170,35 @@ begin
 	-- FIFO
 	fifo_to_uart: entity extras.simple_fifo
 	generic map (
-		mem_size => FIFO_SIZE
+		MEM_SIZE => FIFO_SIZE,
+		SYNC_READ => true
 	)
 	port map (
 		clock => clk,
-		reset => sw_reset or fifo_clear,
+		reset => fifo_reset,
 		wr_data => fifo_data_write,
 		we => fifo_write_en,
 		rd_data => fifo_data_read,
 		re => fifo_read_en,
 		empty => fifo_empty,
 		full => fifo_full,
-		almost_empty_thresh => FIFO_ALMOST,
-		almost_full_thresh => FIFO_ALMOST,
+		almost_empty_thresh => FIFO_ALMOSTEMPTY,
+		almost_full_thresh => FIFO_ALMOSTFULL,
 		almost_empty => fifo_almost_empty,
 		almost_full => fifo_almost_full
 	);
+
+	-- The FIFO is reseted on sw_reset and on clear
+	fifo_reset <= sw_reset or fifo_clear;
+
+	-- The data read from the FIFO is valid the cycle after the read request
+	process (clk, fifo_reset)
+	begin
+		if fifo_reset = '1' then
+			fifo_read_valid <= '0';
+		elsif rising_edge(clk) then
+			fifo_read_valid <= fifo_read_en;
+		end if;
+	end process;
 
 end architecture;

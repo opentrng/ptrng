@@ -30,7 +30,7 @@ create_pblock digitalnoise
 
 # Pblock for the digitizer
 create_pblock digitizer
-	add_cells_to_pblock [get_pblocks digitizer] [get_cells top/ptrng/source/digit.*]
+	add_cells_to_pblock [get_pblocks digitizer] [get_cells top/ptrng/source/digitizer]
 	add_cells_to_pblock [get_pblocks digitizer] [get_cells top/ptrng/source/cdc]
 	resize_pblock [get_pblocks digitizer] -add { {{ digitizer['area']['xilinx'] }} }
 	set_property CONTAIN_ROUTING false [get_pblocks digitizer]
