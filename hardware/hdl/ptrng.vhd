@@ -31,7 +31,7 @@ entity ptrng is
 		freqcount_value: out std_logic_vector (REG_WIDTH-5-4-1 downto 0);
 		-- Sampling clock divider (applies on RO0 for ERO and MURO)
 		freqdivider: in std_logic_vector (REG_WIDTH-1 downto 0);
-		-- Lenght of the entropy accumulator
+		-- Length of the entropy accumulator
 		--accumulator: in std_logic_vector (31 downto 0);
 		-- Enable the raw signal conditionner
 		--conditioning: in std_logic;
@@ -41,6 +41,8 @@ entity ptrng is
 		--low: out std_logic;
 		-- Entropy estimation
 		--estimator: out std_logic_vector (31 downto 0);
+		-- When 'packbits' is pulled to '1', LSB from IRN are packed into 32bits word before being outputed to 'data' port
+		packbits: in std_logic;
 		-- Random data output
 		data: out std_logic_vector (RAND_WIDTH-1 downto 0);
 		-- Random data output valid
@@ -54,6 +56,14 @@ architecture rtl of ptrng is
 	-- RRN from entropy source
 	signal raw_random_number: std_logic_vector (RAND_WIDTH-1 downto 0);
 	signal raw_random_valid: std_logic;
+
+	-- IRN from entropy source
+	signal intermediate_random_number: std_logic_vector (RAND_WIDTH-1 downto 0);
+	signal intermediate_random_valid: std_logic;
+
+	-- Packed data bits
+	signal packed_data: std_logic_vector (RAND_WIDTH-1 downto 0);
+	signal packed_valid: std_logic;
 
 begin
 
@@ -86,9 +96,25 @@ begin
 
 	-- Conditioner
 	-- TODO
+	intermediate_random_number <= raw_random_number;
+	intermediate_random_valid <= raw_random_valid;
+
+	-- LSB packing into words
+	bitpacker: entity work.bitpacker
+	generic map (
+		N => 5
+	)
+	port map (
+		clk => clk,
+		reset => reset,
+		data_in => intermediate_random_number(0),
+		valid_in => intermediate_random_valid,
+		data_out => packed_data,
+		valid_out => packed_valid
+	);
 
 	-- Output selection
-	data <= raw_random_number;
-	valid <= raw_random_valid;
+	data <= intermediate_random_number when packbits = '0' else packed_data;
+	valid <= intermediate_random_valid when packbits = '0' else packed_valid;
 
 end architecture;

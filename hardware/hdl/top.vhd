@@ -46,6 +46,7 @@ architecture rtl of top is
 	signal freqcount_select: std_logic_vector (4 downto 0);
 	signal freqcount_value: std_logic_vector (22 downto 0);
 	signal freqdivider: std_logic_vector (31 downto 0);
+	signal packbits: std_logic;
 
 	-- FIFO
 	constant FIFO_SIZE: natural := 256;
@@ -137,6 +138,7 @@ begin
 		csr_freqcount_overflow_in => freqcount_overflow,
 		csr_freqdivider_value_out => freqdivider,
 		csr_fifoctrl_clear_out => fifo_clear,
+		csr_fifoctrl_packbits_out => packbits,
 	    csr_fifoctrl_empty_in => fifo_empty,
 	    csr_fifoctrl_full_in => fifo_full,
 	    csr_fifoctrl_almostempty_in => fifo_almost_empty,
@@ -163,6 +165,7 @@ begin
 		freqcount_overflow => freqcount_overflow,
 		freqcount_value => freqcount_value,
 		freqdivider => freqdivider,
+		packbits => packbits,
 		data => fifo_data_write,
 		valid => fifo_write_en
 	);

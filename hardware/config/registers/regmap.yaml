@@ -111,7 +111,7 @@ regmap:
 # -   name: ENTROPY
 # -   name: ONLINETESTS
 -   name: FIFOCTRL
-    description: Control register for the FIFO to read the PTRNG random data output
+    description: Control register for the FIFO, into read the PTRNG random data output
     bitfields:
     -   name: CLEAR
         description: Clear the FIFO
@@ -119,28 +119,35 @@ regmap:
         lsb: 0
         access: wosc
         hardware: o
+    -   name: PACKBITS
+        description: Pack LSBs from each IRN into 32bits words (LSB to be read first); else all 32bits of IRN are written into the FIFO.
+        reset: 1
+        width: 1
+        lsb: 1
+        access: rw
+        hardware: o
     -   name: EMPTY
         description: Empty flag
         width: 1
-        lsb: 1
+        lsb: 2
         access: ro
         hardware: i
     -   name: FULL
         description: Full flag
         width: 1
-        lsb: 2
+        lsb: 3
         access: ro
         hardware: i
     -   name: ALMOSTEMPTY
         description: Almost empty flag
         width: 1
-        lsb: 3
+        lsb: 4
         access: ro
         hardware: i
     -   name: ALMOSTFULL
         description: Almost full flag
         width: 1
-        lsb: 4
+        lsb: 5
         access: ro
         hardware: i
 -   name: FIFODATA

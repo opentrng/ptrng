@@ -27,7 +27,7 @@ Base address: 0x00000000
 | [RING](#ring)            | 0x0008     | Ring-oscillator enable register (enable bits are active at `'1'`). |
 | [FREQCOUNT](#freqcount)  | 0x000c     | Frequency counter control register. |
 | [FREQDIVIDER](#freqdivider) | 0x0010     | Clock divider register, applies on oscillator RO0 |
-| [FIFOCTRL](#fifoctrl)    | 0x0014     | Control register for the FIFO to read the PTRNG random data output |
+| [FIFOCTRL](#fifoctrl)    | 0x0014     | Control register for the FIFO, into read the PTRNG random data output |
 | [FIFODATA](#fifodata)    | 0x0018     | Data register for the FIFO to read the PTRNG random data output |
 
 ## ID
@@ -114,20 +114,21 @@ Back to [Register map](#register-map-summary).
 
 ## FIFOCTRL
 
-Control register for the FIFO to read the PTRNG random data output
+Control register for the FIFO, into read the PTRNG random data output
 
 Address offset: 0x0014
 
-Reset value: 0x00000000
+Reset value: 0x00000002
 
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
-| -                | 31:5   | -               | 0x000000   | Reserved |
-| ALMOSTFULL       | 4      | ro              | 0x0        | Almost full flag |
-| ALMOSTEMPTY      | 3      | ro              | 0x0        | Almost empty flag |
-| FULL             | 2      | ro              | 0x0        | Full flag |
-| EMPTY            | 1      | ro              | 0x0        | Empty flag |
+| -                | 31:6   | -               | 0x000000   | Reserved |
+| ALMOSTFULL       | 5      | ro              | 0x0        | Almost full flag |
+| ALMOSTEMPTY      | 4      | ro              | 0x0        | Almost empty flag |
+| FULL             | 3      | ro              | 0x0        | Full flag |
+| EMPTY            | 2      | ro              | 0x0        | Empty flag |
+| PACKBITS         | 1      | rw              | 0x1        | Pack LSBs from each IRN into 32bits words (LSB to be read first); else all 32bits of IRN are written into the FIFO. |
 | CLEAR            | 0      | wosc            | 0x0        | Clear the FIFO |
 
 Back to [Register map](#register-map-summary).

@@ -1,6 +1,7 @@
 # Add design HDL source files to the list
 set hdl_files [list \
 	[list "work" [file normalize "../../hdl/clkdivider.vhd"]] \
+	[list "work" [file normalize "../../hdl/bitpacker.vhd"]] \
 	[list "work" [file normalize "../../hdl/coso.vhd"]] \
 	[list "work" [file normalize "../../hdl/digitizer.vhd"]] \
 	[list "work" [file normalize "../../hdl/clockdomain.vhd"]] \

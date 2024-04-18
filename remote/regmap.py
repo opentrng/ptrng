@@ -155,6 +155,19 @@ class _RegFifoctrl:
         self._rmap._if.write(self._rmap.FIFOCTRL_ADDR, rdata)
 
     @property
+    def packbits(self):
+        """Pack LSBs from each IRN into 32bits words (LSB to be read first); else all 32bits of IRN are written into the FIFO."""
+        rdata = self._rmap._if.read(self._rmap.FIFOCTRL_ADDR)
+        return (rdata >> self._rmap.FIFOCTRL_PACKBITS_POS) & self._rmap.FIFOCTRL_PACKBITS_MSK
+
+    @packbits.setter
+    def packbits(self, val):
+        rdata = self._rmap._if.read(self._rmap.FIFOCTRL_ADDR)
+        rdata = rdata & (~(self._rmap.FIFOCTRL_PACKBITS_MSK << self._rmap.FIFOCTRL_PACKBITS_POS))
+        rdata = rdata | (val << self._rmap.FIFOCTRL_PACKBITS_POS)
+        self._rmap._if.write(self._rmap.FIFOCTRL_ADDR, rdata)
+
+    @property
     def empty(self):
         """Empty flag"""
         rdata = self._rmap._if.read(self._rmap.FIFOCTRL_ADDR)
@@ -230,17 +243,19 @@ class RegMap:
     FREQDIVIDER_VALUE_POS = 0
     FREQDIVIDER_VALUE_MSK = 0xffffffff
 
-    # FIFOCTRL - Control register for the FIFO to read the PTRNG random data output
+    # FIFOCTRL - Control register for the FIFO, into read the PTRNG random data output
     FIFOCTRL_ADDR = 0x0014
     FIFOCTRL_CLEAR_POS = 0
     FIFOCTRL_CLEAR_MSK = 0x1
-    FIFOCTRL_EMPTY_POS = 1
+    FIFOCTRL_PACKBITS_POS = 1
+    FIFOCTRL_PACKBITS_MSK = 0x1
+    FIFOCTRL_EMPTY_POS = 2
     FIFOCTRL_EMPTY_MSK = 0x1
-    FIFOCTRL_FULL_POS = 2
+    FIFOCTRL_FULL_POS = 3
     FIFOCTRL_FULL_MSK = 0x1
-    FIFOCTRL_ALMOSTEMPTY_POS = 3
+    FIFOCTRL_ALMOSTEMPTY_POS = 4
     FIFOCTRL_ALMOSTEMPTY_MSK = 0x1
-    FIFOCTRL_ALMOSTFULL_POS = 4
+    FIFOCTRL_ALMOSTFULL_POS = 5
     FIFOCTRL_ALMOSTFULL_MSK = 0x1
 
     # FIFODATA - Data register for the FIFO to read the PTRNG random data output
@@ -314,7 +329,7 @@ class RegMap:
 
     @property
     def fifoctrl(self):
-        """Control register for the FIFO to read the PTRNG random data output"""
+        """Control register for the FIFO, into read the PTRNG random data output"""
         return self._if.read(self.FIFOCTRL_ADDR)
 
     @fifoctrl.setter

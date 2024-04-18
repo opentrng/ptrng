@@ -42,6 +42,8 @@ port(
 
     -- FIFOCTRL.CLEAR
     csr_fifoctrl_clear_out : out std_logic;
+    -- FIFOCTRL.PACKBITS
+    csr_fifoctrl_packbits_out : out std_logic;
     -- FIFOCTRL.EMPTY
     csr_fifoctrl_empty_in : in std_logic;
     -- FIFOCTRL.FULL
@@ -109,6 +111,7 @@ signal csr_fifoctrl_wen : std_logic;
 signal csr_fifoctrl_ren : std_logic;
 signal csr_fifoctrl_ren_ff : std_logic;
 signal csr_fifoctrl_clear_ff : std_logic;
+signal csr_fifoctrl_packbits_ff : std_logic;
 signal csr_fifoctrl_empty_ff : std_logic;
 signal csr_fifoctrl_full_ff : std_logic;
 signal csr_fifoctrl_almostempty_ff : std_logic;
@@ -469,9 +472,9 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x14] - FIFOCTRL - Control register for the FIFO to read the PTRNG random data output
+-- [0x14] - FIFOCTRL - Control register for the FIFO, into read the PTRNG random data output
 --------------------------------------------------------------------------------
-csr_fifoctrl_rdata(31 downto 5) <= (others => '0');
+csr_fifoctrl_rdata(31 downto 6) <= (others => '0');
 
 csr_fifoctrl_wen <= wen when (waddr = std_logic_vector(to_unsigned(20, ADDR_W))) else '0'; -- 0x14
 
@@ -512,11 +515,37 @@ end process;
 
 -----------------------
 -- Bit field:
--- FIFOCTRL(1) - EMPTY - Empty flag
+-- FIFOCTRL(1) - PACKBITS - Pack LSBs from each IRN into 32bits words (LSB to be read first); else all 32bits of IRN are written into the FIFO.
+-- access: rw, hardware: o
+-----------------------
+
+csr_fifoctrl_rdata(1) <= csr_fifoctrl_packbits_ff;
+
+csr_fifoctrl_packbits_out <= csr_fifoctrl_packbits_ff;
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_fifoctrl_packbits_ff <= '1'; -- 0x1
+elsif rising_edge(clk) then
+        if (csr_fifoctrl_wen = '1') then
+            if (wstrb(0) = '1') then
+                csr_fifoctrl_packbits_ff <= wdata(1);
+            end if;
+        else
+            csr_fifoctrl_packbits_ff <= csr_fifoctrl_packbits_ff;
+        end if;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- FIFOCTRL(2) - EMPTY - Empty flag
 -- access: ro, hardware: i
 -----------------------
 
-csr_fifoctrl_rdata(1) <= csr_fifoctrl_empty_ff;
+csr_fifoctrl_rdata(2) <= csr_fifoctrl_empty_ff;
 
 
 process (clk, rst) begin
@@ -531,11 +560,11 @@ end process;
 
 -----------------------
 -- Bit field:
--- FIFOCTRL(2) - FULL - Full flag
+-- FIFOCTRL(3) - FULL - Full flag
 -- access: ro, hardware: i
 -----------------------
 
-csr_fifoctrl_rdata(2) <= csr_fifoctrl_full_ff;
+csr_fifoctrl_rdata(3) <= csr_fifoctrl_full_ff;
 
 
 process (clk, rst) begin
@@ -550,11 +579,11 @@ end process;
 
 -----------------------
 -- Bit field:
--- FIFOCTRL(3) - ALMOSTEMPTY - Almost empty flag
+-- FIFOCTRL(4) - ALMOSTEMPTY - Almost empty flag
 -- access: ro, hardware: i
 -----------------------
 
-csr_fifoctrl_rdata(3) <= csr_fifoctrl_almostempty_ff;
+csr_fifoctrl_rdata(4) <= csr_fifoctrl_almostempty_ff;
 
 
 process (clk, rst) begin
@@ -569,11 +598,11 @@ end process;
 
 -----------------------
 -- Bit field:
--- FIFOCTRL(4) - ALMOSTFULL - Almost full flag
+-- FIFOCTRL(5) - ALMOSTFULL - Almost full flag
 -- access: ro, hardware: i
 -----------------------
 
-csr_fifoctrl_rdata(4) <= csr_fifoctrl_almostfull_ff;
+csr_fifoctrl_rdata(5) <= csr_fifoctrl_almostfull_ff;
 
 
 process (clk, rst) begin
