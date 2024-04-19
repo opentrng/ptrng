@@ -27,7 +27,7 @@ reg.freqdivider_bf.value = args.div
 
 # Disable the bit packer for 'lsb' and 'word' mode
 if args.mode == 'lsb' or args.mode == 'word':
-	reg.fifoctrl_bf.packbits == 0
+	reg.fifoctrl_bf.packbits = 0
 
 # Enable all ring oscillators
 reg.ring_bf.en = 0xFFFFFFFF
