@@ -3,24 +3,31 @@ import argparse
 import math
 import sys
 
+# Load arguments from file
+class LoadFromFile (argparse.Action):
+	def __call__ (self, parser, namespace, values, option_string = None):
+		with values as f:
+			parser.parse_args(f.read().split(), namespace)
+
 # Get command line arguments
 parser = argparse.ArgumentParser(description="Generate configuration files for the digitalnoise entity. More specifically it generates: 'settings.vhd' that contains HDL constants and 'placeroute.*' that contains all timing/place/route constraints for digitalnoise (extension depending on vendor).")
+parser.add_argument('-args', type=open, action=LoadFromFile, help="load all arguments from file")
 parser.add_argument("-verbose", action='store_true', help="add verbosity to the output")
-parser.add_argument("-vendor", required=True, type=str, choices=['xilinx'], help="target vendor (for selecting the templates)")
-parser.add_argument("-luts", required=True, type=int, help="number of LUT per item (per slice for Xilinx, per LE for Intel Altera)")
-parser.add_argument("-fixedlutpin", required=False, type=str, default='', help="optional parameter to fix the input pin for all LUTs (the value is the name of the pin)")
-parser.add_argument("-x", required=True, type=int, help="origin abscissa for the reserved area ")
-parser.add_argument("-y", required=True, type=int, help="origin ordinate for the reserved area")
-parser.add_argument("-maxwidth", required=True, type=int, help="maximum width for the reserved area")
-parser.add_argument("-maxheight", required=True, type=int, help="maximum height for the reserved area")
-parser.add_argument("-border", type=int, required=True, help="forbidden border all around inside the reserved area")
-parser.add_argument("-ringwidth", type=int, required=True, help="column width for a ring-oscillator")
-parser.add_argument("-digitheight", type=int, required=True, help="height for the digitizer block")
-parser.add_argument("-digittype", required=True, type=str, choices=['TEST', 'ERO', 'MURO', 'COSO'], help="choice of the sampling architecture for the digitizer")
-parser.add_argument("-hpad", type=int, required=True, help="horizontal padding between ROs")
-parser.add_argument("-vpad", type=int, required=True, help="vertical padding between ROs")
-parser.add_argument("-fmax", required=True, type=float, help="maximum estimated frequency for all ring-oscillators (Hz)")
-parser.add_argument("-len", required=True, type=int, nargs='+', help="number of elements in each ring-oscillator")
+parser.add_argument("-vendor", type=str, choices=['xilinx'], default='xilinx', help="target vendor (for selecting the templates)")
+parser.add_argument("-luts", type=int, default=1, help="number of LUT per item (per slice for Xilinx, per LE for Intel Altera)")
+parser.add_argument("-fixedlutpin", type=str, default='', help="optional parameter to fix the input pin for all LUTs (the value is the name of the pin)")
+parser.add_argument("-x", type=int, default=0, help="origin abscissa for the reserved area ")
+parser.add_argument("-y", type=int, default=0, help="origin ordinate for the reserved area")
+parser.add_argument("-maxwidth", type=int, default=20, help="maximum width for the reserved area")
+parser.add_argument("-maxheight", type=int, default=40, help="maximum height for the reserved area")
+parser.add_argument("-border", type=int, default=2, help="forbidden border all around inside the reserved area")
+parser.add_argument("-ringwidth", type=int, default=2, help="column width for a ring-oscillator")
+parser.add_argument("-digitheight", type=int, default=8, help="height for the digitizer block")
+parser.add_argument("-digittype", type=str, default='ERO', choices=['TEST', 'ERO', 'MURO', 'COSO'], help="choice of the sampling architecture for the digitizer")
+parser.add_argument("-hpad", type=int, default=2, help="horizontal padding between ROs")
+parser.add_argument("-vpad", type=int, default=2, help="vertical padding between ROs")
+parser.add_argument("-fmax", type=float, default=200e6, help="maximum estimated frequency for all ring-oscillators (Hz)")
+parser.add_argument("-len", nargs='+', type=int, default=[20, 20], help="number of elements in each ring-oscillator")
 args=parser.parse_args()
 
 # Arguments post-processingc
@@ -28,6 +35,7 @@ cmd = "python "+" ".join(sys.argv)
 t = len(args.len)-1
 
 # Command line argument summary
+print("Digitizer type: {:s}".format(args.digittype))
 print("LUTs per item: {:d}".format(args.luts))
 print("Reserved area for rings: (X{:d},Y{:d}) to max (X{:d},Y{:d})".format(args.x, args.y, args.x+args.maxwidth-1, args.y+args.maxheight-1))
 print("Forbidden border inside the reserved area: {:d}".format(args.border))

@@ -21,12 +21,12 @@ __pycache__
 *.str
 .ucdprod
 hd_visual/
-/hardware/target/fpga/*/*.cache
-/hardware/target/fpga/*/*.hw
-/hardware/target/fpga/*/*.ip_user_files
-/hardware/target/fpga/*/*.runs
-/hardware/target/fpga/*/*.sim
-/hardware/target/fpga/*/*.xpr
+/hardware/target/fpga/xilinx/*/*.cache
+/hardware/target/fpga/xilinx/*/*.hw
+/hardware/target/fpga/xilinx/*/*.ip_user_files
+/hardware/target/fpga/xilinx/*/*.runs
+/hardware/target/fpga/xilinx/*/*.sim
+/hardware/target/fpga/xilinx/*/*.xpr
 
 # Ignore windows files
 Thumbs.db
