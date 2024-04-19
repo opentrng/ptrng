@@ -8,6 +8,7 @@ import binutils
 parser = argparse.ArgumentParser(description="Compute the entropy for a binary file.")
 parser.add_argument("-e", required=True, dest="estimator", type=str, choices=['shannon', 'mcv', 'markov', 't8'], help="entropy estimator")
 parser.add_argument("-b", dest="n", type=int, default=1, help="estimate with N bits samples (default 1)")
+parser.add_argument("-q", "--quiet", action='store_true', help="quiet mode, only display the measured value")
 parser.add_argument("file", type=str, help="data input file (binary)")
 args=parser.parse_args()
 
@@ -96,4 +97,7 @@ if args.estimator=="t8":
 	entropy = t8(bits)
 
 # Output
-print("Entropy computed with {:s} estimator on {:d} bits samples: {:.12f}".format(args.estimator, args.n, entropy))
+if args.quiet:
+	print(entropy)
+else:
+	print("Entropy computed with {:s} estimator on {:d} bits samples: {:.12f}".format(args.estimator, args.n, entropy))
