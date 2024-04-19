@@ -19,7 +19,7 @@ ENTROPY="python ${ANALYSIS}/entropy.py"
 # Define settings
 DIGITIZERS=('ero' 'muro' 'coso')
 TAKES=10
-NUMFREQ=1000
+NUMFREQ=5000
 NUMRAND=100000
 
 # Create the output directory
