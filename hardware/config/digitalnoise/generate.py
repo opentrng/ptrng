@@ -2,6 +2,10 @@ from jinja2 import Environment, FileSystemLoader
 import argparse
 import math
 import sys
+import os
+
+# Get the directory absolute path
+path = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 # Load arguments from file
 class LoadFromFile (argparse.Action):
@@ -193,7 +197,7 @@ digitizer['area']['xilinx'] = xilinx_slice_area(digit_x, digit_y, digit_width, d
 print("- digitizer origin=({:d},{:d}) size=({:d},{:d})".format(digit_x, digit_y, digit_width, digit_height))
 
 # Init Jijna templating environement
-environment = Environment(loader=FileSystemLoader("templates"))
+environment = Environment(loader=FileSystemLoader(path+"templates"))
 
 # Generate the VHDL setting package
 template = environment.get_template("settings.vhd.jinja")
@@ -202,7 +206,7 @@ content = template.render(
 		rings = rings,
 		digitizer = digitizer
 	)
-settings = open("settings.vhd", "w")
+settings = open(path+"settings.vhd", "w")
 settings.write(content)
 settings.close()
 
@@ -215,6 +219,6 @@ content = template.render(
 		bank = bank,
 		rings = rings
 	)
-settings = open("constraints.xdc", "w")
+settings = open(path+"constraints.xdc", "w")
 settings.write(content)
 settings.close()
