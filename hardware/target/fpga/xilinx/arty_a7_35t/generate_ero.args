@@ -1,1 +1,1 @@
--vendor xilinx -luts 4 -x 12 -y 102 -maxwidth 14 -maxheight 20 -border 2 -digittype ERO -digitheight 8 -ringwidth 2 -hpad 2 -vpad 2 -fmax 150e6 -len 20 20
+-vendor xilinx -luts 4 -x 12 -y 102 -maxwidth 14 -maxheight 42 -border 2 -digittype ERO -digitheight 8 -ringwidth 2 -hpad 2 -vpad 2 -fmax 200e6 -len 20 20
