@@ -16,16 +16,19 @@ if { $::argc != 2 } {
 set boardname [lindex $argv 0]
 set partnumber [lindex $argv 1]
 
+# Set paths
+set hardware "../../.."
+
 # Set VHDL source files into a list
-source "hdl_files.tcl"
+source "${hardware}/target/fpga/hdl_files.tcl"
 lappend hdl_files [list "work" [file normalize "${boardname}/target.vhd"]]
-lappend hdl_files [list "work" [file normalize "../common/xilinx/ring.vhd"]]
+lappend hdl_files [list "work" [file normalize "${hardware}/target/common/xilinx/ring.vhd"]]
 
 # Set constraints files into a list (first file will be defined as target constraint file)
 set constraints_files [list \
 	[file normalize "${boardname}/target.xdc"] \
-	[file normalize "../common/xilinx/top.xdc"] \
-	[file normalize "../../config/digitalnoise/constraints.xdc"] \
+	[file normalize "${hardware}/target/common/xilinx/top.xdc"] \
+	[file normalize "${hardware}/config/digitalnoise/constraints.xdc"] \
 ]
 
 # Create an empty projet for given partnumber

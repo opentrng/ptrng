@@ -1,7 +1,11 @@
 # Ignore data
 /data/*
 
-# Ingore remote config file
+# Ignore generated files
+/hardware/config/digitalnoise/settings.vhd
+/hardware/config/digitalnoise/constraints.xdc
+
+# Ignore remote config file
 /remote/settings.py
 
 # Ignore python bins
