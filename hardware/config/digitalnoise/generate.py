@@ -5,6 +5,7 @@ import sys
 
 # Get command line arguments
 parser = argparse.ArgumentParser(description="Generate configuration files for the digitalnoise entity. More specifically it generates: 'settings.vhd' that contains HDL constants and 'placeroute.*' that contains all timing/place/route constraints for digitalnoise (extension depending on vendor).")
+parser.add_argument("-verbose", action='store_true', help="add verbosity to the output")
 parser.add_argument("-vendor", required=True, type=str, choices=['xilinx'], help="target vendor (for selecting the templates)")
 parser.add_argument("-luts", required=True, type=int, help="number of LUT per item (per slice for Xilinx, per LE for Intel Altera)")
 parser.add_argument("-fixedlutpin", required=False, type=str, default='', help="optional parameter to fix the input pin for all LUTs (the value is the name of the pin)")
@@ -15,7 +16,7 @@ parser.add_argument("-maxheight", required=True, type=int, help="maximum height 
 parser.add_argument("-border", type=int, required=True, help="forbidden border all around inside the reserved area")
 parser.add_argument("-ringwidth", type=int, required=True, help="column width for a ring-oscillator")
 parser.add_argument("-digitheight", type=int, required=True, help="height for the digitizer block")
-parser.add_argument("-digittype", required=True, type=str, choices=['TEST', 'COSO'], help="choice of the sampling architecture for the digitizer")
+parser.add_argument("-digittype", required=True, type=str, choices=['TEST', 'ERO', 'MURO', 'COSO'], help="choice of the sampling architecture for the digitizer")
 parser.add_argument("-hpad", type=int, required=True, help="horizontal padding between ROs")
 parser.add_argument("-vpad", type=int, required=True, help="vertical padding between ROs")
 parser.add_argument("-fmax", required=True, type=float, help="maximum estimated frequency for all ring-oscillators (Hz)")
@@ -82,7 +83,8 @@ def add_ring(x, y, width, index, length):
 		else:
 			xilinx_element['name'] = "element[{:d}].lut_buffer".format(element)
 		ring['elements']['xilinx'].append(xilinx_element)
-		print("  - element={:d} item=({:d},{:d}) lut={:d}".format(element, x+item_i, y+item_j, lut_i))
+		if args.verbose:
+			print("  - element={:d} item=({:d},{:d}) lut={:d}".format(element, x+item_i, y+item_j, lut_i))
 
 	# Add a dictionnary entry for the area and return the whole dict
 	ring['area'] = {}
@@ -119,6 +121,7 @@ bank_y = args.y + args.border + args.digitheight
 # For each RO
 x = bank_x
 y = bank_y
+row_y = bank_y
 xmax = 0
 ymax = 0
 for index in range(len(args.len)):
@@ -130,13 +133,11 @@ for index in range(len(args.len)):
 	# Add the padding for isolation
 	x += args.hpad
 	y += args.vpad
-	# if y > bank_y:
-	# 	y += args.vpad
 
 	# Add the ring-oscillator
 	ring['parameters'], ringheight = add_ring(x, y, args.ringwidth, index, args.len[index])
-	y += ringheight
 	x += args.ringwidth
+	y += ringheight
 
 	# Check if it fits the reserved area
 	assert x <= args.x+args.maxwidth-args.hpad-args.border, "Placement error for ring-oscillator {:d}, {:d} does not fit in the reserved width".format(index, x)
@@ -145,13 +146,14 @@ for index in range(len(args.len)):
 	ymax = max(y, ymax)
 
 	# Check if the next RO will fit in the remaining width in the current row, or start a new row
-	if x+args.hpad+2+args.hpad > args.x+args.maxwidth:
+	if x+args.hpad+args.ringwidth > args.x+args.maxwidth-args.hpad-args.border:
 		x = bank_x
 		y = ymax
+		row_y = ymax
 		if index < len(args.len)-1:
 			ymax = 0
 	else:
-		y = bank_y
+		y = row_y
 
 	# Append the bank to the dictionnary
 	rings.append(ring)

@@ -29,8 +29,8 @@ reg.freqdivider_bf.value = args.div
 if args.mode == 'lsb' or args.mode == 'word':
 	reg.fifoctrl_bf.packbits == 0
 
-# Enable RO0 and RO1
-reg.ring_bf.en = 0x3
+# Enable all ring oscillators
+reg.ring_bf.en = 0xFFFFFFFF
 
 # Read words
 count = 0
@@ -53,5 +53,5 @@ while count<args.count or args.count==-1:
 	if reg.fifoctrl_bf.full == 1:
 		print("WARNING: FIFO full, data are not contiguous!")
 
-# Disable all the ROs
+# Disable all ring oscillators
 reg.ring_bf.enable = 0x00000000

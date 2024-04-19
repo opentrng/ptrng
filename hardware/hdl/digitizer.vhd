@@ -48,17 +48,32 @@ begin
 			end if;
 		end process;
 
-	-- Instanciate the ERO
+	-- Instantiate the ERO
 	elsif DIGITIZER_GEN = ERO generate
-		digit_clk <= '0';
-		digit_data <= (others => '0');
+		ero: entity work.ero
+		port map (
+			ro0 => osc(0),
+			ro1 => osc(1),
+			div => freqdivider,
+			clk => digit_clk,
+			data => digit_data(0)
+		);
 
-	-- Instanciate the MURO
+	-- Instantiate the MURO
 	elsif DIGITIZER_GEN = MURO generate
-		digit_clk <= '0';
-		digit_data <= (others => '0');
+		muro: entity work.muro
+		generic map (
+			t => T
+		)
+		port map (
+			ro0 => osc(0),
+			rox => osc(T downto 1),
+			div => freqdivider,
+			clk => digit_clk,
+			data => digit_data(0)
+		);
 
-	-- Instanciate the COSO
+	-- Instantiate the COSO
 	elsif DIGITIZER_GEN = COSO generate
 		coso: entity work.coso
 		generic map (

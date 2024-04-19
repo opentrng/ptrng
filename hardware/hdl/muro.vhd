@@ -30,7 +30,7 @@ architecture rtl of muro is
 begin
 
 	-- Divide RO0 clock by the divider factor
-	clkdiv: entity work.clkdiv
+	clkdivider: entity work.clkdivider
 	generic map (
 		FACTOR_WIDTH => 32
 	)
