@@ -29,7 +29,8 @@ reg.freqdivider_bf.value = args.div
 if args.mode == 'lsb' or args.mode == 'word':
 	reg.fifoctrl_bf.packbits = 0
 
-# Enable all ring oscillators
+# Clear the FIFO and enable all ring oscillators
+reg.fifoctrl_bf.clear = 1
 reg.ring_bf.en = 0xFFFFFFFF
 
 # Read words
