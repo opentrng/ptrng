@@ -27,7 +27,7 @@ rm -f "${OUT}/entropy.txt"
 mkdir -p "${OUT}"
 
 # Create the entropy file
-echo "type;rings;div;take;mcv" > "${OUT}/entropy.txt"
+echo "type;rings;divider;take;shannon1;shannon8;mcv1;mcv8;markov" > "${OUT}/entropy.txt"
 
 # For ERO, COSO and MURO
 for DIGITIZER in "${DIGITIZERS[@]}"
@@ -109,8 +109,13 @@ do
 				fi
 
 				# Compute the entropy and put in a file
-				VALUE=`${ENTROPY} -q -e mcv "${OUT}/${SLUG1}.bin"`
-				echo "${DIGITIZER};${LENGTH};${DIVIDER};${TAKE};${VALUE}" >> "${OUT}/entropy.txt"
+				echo " - Computing entropy for ${SLUG1}.bin"
+				SHANNON1=`${ENTROPY} -q -e shannon -b 1 "${OUT}/${SLUG1}.bin"`
+				SHANNON8=`${ENTROPY} -q -e shannon -b 8 "${OUT}/${SLUG1}.bin"`
+				MCV1=`${ENTROPY} -q -e mcv -b 1 "${OUT}/${SLUG1}.bin"`
+				MCV8=`${ENTROPY} -q -e mcv -b 8 "${OUT}/${SLUG1}.bin"`
+				MARKOV=`${ENTROPY} -q -e markov -b 1 "${OUT}/${SLUG1}.bin"`
+				echo "${DIGITIZER};${LENGTH};${DIVIDER};${TAKE};${SHANNON1};${SHANNON8};${MCV1};${MCV8};${MARKOV}" >> "${OUT}/entropy.txt"
 			done
 		done
 	done
