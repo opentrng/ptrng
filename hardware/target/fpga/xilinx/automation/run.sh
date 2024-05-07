@@ -12,7 +12,9 @@ GENERATE="python ${HARDWARE}/config/digitalnoise/generate.py"
 VIVADO="vivado"
 FREQUENCY="python ${REMOTE}/frequency.py"
 READRNG="python ${REMOTE}/readrng.py"
+AUTOCORRELATION="python ${ANALYSIS}/autocorrelation.py"
 DISTRIBUTION="python ${ANALYSIS}/distribution.py"
+ALLANVARIANCE="python ${ANALYSIS}/allanvariance.py"
 TOBINARY="python ${ANALYSIS}/tobinary.py"
 ENTROPY="python ${ANALYSIS}/entropy.py"
 
@@ -24,10 +26,12 @@ NUMRAND=100000
 
 # Create the output directory
 rm -f "${OUT}/entropy.txt"
+rm -f "${OUT}/variance.txt"
 mkdir -p "${OUT}"
 
-# Create the entropy file
-echo "type;rings;divider;take;shannon1;shannon8;mcv1;mcv8;markov" > "${OUT}/entropy.txt"
+# Create the entropy and variance file
+echo "type;rings;divider;inst;shannon1;shannon8;mcv1;mcv8;markov" > "${OUT}/entropy.txt"
+echo "type;rings;divider;inst;a0;a1;a2" > "${OUT}/variance.txt"
 
 # For ERO, COSO and MURO
 for DIGITIZER in "${DIGITIZERS[@]}"
@@ -95,6 +99,11 @@ do
 					${READRNG} -c ${NUMRAND} -m word "${OUT}/${SLUG1}_counters.txt" > "${OUT}/${SLUG1}_readrng.log"
 					${DISTRIBUTION} -l -t "COSO n=[${LENGTH}]" "${OUT}/${SLUG1}_counters.txt" "${OUT}/${SLUG1}_distrib.png"
 
+					# Compute Allan variance coefficients
+					echo " - Compute Allan variance for ${SLUG1}"
+					VARCOEFFS=`${ALLANVARIANCE} -q "${OUT}/${SLUG1}_counters.txt" "${OUT}/${SLUG1}_allanvar.png"`
+					echo "${DIGITIZER};${LENGTH};${DIVIDER};${TAKE};${VARCOEFFS}" >> "${OUT}/variance.txt"
+
 					# Extract LSB from counter values and convert to binary
 					${TOBINARY} "${OUT}/${SLUG1}_counters.txt" "${OUT}/${SLUG1}.bin" > "${OUT}/${SLUG1}_tobinary.log"
 
@@ -116,6 +125,11 @@ do
 				MCV8=`${ENTROPY} -q -e mcv -b 8 "${OUT}/${SLUG1}.bin"`
 				MARKOV=`${ENTROPY} -q -e markov -b 1 "${OUT}/${SLUG1}.bin"`
 				echo "${DIGITIZER};${LENGTH};${DIVIDER};${TAKE};${SHANNON1};${SHANNON8};${MCV1};${MCV8};${MARKOV}" >> "${OUT}/entropy.txt"
+
+				# Ploting autocorrelation
+				echo " - Plotting autocorrelation for ${SLUG1}.bin"
+				${AUTOCORRELATION} -b 1 -d 1000 -t "Autocorrelation n=${LENGTH} div=${DIVIDER} b=1" "${OUT}/${SLUG1}.bin" "${OUT}/${SLUG1}_autocorr_b1_d1000.png"
+				${AUTOCORRELATION} -b 8 -d 1000 -t "Autocorrelation n=${LENGTH} div=${DIVIDER} b=8" "${OUT}/${SLUG1}.bin" "${OUT}/${SLUG1}_autocorr_b8_d1000.png"
 			done
 		done
 	done
