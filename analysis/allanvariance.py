@@ -6,6 +6,7 @@ import lsne
 # Get command line arguments
 parser = argparse.ArgumentParser(description="Generate a normalized Allan Variance plot for a RO time serie or for COSO counter values.")
 parser.add_argument("-t", dest="title", type=str, default="", help="plot title")
+parser.add_argument("-q", "--quiet", action='store_true', help="quiet mode, only display the measured value")
 parser.add_argument("datafile", type=str, help="data input file (text format, should contain one sample per line)")
 parser.add_argument("plotfile", type=str, help="plot output file (possibles extensions png, jpg, pdf)")
 args=parser.parse_args()
@@ -27,9 +28,13 @@ for n in nspace:
 
 # Do the polynomial regression LSNE (np.polyfit only fit values in high decades)
 poly = lsne.regression(nspace, allanvar, [2, 1, 0])
-print("Polynomial regression coefficients:")
-print(" - thermal: {:e}".format(poly[1]))
-print(" - flicker: {:e}".format(poly[0]))
+if args.quiet:
+	print("{:e};{:e};{:e}".format(poly[2], poly[1], poly[0]))
+else:
+	print("Polynomial regression coefficients:")
+	print(" - quantif: {:e}".format(poly[2]))
+	print(" - thermal: {:e}".format(poly[1]))
+	print(" - flicker: {:e}".format(poly[0]))
 
 # Plot in log/log
 plt.title(args.title)
