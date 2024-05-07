@@ -8,7 +8,7 @@ import binutils
 def autocorr(samples, depth):
 	assert depth <= samples.size/2
 	lags = range(1, depth)
-	result = np.array([np.count_nonzero(np.equal(samples, np.roll(samples, lag)) == True) for lag in lags])
+	result = np.array([np.count_nonzero(np.equal(samples, np.roll(samples, lag)) == True)/samples.size for lag in lags])
 	return result/samples.size
 
 # When started from terminal
