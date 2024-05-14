@@ -9,7 +9,7 @@ def autocorr(samples, depth):
 	assert depth <= samples.size/2
 	lags = range(1, depth)
 	result = np.array([np.count_nonzero(np.equal(samples, np.roll(samples, lag)) == True)/samples.size for lag in lags])
-	return result/samples.size
+	return lags, result/samples.size
 
 # When started from terminal
 if __name__ == '__main__':
@@ -27,9 +27,12 @@ if __name__ == '__main__':
 	data = np.fromfile(args.datafile, dtype='uint8')
 	bits = np.unpackbits(data)
 
+	# Compute the autocorrelation
+	lags, acf = autocorr(binutils.to_words(bits, args.n), args.depth)
+
 	# Plot the autocorrelation
 	plt.title(args.title)
 	plt.xlabel('Autocorrelation lag')
 	plt.ylabel('Normalized correlation')
-	plt.plot(autocorr(binutils.to_words(bits, args.n), args.depth)*2**args.n)
+	plt.plot(acf*2**args.n)
 	plt.savefig(args.plotfile)
