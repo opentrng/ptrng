@@ -1,9 +1,9 @@
 [submodule "hardware/lib/vhdl-extras"]
 	path = hardware/lib/vhdl-extras
-	url = https://github.com/kevinpt/vhdl-extras.git
+	url = https://github.com/fpebaypeyroula/vhdl-extras.git
 [submodule "hardware/lib/fluart"]
 	path = hardware/lib/fluart
-	url = https://github.com/marcj71/fluart.git
+	url = https://github.com/fpebaypeyroula/fluart.git
 [submodule "hardware/lib/cmd_proc"]
 	path = hardware/lib/cmd_proc
-	url = https://github.com/marcj71/cmd_proc.git
+	url = https://github.com/fpebaypeyroula/cmd_proc.git
