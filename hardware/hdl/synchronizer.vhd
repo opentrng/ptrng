@@ -1,0 +1,79 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
+
+-- Vector clock domain crossing. Resynchronize a vector from source clock to destination clock. Takes 4 clock (clk_to) cycles, so input datarate must be 4 times slower than destination clock. Also, destination clock must be faster as the source clock.
+entity synchronizer is
+	generic (
+		-- With of data ports
+		DATA_WIDTH: natural := 32
+	);
+	port (
+		-- Asynchronous reset
+		reset: in std_logic;
+		-- Cross from this clock
+		clk_from: in std_logic;
+		-- Input data, sync to 'clk_from'
+		data_in: in std_logic_vector (DATA_WIDTH-1 downto 0);
+		-- Valid signal for 'data_in'
+		data_in_en: in std_logic;
+		-- Cross to this clock
+		clk_to: in std_logic;
+		-- Ouput data, sync to 'clk_to'
+		data_out: out std_logic_vector (DATA_WIDTH-1 downto 0);
+		-- Valid signal for 'data_out'
+		data_out_en: out std_logic
+	);
+end entity;
+
+-- RTL implemenation of the resynchronizer for a vector.
+architecture rtl of synchronizer is
+
+	signal digit_clk_tap: std_logic_vector (7 downto 0);
+	signal data_en_tap: std_logic_vector (7 downto 0);
+	signal data: std_logic_vector (DATA_WIDTH-1 downto 0);
+	signal valid: std_logic := '0';
+
+begin
+
+	-- Resynchronize the input clock
+	process (clk_to, reset)
+	begin
+		if reset = '1' then
+			digit_clk_tap <= (others => '0');
+			data_en_tap <= (others => '0');
+		elsif rising_edge(clk_to) then
+			digit_clk_tap <= digit_clk_tap(digit_clk_tap'Length-2 downto 0) & clk_from;
+			data_en_tap <= data_en_tap(data_en_tap'Length-2 downto 0) & data_in_en;
+		end if;
+	end process;
+
+	-- Sampling the data input
+	process (clk_to, reset)
+	begin
+		if reset = '1' then
+			valid <= '0';
+		elsif rising_edge(clk_to) then
+			if digit_clk_tap(1) = '0' and digit_clk_tap(0) = '1' and data_en_tap(0) = '1' then
+				data <= data_in;
+				valid <= '1';
+			else
+				valid <= '0';
+			end if;
+		end if;
+	end process;
+	
+	-- Registering the output
+	process (clk_to, reset)
+	begin
+		if reset = '1' then
+			data_out_en <= '0';
+		elsif rising_edge(clk_to) then
+			if valid = '1' then
+				data_out <= data;
+			end if;
+			data_out_en <= valid;
+		end if;
+	end process;
+
+end architecture;
