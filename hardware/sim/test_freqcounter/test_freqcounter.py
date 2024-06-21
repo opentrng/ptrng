@@ -11,7 +11,7 @@ async def test_count_frequency(dut):
 	dut.enable.value = 0
 	dut.start.value = 0
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
-	await cocotb.start(Clock(dut.osc, 333, units="ns").start())
+	await cocotb.start(Clock(dut.source, 333, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
 	await Signal.SetBitAfter(dut.enable, 20, units="ns")
 	await Signal.PulseBit(dut.start, dut.clk)
@@ -25,7 +25,7 @@ async def test_counter_overflow(dut):
 	dut.enable.value = 1
 	dut.start.value = 0
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
-	await cocotb.start(Clock(dut.osc, 333, units="ns").start())
+	await cocotb.start(Clock(dut.source, 333, units="ns").start())
 	await Signal.PulseBit(dut.start, dut.clk)
 	await Signal.Skip(dut.clk, 100)
 	dut.counter.value = Deposit((2**24)-1)
@@ -40,7 +40,7 @@ async def test_duration_overflow(dut):
 	dut.enable.value = 1
 	dut.start.value = 0
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
-	await cocotb.start(Clock(dut.osc, 333, units="ns").start())
+	await cocotb.start(Clock(dut.source, 333, units="ns").start())
 	await Signal.PulseBit(dut.start, dut.clk)
 	await Signal.Skip(dut.clk, 100)
 	dut.duration.value = Deposit(1001)

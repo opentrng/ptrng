@@ -1,4 +1,4 @@
-VHDL_SOURCES += murowrapper.vhd ../../hdl/muro.vhd ../../hdl/clkdiv.vhd
+VHDL_SOURCES += murowrapper.vhd ../../hdl/muro.vhd ../../hdl/clkdivider.vhd
 TOPLEVEL = murowrapper
 MODULE = test_muro
 

@@ -17,6 +17,7 @@ __pycache__
 /hardware/sim/*/sim_build
 /hardware/sim/*/results.xml
 /hardware/sim/*/*.vcd
+/hardware/sim/*/*.o
 
 # Ignore Xilinx files
 .Xil

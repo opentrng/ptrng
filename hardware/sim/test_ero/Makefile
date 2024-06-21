@@ -1,4 +1,4 @@
-VHDL_SOURCES += ../../hdl/ero.vhd ../../hdl/clkdiv.vhd
+VHDL_SOURCES += ../../hdl/ero.vhd ../../hdl/clkdivider.vhd
 TOPLEVEL = ero
 MODULE = test_ero
 
