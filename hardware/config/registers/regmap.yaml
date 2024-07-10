@@ -150,6 +150,18 @@ regmap:
         lsb: 5
         access: ro
         hardware: i
+    -   name: RDBURSTAVAILABLE
+        description: Valid to '1' when a burst is available for read (see BURSTSIZE)
+        width: 1
+        lsb: 6
+        access: ro
+        hardware: i
+    -   name: BURSTSIZE
+        description: Size of a burst (in count of 32bit words)
+        width: 16
+        lsb: 7
+        access: ro
+        hardware: i
 -   name: FIFODATA
     description: Data register for the FIFO to read the PTRNG random data output
     bitfields:

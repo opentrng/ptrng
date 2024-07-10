@@ -52,6 +52,10 @@ port(
     csr_fifoctrl_almostempty_in : in std_logic;
     -- FIFOCTRL.ALMOSTFULL
     csr_fifoctrl_almostfull_in : in std_logic;
+    -- FIFOCTRL.RDBURSTAVAILABLE
+    csr_fifoctrl_rdburstavailable_in : in std_logic;
+    -- FIFOCTRL.BURSTSIZE
+    csr_fifoctrl_burstsize_in : in std_logic_vector(15 downto 0);
 
     -- FIFODATA.DATA
     csr_fifodata_data_rvalid : in std_logic;
@@ -116,6 +120,8 @@ signal csr_fifoctrl_empty_ff : std_logic;
 signal csr_fifoctrl_full_ff : std_logic;
 signal csr_fifoctrl_almostempty_ff : std_logic;
 signal csr_fifoctrl_almostfull_ff : std_logic;
+signal csr_fifoctrl_rdburstavailable_ff : std_logic;
+signal csr_fifoctrl_burstsize_ff : std_logic_vector(15 downto 0);
 
 signal csr_fifodata_rdata : std_logic_vector(31 downto 0);
 signal csr_fifodata_ren : std_logic;
@@ -474,7 +480,7 @@ end process;
 -- CSR:
 -- [0x14] - FIFOCTRL - Control register for the FIFO, into read the PTRNG random data output
 --------------------------------------------------------------------------------
-csr_fifoctrl_rdata(31 downto 6) <= (others => '0');
+csr_fifoctrl_rdata(31 downto 23) <= (others => '0');
 
 csr_fifoctrl_wen <= wen when (waddr = std_logic_vector(to_unsigned(20, ADDR_W))) else '0'; -- 0x14
 
@@ -610,6 +616,44 @@ if (rst = '1') then
     csr_fifoctrl_almostfull_ff <= '0'; -- 0x0
 elsif rising_edge(clk) then
             csr_fifoctrl_almostfull_ff <= csr_fifoctrl_almostfull_in;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- FIFOCTRL(6) - RDBURSTAVAILABLE - Valid to '1' when a burst is available for read (see BURSTSIZE)
+-- access: ro, hardware: i
+-----------------------
+
+csr_fifoctrl_rdata(6) <= csr_fifoctrl_rdburstavailable_ff;
+
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_fifoctrl_rdburstavailable_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+            csr_fifoctrl_rdburstavailable_ff <= csr_fifoctrl_rdburstavailable_in;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- FIFOCTRL(22 downto 7) - BURSTSIZE - Size of a burst (in count of 32bit words)
+-- access: ro, hardware: i
+-----------------------
+
+csr_fifoctrl_rdata(22 downto 7) <= csr_fifoctrl_burstsize_ff;
+
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_fifoctrl_burstsize_ff <= "0000000000000000"; -- 0x0
+elsif rising_edge(clk) then
+            csr_fifoctrl_burstsize_ff <= csr_fifoctrl_burstsize_in;
 end if;
 end process;
 

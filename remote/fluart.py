@@ -27,6 +27,22 @@ class CmdProc:
 		cmd += value.to_bytes(4, 'big')
 		self.port.write(cmd)
 
+	def burstread(self, address, size):
+		cmd = bytearray()
+		cmd.append(0x02)
+		cmd += address.to_bytes(2, 'big')
+		cmd += size.to_bytes(2, 'big')
+		self.port.write(cmd)
+		return self.port.read(size*4)
+
+	def burstwrite(self, address, size, data):
+		cmd = bytearray()
+		cmd.append(0x03)
+		cmd += address.to_bytes(2, 'big')
+		cmd += size.to_bytes(2, 'big')
+		cmd += data
+		self.port.write(cmd)
+
 	def check(self, uid, rev):
 		assert uid==0xCEA3, "This is not an OpenTRNG target board"
 		assert rev==1, "Wrong version of OpenTRNG target board"

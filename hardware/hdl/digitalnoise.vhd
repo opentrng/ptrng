@@ -49,17 +49,23 @@ architecture rtl of digitalnoise is
 	signal osc: std_logic_vector (T downto 0);
 	signal mon: std_logic_vector (T downto 0);
 	signal mon_en: std_logic_vector (T downto 0);
+	signal selected_mon: std_logic;
 
 	-- Digitizer
 	signal digit_clk: std_logic;
 	signal digit_data: std_logic_vector (RAND_WIDTH-1 downto 0) := (others => '0');
+	
+	-- CDC
+	signal cdc_fifo_empty: std_logic;
+	signal cdc_fifo_read: std_logic;
+	signal cdc_fifo_data: std_logic_vector (RAND_WIDTH-1 downto 0);
 
 begin
 
 	-- Instantiate ring-oscillators from 0 to T with their respective frequency monitor enable
 	bank: for I in 0 to T generate
-
-		-- Each RO of the bank
+	
+		-- Each RO of the bank (or system clock bypass for tests)
 		ring: entity work.ring
 		generic map (
 			N => RO_LEN(I)
@@ -95,13 +101,14 @@ begin
 	port map (
 		clk => clk,
 		reset => reset,
-		source => mon(conv_integer(freqcount_select)),
+		source => selected_mon,
 		enable => freqcount_en,
 		start => freqcount_start,
 		done => freqcount_done,
 		overflow => freqcount_overflow,
 		result => freqcount_value
 	);
+	selected_mon <= mon(conv_integer(freqcount_select));
 
 	-- Digitizer 
 	digitizer: entity work.digitizer
@@ -117,7 +124,7 @@ begin
 	);
 
 	-- Clock domain crossing from osc(0) to system clock (clk)
-	cdc: entity work.clockdomain
+	cdc: entity work.synchronizer
 	generic map (
 		DATA_WIDTH => RAND_WIDTH
 	)
@@ -125,9 +132,10 @@ begin
 		reset => reset,
 		clk_from => digit_clk,
 		data_in => digit_data,
+		data_in_en => '1',
 		clk_to => clk,
 		data_out => data,
-		data_en => valid
+		data_out_en => valid
 	);
 
 end architecture;

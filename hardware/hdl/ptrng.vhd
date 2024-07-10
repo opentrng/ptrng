@@ -1,6 +1,5 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_unsigned.all;
 
 -- OpenTRNG's PTRNG base entity.
 entity ptrng is
@@ -114,7 +113,19 @@ begin
 	);
 
 	-- Output selection
-	data <= intermediate_random_number when packbits = '0' else packed_data;
-	valid <= intermediate_random_valid when packbits = '0' else packed_valid;
+	process (clk, reset)
+	begin
+		if reset = '1' then
+			valid <= '0';
+		elsif rising_edge(clk) then
+			if packbits = '1' then
+				data <=  packed_data;
+				valid <= packed_valid;
+			else
+				data <= intermediate_random_number;
+				valid <= intermediate_random_valid;
+			end if;
+		end if;
+	end process;
 
 end architecture;

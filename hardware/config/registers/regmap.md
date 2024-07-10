@@ -123,7 +123,9 @@ Reset value: 0x00000002
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
-| -                | 31:6   | -               | 0x000000   | Reserved |
+| -                | 31:23  | -               | 0x00       | Reserved |
+| BURSTSIZE        | 22:7   | ro              | 0x0000     | Size of a burst (in count of 32bit words) |
+| RDBURSTAVAILABLE | 6      | ro              | 0x0        | Valid to '1' when a burst is available for read (see BURSTSIZE) |
 | ALMOSTFULL       | 5      | ro              | 0x0        | Almost full flag |
 | ALMOSTEMPTY      | 4      | ro              | 0x0        | Almost empty flag |
 | FULL             | 3      | ro              | 0x0        | Full flag |

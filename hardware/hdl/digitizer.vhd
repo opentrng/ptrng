@@ -32,21 +32,24 @@ begin
 
 	-- TEST digitizer is a 32bit counter clocked at osc(0)/freqdivider
 	gen: if DIGITIZER_GEN = TEST generate
-		signal counter: std_logic_vector (RAND_WIDTH-1 downto 0);
+		signal counter: std_logic_vector (RAND_WIDTH-1 downto 0) := (others => '0');
 	begin
-		process (osc(0))
+		clkdivider: entity work.clkdivider
+		generic map (
+			FACTOR_WIDTH => 32
+		)
+		port map (
+			original => osc(0),
+			factor => freqdivider,
+			divided => digit_clk
+		);
+		process (digit_clk)
 		begin
-			if rising_edge(osc(0)) then
-				if counter < freqdivider-1 then
-					counter <= counter + 1;
-					digit_clk <= '0';
-				else
-					counter <= (others => '0');
-					digit_data <= digit_data + 1;
-					digit_clk <= '1';
-				end if;
+			if rising_edge(digit_clk) then
+				counter <= counter + 1;
 			end if;
 		end process;
+		digit_data <= counter;
 
 	-- Instantiate the ERO
 	elsif DIGITIZER_GEN = ERO generate

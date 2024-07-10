@@ -1,15 +1,17 @@
 # Add design HDL source files to the list
 set hdl_files [list \
 	[list "work" [file normalize "${hardware}/hdl/clkdivider.vhd"]] \
+	[list "work" [file normalize "${hardware}/hdl/delay.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/bitpacker.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/ero.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/muro.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/coso.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/digitizer.vhd"]] \
-	[list "work" [file normalize "${hardware}/hdl/clockdomain.vhd"]] \
+	[list "work" [file normalize "${hardware}/hdl/synchronizer.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/digitalnoise.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/freqcounter.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/ptrng.vhd"]] \
+	[list "work" [file normalize "${hardware}/hdl/prefetch.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/top.vhd"]] \
 ]
 

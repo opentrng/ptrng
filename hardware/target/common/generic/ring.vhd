@@ -11,7 +11,11 @@ entity ring is
 		-- Enable signal (active '1')
 		enable: in std_logic;
 		-- Clock output signal
-		osc: out std_logic
+		osc: out std_logic;
+		-- Enable the monitoring signal
+		mon_en: in std_logic;
+		-- Output signal for monitoring
+		mon: out std_logic
 	);
 end entity;
 
@@ -32,5 +36,8 @@ begin
 
 	-- Output a net of the RO
 	osc <= net(0);
+	
+	-- Monitoring output
+	mon <= osc when mon_en = '1' else '0';
 
 end architecture;

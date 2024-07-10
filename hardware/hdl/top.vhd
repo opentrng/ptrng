@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library extras;
 use extras.fifos.all;
@@ -7,12 +8,17 @@ use extras.fifos.all;
 -- Top for testing the PTRNG by writing configuration registers and reading data into a FIFO through an UART.
 entity top is
 	generic (
-		CLK_REF: natural
+		-- Frequency (Hz) of the oscillator (clk)
+		CLK_REF: natural := 100_000_000
 	);
 	port (
+		-- Oscillator input
 		clk: in std_logic;
+		-- Asynchronous hardware reset active to '1'
 		hw_reset: in std_logic;
+		-- UART signal from PC
 		uart_txd: in std_logic;
+		-- UART signal to PC
 		uart_rxd: out std_logic
 	);
 end;
@@ -37,7 +43,7 @@ architecture rtl of top is
 	signal write_req: std_logic;
 
 	-- Register map
-	signal sw_reset: std_logic;
+	signal ptrng_reset: std_logic;
 	signal ring_en: std_logic_vector (31 downto 0);
 	signal freqcount_en: std_logic;
 	signal freqcount_start: std_logic;
@@ -47,24 +53,32 @@ architecture rtl of top is
 	signal freqcount_value: std_logic_vector (22 downto 0);
 	signal freqdivider: std_logic_vector (31 downto 0);
 	signal packbits: std_logic;
+	
+	-- PTRNG
+	signal ptrng_data: std_logic_vector (31 downto 0);
+	signal ptrng_valid: std_logic;
 
 	-- FIFO
-	constant FIFO_SIZE: natural := 256;
-	constant FIFO_SAFE: natural := 32;
-	constant FIFO_ALMOSTEMPTY: natural := FIFO_SAFE;
-	constant FIFO_ALMOSTFULL: natural := FIFO_SIZE-FIFO_SAFE;
-	signal fifo_reset: std_logic;
+	constant BURST_SIZE: natural := 128;
+	constant FIFO_SIZE: natural := 4*BURST_SIZE;
+	constant FIFO_ALMOSTEMPTY: natural := BURST_SIZE;
+	constant FIFO_ALMOSTFULL: natural := BURST_SIZE;
 	signal fifo_clear: std_logic;
 	signal fifo_empty: std_logic;
 	signal fifo_full: std_logic;
 	signal fifo_almost_empty: std_logic;
 	signal fifo_almost_full: std_logic;
 	signal fifo_read_en: std_logic;
-	signal fifo_read_valid: std_logic;
 	signal fifo_write_en: std_logic;
 	signal fifo_data_read: std_logic_vector (31 downto 0);
 	signal fifo_data_write: std_logic_vector (31 downto 0);
-
+	
+	-- FIFO PREFETCHER
+	signal fifo_prefetch_read: std_logic;
+	signal fifo_prefetch_data: std_logic_vector (31 downto 0);
+	
+	signal counter: std_logic_vector (31 downto 0);
+	
 begin
 
 	-- UART
@@ -128,7 +142,7 @@ begin
 		--rvalid
 
 		-- Registers for the user
-		csr_control_reset_out => sw_reset,
+		csr_control_reset_out => ptrng_reset,
 		csr_ring_en_out => ring_en,
 		csr_freqcount_en_out => freqcount_en,
 		csr_freqcount_start_out => freqcount_start,
@@ -139,11 +153,13 @@ begin
 		csr_freqdivider_value_out => freqdivider,
 		csr_fifoctrl_clear_out => fifo_clear,
 		csr_fifoctrl_packbits_out => packbits,
-	    csr_fifoctrl_empty_in => fifo_empty,
-	    csr_fifoctrl_full_in => fifo_full,
-	    csr_fifoctrl_almostempty_in => fifo_almost_empty,
-	    csr_fifoctrl_almostfull_in => fifo_almost_full,
-		csr_fifodata_data_rvalid => fifo_read_valid,
+		csr_fifoctrl_empty_in => fifo_empty,
+		csr_fifoctrl_full_in => fifo_full,
+		csr_fifoctrl_almostempty_in => fifo_almost_empty,
+		csr_fifoctrl_almostfull_in => fifo_almost_full,
+		csr_fifoctrl_rdburstavailable_in => not fifo_almost_empty,
+		csr_fifoctrl_burstsize_in => std_logic_vector(to_unsigned(BURST_SIZE, 16)),
+		csr_fifodata_data_rvalid => '1', -- Useless since rvalid is not used
 		csr_fifodata_data_ren => fifo_read_en,
 		csr_fifodata_data_in => fifo_data_read
 	);
@@ -156,7 +172,7 @@ begin
 	)
 	port map (
 		clk => clk,
-		reset => sw_reset,
+		reset => ptrng_reset,
 		ring_en => ring_en,
 		freqcount_en => freqcount_en,
 		freqcount_select => freqcount_select,
@@ -166,23 +182,23 @@ begin
 		freqcount_value => freqcount_value,
 		freqdivider => freqdivider,
 		packbits => packbits,
-		data => fifo_data_write,
-		valid => fifo_write_en
+		data => ptrng_data,
+		valid => ptrng_valid
 	);
 
 	-- FIFO
 	fifo_to_uart: entity extras.simple_fifo
 	generic map (
 		MEM_SIZE => FIFO_SIZE,
-		SYNC_READ => true
+		SYNC_READ => true -- use BRAM instead of registers
 	)
 	port map (
 		clock => clk,
-		reset => fifo_reset,
+		reset => hw_reset or fifo_clear,
 		wr_data => fifo_data_write,
 		we => fifo_write_en,
-		rd_data => fifo_data_read,
-		re => fifo_read_en,
+		rd_data => fifo_prefetch_data,
+		re => fifo_prefetch_read,
 		empty => fifo_empty,
 		full => fifo_full,
 		almost_empty_thresh => FIFO_ALMOSTEMPTY,
@@ -190,18 +206,34 @@ begin
 		almost_empty => fifo_almost_empty,
 		almost_full => fifo_almost_full
 	);
-
-	-- The FIFO is reseted on sw_reset and on clear
-	fifo_reset <= sw_reset or fifo_clear;
-
-	-- The data read from the FIFO is valid the cycle after the read request
-	process (clk, fifo_reset)
+	
+	-- Do not write when FIFO is full
+	process (clk, hw_reset)
 	begin
-		if fifo_reset = '1' then
-			fifo_read_valid <= '0';
+		if hw_reset = '1' then
+			fifo_write_en <= '0';
 		elsif rising_edge(clk) then
-			fifo_read_valid <= fifo_read_en;
+			if fifo_full = '1' then
+				fifo_write_en <= '0';
+			else
+				fifo_write_en <= ptrng_valid;
+			end if;
+			fifo_data_write <= ptrng_data;
 		end if;
 	end process;
+
+	-- Synchronous FIFO requires an extra clock cycle for read data to be
+	-- available, always prefetch the first data from FIFO into a register
+	fifo_prefetcher: entity work.prefetch
+	port map (
+		clk => clk,
+		reset => hw_reset,
+		clear => fifo_clear,
+		input_available => not fifo_empty,
+		input_read_en => fifo_prefetch_read,
+		input_data => fifo_prefetch_data,
+		output_read_en => fifo_read_en,
+		output_data => fifo_data_read
+	);
 
 end architecture;

@@ -191,6 +191,18 @@ class _RegFifoctrl:
         rdata = self._rmap._if.read(self._rmap.FIFOCTRL_ADDR)
         return (rdata >> self._rmap.FIFOCTRL_ALMOSTFULL_POS) & self._rmap.FIFOCTRL_ALMOSTFULL_MSK
 
+    @property
+    def rdburstavailable(self):
+        """Valid to '1' when a burst is available for read (see BURSTSIZE)"""
+        rdata = self._rmap._if.read(self._rmap.FIFOCTRL_ADDR)
+        return (rdata >> self._rmap.FIFOCTRL_RDBURSTAVAILABLE_POS) & self._rmap.FIFOCTRL_RDBURSTAVAILABLE_MSK
+
+    @property
+    def burstsize(self):
+        """Size of a burst (in count of 32bit words)"""
+        rdata = self._rmap._if.read(self._rmap.FIFOCTRL_ADDR)
+        return (rdata >> self._rmap.FIFOCTRL_BURSTSIZE_POS) & self._rmap.FIFOCTRL_BURSTSIZE_MSK
+
 
 class _RegFifodata:
     def __init__(self, rmap):
@@ -257,6 +269,10 @@ class RegMap:
     FIFOCTRL_ALMOSTEMPTY_MSK = 0x1
     FIFOCTRL_ALMOSTFULL_POS = 5
     FIFOCTRL_ALMOSTFULL_MSK = 0x1
+    FIFOCTRL_RDBURSTAVAILABLE_POS = 6
+    FIFOCTRL_RDBURSTAVAILABLE_MSK = 0x1
+    FIFOCTRL_BURSTSIZE_POS = 7
+    FIFOCTRL_BURSTSIZE_MSK = 0xffff
 
     # FIFODATA - Data register for the FIFO to read the PTRNG random data output
     FIFODATA_ADDR = 0x0018
