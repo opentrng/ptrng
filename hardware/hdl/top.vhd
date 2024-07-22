@@ -59,7 +59,7 @@ architecture rtl of top is
 	signal ptrng_valid: std_logic;
 
 	-- FIFO
-	constant BURST_SIZE: natural := 128;
+	constant BURST_SIZE: natural := 512;
 	constant FIFO_SIZE: natural := 4*BURST_SIZE;
 	constant FIFO_ALMOSTEMPTY: natural := BURST_SIZE;
 	constant FIFO_ALMOSTFULL: natural := BURST_SIZE;
