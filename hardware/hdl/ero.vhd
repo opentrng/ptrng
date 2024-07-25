@@ -13,7 +13,9 @@ entity ero is
 		-- Clock output (equal to ro0/div)
 		clk: out std_logic;
 		-- Entropy source data output
-		data: out std_logic
+		data: out std_logic;
+		-- Valid signal for 'data'
+		valid: out std_logic
 	);
 end entity;
 
@@ -45,5 +47,6 @@ begin
 
 	-- Output data is syncrhonized with this clock
 	clk <= ro0_div;
+	valid <= '1';
 
 end architecture;

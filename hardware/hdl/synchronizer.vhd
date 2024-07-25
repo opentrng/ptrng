@@ -30,7 +30,6 @@ end entity;
 architecture rtl of synchronizer is
 
 	signal digit_clk_tap: std_logic_vector (7 downto 0);
---	signal data_en_tap: std_logic_vector (7 downto 0);
 	signal data: std_logic_vector (DATA_WIDTH-1 downto 0);
 	signal valid: std_logic := '0';
 
@@ -41,10 +40,8 @@ begin
 	begin
 		if reset = '1' then
 			digit_clk_tap <= (others => '0');
---			data_en_tap <= (others => '0');
 		elsif rising_edge(clk_to) then
 			digit_clk_tap <= digit_clk_tap(digit_clk_tap'Length-2 downto 0) & (clk_from and data_in_en);
---			data_en_tap <= data_en_tap(data_en_tap'Length-2 downto 0) & data_in_en;
 		end if;
 	end process;
 
@@ -55,7 +52,6 @@ begin
 			valid <= '0';
 		elsif rising_edge(clk_to) then
 			if digit_clk_tap(1) = '0' and digit_clk_tap(0) = '1' then
---			if digit_clk_tap(1) = '0' and digit_clk_tap(0) = '1' and data_en_tap(0) = '1' then
 				data <= data_in;
 				valid <= '1';
 			else

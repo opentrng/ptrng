@@ -22,7 +22,9 @@ entity digitizer is
 		-- Sampling clock (osc(0))
 		digit_clk: out std_logic;
 		-- Sampled data
-		digit_data: out std_logic_vector (RAND_WIDTH-1 downto 0)
+		digit_data: out std_logic_vector (RAND_WIDTH-1 downto 0);
+		-- Valid signal for 'digit_data'
+		digit_valid: out std_logic
 	);
 end entity;
 
@@ -50,6 +52,7 @@ begin
 			end if;
 		end process;
 		digit_data <= counter;
+		digit_valid <= '1';
 
 	-- Instantiate the ERO
 	elsif DIGITIZER_GEN = ERO generate
@@ -59,7 +62,8 @@ begin
 			ro1 => osc(1),
 			div => freqdivider,
 			clk => digit_clk,
-			data => digit_data(0)
+			data => digit_data(0),
+			valid => digit_valid
 		);
 
 	-- Instantiate the MURO
@@ -73,7 +77,8 @@ begin
 			rox => osc(T downto 1),
 			div => freqdivider,
 			clk => digit_clk,
-			data => digit_data(0)
+			data => digit_data(0),
+			valid => digit_valid
 		);
 
 	-- Instantiate the COSO
@@ -86,13 +91,15 @@ begin
 			ro0 => osc(0),
 			ro1 => osc(1),
 			clk => digit_clk,
-			data => digit_data(15 downto 0)
+			data => digit_data(15 downto 0),
+			valid => digit_valid
 		);
 
 	-- Stub for inactive digitizer
 	else generate
 		digit_clk <= '0';
 		digit_data <= (others => '0');
+		digit_valid <= '1';
 	end generate;
 
 end architecture;

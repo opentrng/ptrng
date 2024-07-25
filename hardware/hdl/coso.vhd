@@ -17,7 +17,9 @@ entity coso is
 		-- Bit data output (LSB of the counter)
 		lsb: out std_logic;
 		-- Raw value of the counter
-		data: out std_logic_vector (DATA_WIDTH-1 downto 0)
+		data: out std_logic_vector (DATA_WIDTH-1 downto 0);
+		-- Valid signal for 'data' and 'lsb'
+		valid: out std_logic
 	);
 end entity;
 
@@ -69,5 +71,6 @@ begin
 	clk <= beat;
 	lsb <= value(0);
 	data <= value;
+	valid <= '1';
 
 end architecture;

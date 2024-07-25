@@ -54,6 +54,7 @@ architecture rtl of digitalnoise is
 	-- Digitizer
 	signal digit_clk: std_logic;
 	signal digit_data: std_logic_vector (RAND_WIDTH-1 downto 0) := (others => '0');
+	signal digit_valid: std_logic;
 	
 	-- CDC
 	signal cdc_fifo_empty: std_logic;
@@ -120,7 +121,9 @@ begin
 		osc => osc,
 		freqdivider => freqdivider,
 		digit_clk => digit_clk,
-		digit_data => digit_data
+		digit_data => digit_data,
+		digit_valid => digit_valid
+		
 	);
 
 	-- Clock domain crossing from osc(0) to system clock (clk)
@@ -132,7 +135,7 @@ begin
 		reset => reset,
 		clk_from => digit_clk,
 		data_in => digit_data,
-		data_in_en => '1',
+		data_in_en => digit_valid,
 		clk_to => clk,
 		data_out => data,
 		data_out_en => valid
