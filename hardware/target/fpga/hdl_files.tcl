@@ -9,6 +9,7 @@ set hdl_files [list \
 	[list "work" [file normalize "${hardware}/hdl/synchronizer.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/digitalnoise.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/freqcounter.vhd"]] \
+	[list "work" [file normalize "${hardware}/hdl/alarm.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/ptrng.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/prefetch.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/top.vhd"]] \

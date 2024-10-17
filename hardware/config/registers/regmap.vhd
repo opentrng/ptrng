@@ -40,6 +40,11 @@ port(
     -- FREQDIVIDER.VALUE
     csr_freqdivider_value_out : out std_logic_vector(31 downto 0);
 
+    -- ALARM.THRESHOLD
+    csr_alarm_threshold_out : out std_logic_vector(15 downto 0);
+    -- ALARM.DETECTED
+    csr_alarm_detected_in : in std_logic;
+
     -- FIFOCTRL.CLEAR
     csr_fifoctrl_clear_out : out std_logic;
     -- FIFOCTRL.PACKBITS
@@ -109,6 +114,13 @@ signal csr_freqdivider_wen : std_logic;
 signal csr_freqdivider_ren : std_logic;
 signal csr_freqdivider_ren_ff : std_logic;
 signal csr_freqdivider_value_ff : std_logic_vector(31 downto 0);
+
+signal csr_alarm_rdata : std_logic_vector(31 downto 0);
+signal csr_alarm_wen : std_logic;
+signal csr_alarm_ren : std_logic;
+signal csr_alarm_ren_ff : std_logic;
+signal csr_alarm_threshold_ff : std_logic_vector(15 downto 0);
+signal csr_alarm_detected_ff : std_logic;
 
 signal csr_fifoctrl_rdata : std_logic_vector(31 downto 0);
 signal csr_fifoctrl_wen : std_logic;
@@ -478,13 +490,81 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x14] - FIFOCTRL - Control register for the FIFO, into read the PTRNG random data output
+-- [0x14] - ALARM - Register for the total failure alarm.
+--------------------------------------------------------------------------------
+csr_alarm_rdata(31 downto 17) <= (others => '0');
+
+csr_alarm_wen <= wen when (waddr = std_logic_vector(to_unsigned(20, ADDR_W))) else '0'; -- 0x14
+
+csr_alarm_ren <= ren when (raddr = std_logic_vector(to_unsigned(20, ADDR_W))) else '0'; -- 0x14
+process (clk, rst) begin
+if (rst = '1') then
+    csr_alarm_ren_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+        csr_alarm_ren_ff <= csr_alarm_ren;
+end if;
+end process;
+
+-----------------------
+-- Bit field:
+-- ALARM(15 downto 0) - THRESHOLD - Threshold value for triggering the total failure alarm. The threshold is compared to a counter, alarm is triggered when the counter greater or equal than the threshold. The counting method depends on the digitizer (ERO/MURO/COSO...)
+-- access: rw, hardware: o
+-----------------------
+
+csr_alarm_rdata(15 downto 0) <= csr_alarm_threshold_ff;
+
+csr_alarm_threshold_out <= csr_alarm_threshold_ff;
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_alarm_threshold_ff <= "0000000000000000"; -- 0x0
+elsif rising_edge(clk) then
+        if (csr_alarm_wen = '1') then
+            if (wstrb(0) = '1') then
+                csr_alarm_threshold_ff(7 downto 0) <= wdata(7 downto 0);
+            end if;
+            if (wstrb(1) = '1') then
+                csr_alarm_threshold_ff(15 downto 8) <= wdata(15 downto 8);
+            end if;
+        else
+            csr_alarm_threshold_ff <= csr_alarm_threshold_ff;
+        end if;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- ALARM(16) - DETECTED - This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on read.
+-- access: roc, hardware: i
+-----------------------
+
+csr_alarm_rdata(16) <= csr_alarm_detected_ff;
+
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_alarm_detected_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+        if (csr_alarm_ren = '1' and csr_alarm_ren_ff = '0') then
+            csr_alarm_detected_ff <= '0';
+            csr_alarm_detected_ff <= csr_alarm_detected_in;
+        end if;
+end if;
+end process;
+
+
+
+--------------------------------------------------------------------------------
+-- CSR:
+-- [0x18] - FIFOCTRL - Control register for the FIFO, into read the PTRNG random data output
 --------------------------------------------------------------------------------
 csr_fifoctrl_rdata(31 downto 23) <= (others => '0');
 
-csr_fifoctrl_wen <= wen when (waddr = std_logic_vector(to_unsigned(20, ADDR_W))) else '0'; -- 0x14
+csr_fifoctrl_wen <= wen when (waddr = std_logic_vector(to_unsigned(24, ADDR_W))) else '0'; -- 0x18
 
-csr_fifoctrl_ren <= ren when (raddr = std_logic_vector(to_unsigned(20, ADDR_W))) else '0'; -- 0x14
+csr_fifoctrl_ren <= ren when (raddr = std_logic_vector(to_unsigned(24, ADDR_W))) else '0'; -- 0x18
 process (clk, rst) begin
 if (rst = '1') then
     csr_fifoctrl_ren_ff <= '0'; -- 0x0
@@ -661,11 +741,11 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x18] - FIFODATA - Data register for the FIFO to read the PTRNG random data output
+-- [0x1c] - FIFODATA - Data register for the FIFO to read the PTRNG random data output
 --------------------------------------------------------------------------------
 
 
-csr_fifodata_ren <= ren when (raddr = std_logic_vector(to_unsigned(24, ADDR_W))) else '0'; -- 0x18
+csr_fifodata_ren <= ren when (raddr = std_logic_vector(to_unsigned(28, ADDR_W))) else '0'; -- 0x1c
 process (clk, rst) begin
 if (rst = '1') then
     csr_fifodata_ren_ff <= '0'; -- 0x0
@@ -727,8 +807,10 @@ elsif rising_edge(clk) then
         elsif raddr = std_logic_vector(to_unsigned(16, ADDR_W)) then -- 0x10
             rdata_ff <= csr_freqdivider_rdata;
         elsif raddr = std_logic_vector(to_unsigned(20, ADDR_W)) then -- 0x14
-            rdata_ff <= csr_fifoctrl_rdata;
+            rdata_ff <= csr_alarm_rdata;
         elsif raddr = std_logic_vector(to_unsigned(24, ADDR_W)) then -- 0x18
+            rdata_ff <= csr_fifoctrl_rdata;
+        elsif raddr = std_logic_vector(to_unsigned(28, ADDR_W)) then -- 0x1c
             rdata_ff <= csr_fifodata_rdata;
         else 
             rdata_ff <= "10111010101011011011111011101111"; -- 0xbaadbeef

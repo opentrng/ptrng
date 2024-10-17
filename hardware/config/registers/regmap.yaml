@@ -109,6 +109,21 @@ regmap:
         hardware: o
 # -   name: ACCUMULATOR
 # -   name: ENTROPY
+-   name: ALARM
+    description: Register for the total failure alarm.
+    bitfields:
+    -   name: THRESHOLD
+        description: Threshold value for triggering the total failure alarm. The threshold is compared to a counter, alarm is triggered when the counter greater or equal than the threshold. The counting method depends on the digitizer (ERO/MURO/COSO...)
+        width: 16
+        lsb: 0
+        access: rw
+        hardware: o
+    -   name: DETECTED
+        description: This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on read.
+        width: 1
+        lsb: 16
+        access: roc
+        hardware: i
 # -   name: ONLINETESTS
 -   name: FIFOCTRL
     description: Control register for the FIFO, into read the PTRNG random data output

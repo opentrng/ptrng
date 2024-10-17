@@ -34,8 +34,10 @@ entity ptrng is
 		--accumulator: in std_logic_vector (31 downto 0);
 		-- Enable the raw signal conditionner
 		--conditioning: in std_logic;
-		-- Total failure alarm
-		--fail: out std_logic;
+		-- Threshold for triggering the total failure alarm
+		alarm_threshold: in std_logic_vector(15 downto 0);
+		-- Total failure alarm, risen to '1' when total failure event is detected
+		alarm_detected: out std_logic;
 		-- Low entropy alarm
 		--low: out std_logic;
 		-- Entropy estimation
@@ -87,8 +89,21 @@ begin
 		valid => raw_random_valid
 	);
 
-	-- Total failure test
-	-- TODO
+	-- Total failure alarm
+	alarm: entity work.alarm
+	generic map (
+		REG_WIDTH => REG_WIDTH,
+		RAND_WIDTH => RAND_WIDTH
+	)
+	port map (
+		clk => clk,
+		reset => reset,
+		digitizer => DIGITIZER_GEN,
+		raw_random_input => raw_random_number,
+		raw_random_valid => raw_random_valid,
+		threshold => alarm_threshold,
+		detected => alarm_detected
+	);
 
 	-- Online test
 	-- TODO

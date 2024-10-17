@@ -138,6 +138,30 @@ class _RegFreqdivider:
         self._rmap._if.write(self._rmap.FREQDIVIDER_ADDR, rdata)
 
 
+class _RegAlarm:
+    def __init__(self, rmap):
+        self._rmap = rmap
+
+    @property
+    def threshold(self):
+        """Threshold value for triggering the total failure alarm. The threshold is compared to a counter, alarm is triggered when the counter greater or equal than the threshold. The counting method depends on the digitizer (ERO/MURO/COSO...)"""
+        rdata = self._rmap._if.read(self._rmap.ALARM_ADDR)
+        return (rdata >> self._rmap.ALARM_THRESHOLD_POS) & self._rmap.ALARM_THRESHOLD_MSK
+
+    @threshold.setter
+    def threshold(self, val):
+        rdata = self._rmap._if.read(self._rmap.ALARM_ADDR)
+        rdata = rdata & (~(self._rmap.ALARM_THRESHOLD_MSK << self._rmap.ALARM_THRESHOLD_POS))
+        rdata = rdata | (val << self._rmap.ALARM_THRESHOLD_POS)
+        self._rmap._if.write(self._rmap.ALARM_ADDR, rdata)
+
+    @property
+    def detected(self):
+        """This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on read."""
+        rdata = self._rmap._if.read(self._rmap.ALARM_ADDR)
+        return (rdata >> self._rmap.ALARM_DETECTED_POS) & self._rmap.ALARM_DETECTED_MSK
+
+
 class _RegFifoctrl:
     def __init__(self, rmap):
         self._rmap = rmap
@@ -255,8 +279,15 @@ class RegMap:
     FREQDIVIDER_VALUE_POS = 0
     FREQDIVIDER_VALUE_MSK = 0xffffffff
 
+    # ALARM - Register for the total failure alarm.
+    ALARM_ADDR = 0x0014
+    ALARM_THRESHOLD_POS = 0
+    ALARM_THRESHOLD_MSK = 0xffff
+    ALARM_DETECTED_POS = 16
+    ALARM_DETECTED_MSK = 0x1
+
     # FIFOCTRL - Control register for the FIFO, into read the PTRNG random data output
-    FIFOCTRL_ADDR = 0x0014
+    FIFOCTRL_ADDR = 0x0018
     FIFOCTRL_CLEAR_POS = 0
     FIFOCTRL_CLEAR_MSK = 0x1
     FIFOCTRL_PACKBITS_POS = 1
@@ -275,7 +306,7 @@ class RegMap:
     FIFOCTRL_BURSTSIZE_MSK = 0xffff
 
     # FIFODATA - Data register for the FIFO to read the PTRNG random data output
-    FIFODATA_ADDR = 0x0018
+    FIFODATA_ADDR = 0x001c
     FIFODATA_DATA_POS = 0
     FIFODATA_DATA_MSK = 0xffffffff
 
@@ -342,6 +373,19 @@ class RegMap:
     @property
     def freqdivider_bf(self):
         return _RegFreqdivider(self)
+
+    @property
+    def alarm(self):
+        """Register for the total failure alarm."""
+        return self._if.read(self.ALARM_ADDR)
+
+    @alarm.setter
+    def alarm(self, val):
+        self._if.write(self.ALARM_ADDR, val)
+
+    @property
+    def alarm_bf(self):
+        return _RegAlarm(self)
 
     @property
     def fifoctrl(self):

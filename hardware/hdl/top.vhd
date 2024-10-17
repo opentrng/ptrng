@@ -52,6 +52,8 @@ architecture rtl of top is
 	signal freqcount_select: std_logic_vector (4 downto 0);
 	signal freqcount_value: std_logic_vector (22 downto 0);
 	signal freqdivider: std_logic_vector (31 downto 0);
+	signal alarm_threshold: std_logic_vector(15 downto 0);
+	signal alarm_detected: std_logic;
 	signal packbits: std_logic;
 	
 	-- PTRNG
@@ -151,6 +153,8 @@ begin
 		csr_freqcount_value_in => freqcount_value,
 		csr_freqcount_overflow_in => freqcount_overflow,
 		csr_freqdivider_value_out => freqdivider,
+		csr_alarm_threshold_out => alarm_threshold,
+		csr_alarm_detected_in => alarm_detected,
 		csr_fifoctrl_clear_out => fifo_clear,
 		csr_fifoctrl_packbits_out => packbits,
 		csr_fifoctrl_empty_in => fifo_empty,
@@ -181,6 +185,8 @@ begin
 		freqcount_overflow => freqcount_overflow,
 		freqcount_value => freqcount_value,
 		freqdivider => freqdivider,
+		alarm_threshold => alarm_threshold,
+		alarm_detected => alarm_detected,
 		packbits => packbits,
 		data => ptrng_data,
 		valid => ptrng_valid

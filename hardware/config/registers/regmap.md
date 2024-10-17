@@ -27,8 +27,9 @@ Base address: 0x00000000
 | [RING](#ring)            | 0x0008     | Ring-oscillator enable register (enable bits are active at `'1'`). |
 | [FREQCOUNT](#freqcount)  | 0x000c     | Frequency counter control register. |
 | [FREQDIVIDER](#freqdivider) | 0x0010     | Clock divider register, applies on oscillator RO0 |
-| [FIFOCTRL](#fifoctrl)    | 0x0014     | Control register for the FIFO, into read the PTRNG random data output |
-| [FIFODATA](#fifodata)    | 0x0018     | Data register for the FIFO to read the PTRNG random data output |
+| [ALARM](#alarm)          | 0x0014     | Register for the total failure alarm. |
+| [FIFOCTRL](#fifoctrl)    | 0x0018     | Control register for the FIFO, into read the PTRNG random data output |
+| [FIFODATA](#fifodata)    | 0x001c     | Data register for the FIFO to read the PTRNG random data output |
 
 ## ID
 
@@ -112,11 +113,28 @@ Reset value: 0x00000000
 
 Back to [Register map](#register-map-summary).
 
+## ALARM
+
+Register for the total failure alarm.
+
+Address offset: 0x0014
+
+Reset value: 0x00000000
+
+
+| Name             | Bits   | Mode            | Reset      | Description |
+| :---             | :---   | :---            | :---       | :---        |
+| -                | 31:17  | -               | 0x000      | Reserved |
+| DETECTED         | 16     | roc             | 0x0        | This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on read. |
+| THRESHOLD        | 15:0   | rw              | 0x0000     | Threshold value for triggering the total failure alarm. The threshold is compared to a counter, alarm is triggered when the counter greater or equal than the threshold. The counting method depends on the digitizer (ERO/MURO/COSO...) |
+
+Back to [Register map](#register-map-summary).
+
 ## FIFOCTRL
 
 Control register for the FIFO, into read the PTRNG random data output
 
-Address offset: 0x0014
+Address offset: 0x0018
 
 Reset value: 0x00000002
 
@@ -139,7 +157,7 @@ Back to [Register map](#register-map-summary).
 
 Data register for the FIFO to read the PTRNG random data output
 
-Address offset: 0x0018
+Address offset: 0x001c
 
 Reset value: 0x00000000
 
