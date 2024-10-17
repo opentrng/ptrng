@@ -1,7 +1,6 @@
 # Add design HDL source files to the list
 set hdl_files [list \
 	[list "work" [file normalize "${hardware}/hdl/clkdivider.vhd"]] \
-	[list "work" [file normalize "${hardware}/hdl/delay.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/bitpacker.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/ero.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/muro.vhd"]] \
@@ -17,6 +16,7 @@ set hdl_files [list \
 
 # Add configuration files
 lappend hdl_files [list "work" [file normalize "${hardware}/config/registers/regmap.vhd"]]
+lappend hdl_files [list "work" [file normalize "${hardware}/config/digitalnoise/constants.vhd"]]
 lappend hdl_files [list "work" [file normalize "${hardware}/config/digitalnoise/settings.vhd"]]
 
 # Add required HDL sources files from libraries

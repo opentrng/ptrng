@@ -101,7 +101,7 @@ begin
 	-- LSB packing into words
 	bitpacker: entity work.bitpacker
 	generic map (
-		N => 5
+		WIDTH => REG_WIDTH
 	)
 	port map (
 		clk => clk,

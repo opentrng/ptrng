@@ -1,12 +1,13 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
+use ieee.math_real.all;
 
 -- Pack bits into words of 2^N bits
 entity bitpacker is
 	generic (
-		-- Defines size of the packing (default to 2^5 = 32bits)
-		N: natural := 5
+		-- Defines size of the packing (output width 2^N bits)
+		W: natural
 	);
 	port (
 		-- Base clock
@@ -18,7 +19,7 @@ entity bitpacker is
 		-- Validate the bit input
 		valid_in: in std_logic;
 		-- Word output
-		data_out: out std_logic_vector ((2**N)-1 downto 0);
+		data_out: out std_logic_vector (W-1 downto 0);
 		-- Validate the word output
 		valid_out: out std_logic
 	);
@@ -27,8 +28,9 @@ end entity;
 -- RTL implementation of the bit packer
 architecture rtl of bitpacker is
 
+	constant N: positive := positive(ceil(log2(real(W))));
 	signal pipe: std_logic;
-	signal shift_reg: std_logic_vector ((2**N)-1 downto 0);
+	signal shift_reg: std_logic_vector (W-1 downto 0);
 	signal counter: std_logic_vector (N-1 downto 0);
 
 begin
@@ -54,7 +56,7 @@ begin
 			shift_reg <= (others => '0');
 		elsif rising_edge(clk) then
 			if valid_in = '1' then
-				shift_reg <= data_in & shift_reg((2**N)-1 downto 1);
+				shift_reg <= data_in & shift_reg(W-1 downto 1);
 			end if;
 		end if;
 	end process;
