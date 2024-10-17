@@ -18,11 +18,17 @@ set partnumber [lindex $argv 1]
 
 # Set paths
 set hardware "../../.."
+set custom "${hardware}/lib/custom"
 
 # Set VHDL source files into a list
 source "${hardware}/target/fpga/hdl_files.tcl"
 lappend hdl_files [list "work" [file normalize "${boardname}/target.vhd"]]
 lappend hdl_files [list "work" [file normalize "${hardware}/target/common/xilinx/ring.vhd"]]
+
+# If custom HDL files exist add them to the list
+if { [file exists "${custom}/hdl_files.tcl"] == 1} {
+	source "${custom}/hdl_files.tcl"
+} 
 
 # Set constraints files into a list (first file will be defined as target constraint file)
 set constraints_files [list \

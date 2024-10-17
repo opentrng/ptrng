@@ -1,6 +1,9 @@
 # Ignore data
 /data/*
 
+# Ignore custom design files
+/hardware/lib/custom
+
 # Ignore generated files
 /hardware/config/digitalnoise/settings.vhd
 /hardware/config/digitalnoise/constraints.xdc
