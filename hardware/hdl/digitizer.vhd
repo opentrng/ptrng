@@ -3,9 +3,6 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use work.settings.all;
 
-library extras;
-use extras.synchronizing.all;
-
 -- The digitizer takes the ring-oscillator signals as input and instanciante the sampling architecture specified in 'settings.vhd'. It outputs the sampling clock and the sampled data.
 entity digitizer is
 	generic (
