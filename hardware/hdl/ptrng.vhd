@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use work.settings.all;
 
 -- OpenTRNG's PTRNG base entity.
 entity ptrng is
@@ -92,7 +93,6 @@ begin
 	-- Total failure alarm
 	alarm: entity work.alarm
 	generic map (
-		REG_WIDTH => REG_WIDTH,
 		RAND_WIDTH => RAND_WIDTH
 	)
 	port map (
@@ -116,7 +116,7 @@ begin
 	-- LSB packing into words
 	bitpacker: entity work.bitpacker
 	generic map (
-		WIDTH => REG_WIDTH
+		W => REG_WIDTH
 	)
 	port map (
 		clk => clk,
