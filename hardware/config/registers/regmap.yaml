@@ -124,7 +124,33 @@ regmap:
         lsb: 16
         access: roc
         hardware: i
-# -   name: ONLINETESTS
+-   name: ONLINETEST
+    description: Register for online testing.
+    bitfields:
+    -   name: AVERAGE
+        description: Average expected value for the online test.
+        width: 16
+        lsb: 0
+        access: rw
+        hardware: o
+    -   name: DRIFT
+        description: Maximum drift between the expected value and the actual value for the online tests.
+        width: 14
+        lsb: 16
+        access: rw
+        hardware: o
+    -   name: VALID
+        description: This signal is fallen to '0' when the online test becomes invalid, must be manually cleared.
+        width: 1
+        lsb: 30
+        access: ro
+        hardware: i
+    -   name: CLEAR
+        description: This signal clears the 'valid' signal back to '1'.
+        width: 1
+        lsb: 31
+        access: wosc
+        hardware: o
 -   name: FIFOCTRL
     description: Control register for the FIFO, into read the PTRNG random data output
     bitfields:

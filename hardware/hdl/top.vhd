@@ -54,6 +54,10 @@ architecture rtl of top is
 	signal freqdivider: std_logic_vector (31 downto 0);
 	signal alarm_threshold: std_logic_vector(15 downto 0);
 	signal alarm_detected: std_logic;
+	signal onlinetest_average: std_logic_vector(15 downto 0);
+	signal onlinetest_drift: std_logic_vector(13 downto 0);
+	signal onlinetest_valid: std_logic;
+	signal onlinetest_clear: std_logic;
 	signal packbits: std_logic;
 	
 	-- PTRNG
@@ -155,6 +159,10 @@ begin
 		csr_freqdivider_value_out => freqdivider,
 		csr_alarm_threshold_out => alarm_threshold,
 		csr_alarm_detected_in => alarm_detected,
+		csr_onlinetest_clear_out => onlinetest_clear,
+		csr_onlinetest_average_out => onlinetest_average,
+		csr_onlinetest_drift_out => onlinetest_drift,
+		csr_onlinetest_valid_in => onlinetest_valid,
 		csr_fifoctrl_clear_out => fifo_clear,
 		csr_fifoctrl_packbits_out => packbits,
 		csr_fifoctrl_empty_in => fifo_empty,
@@ -187,6 +195,10 @@ begin
 		freqdivider => freqdivider,
 		alarm_threshold => alarm_threshold,
 		alarm_detected => alarm_detected,
+		onlinetest_clear => onlinetest_clear,
+		onlinetest_average => onlinetest_average,
+		onlinetest_drift => onlinetest_drift,
+		onlinetest_valid => onlinetest_valid,
 		packbits => packbits,
 		data => ptrng_data,
 		valid => ptrng_valid

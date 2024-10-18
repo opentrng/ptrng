@@ -39,10 +39,14 @@ entity ptrng is
 		alarm_threshold: in std_logic_vector(15 downto 0);
 		-- Total failure alarm, risen to '1' when total failure event is detected
 		alarm_detected: out std_logic;
-		-- Low entropy alarm
-		--low: out std_logic;
-		-- Entropy estimation
-		--estimator: out std_logic_vector (31 downto 0);
+		-- Clear-to-set the online test
+		onlinetest_clear: in std_logic;
+		-- Expected average value for online test
+		onlinetest_average: in std_logic_vector (15 downto 0);
+		-- Maximum drift to expected value for online test to be valid
+		onlinetest_drift: in std_logic_vector (13 downto 0);
+		-- Set to '1' when the online test is valid (need to be cleared)
+		onlinetest_valid: out std_logic;
 		-- When 'packbits' is pulled to '1', LSB from IRN are packed into 32bits word before being outputed to 'data' port
 		packbits: in std_logic;
 		-- Random data output
@@ -106,7 +110,21 @@ begin
 	);
 
 	-- Online test
-	-- TODO
+	onlinetest: entity work.onlinetest
+	generic map (
+		DEPTH => 128,
+		RAND_WIDTH => RAND_WIDTH
+	)
+	port map (
+		clk => clk,
+		reset => reset,
+		clear => onlinetest_clear,
+		raw_random_input => raw_random_number,
+		raw_random_valid => raw_random_valid,
+		average => onlinetest_average,
+		drift => onlinetest_drift,
+		valid => onlinetest_valid
+	);
 
 	-- Conditioner
 	-- TODO

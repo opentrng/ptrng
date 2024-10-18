@@ -162,6 +162,55 @@ class _RegAlarm:
         return (rdata >> self._rmap.ALARM_DETECTED_POS) & self._rmap.ALARM_DETECTED_MSK
 
 
+class _RegOnlinetest:
+    def __init__(self, rmap):
+        self._rmap = rmap
+
+    @property
+    def average(self):
+        """Average expected value for the online test."""
+        rdata = self._rmap._if.read(self._rmap.ONLINETEST_ADDR)
+        return (rdata >> self._rmap.ONLINETEST_AVERAGE_POS) & self._rmap.ONLINETEST_AVERAGE_MSK
+
+    @average.setter
+    def average(self, val):
+        rdata = self._rmap._if.read(self._rmap.ONLINETEST_ADDR)
+        rdata = rdata & (~(self._rmap.ONLINETEST_AVERAGE_MSK << self._rmap.ONLINETEST_AVERAGE_POS))
+        rdata = rdata | (val << self._rmap.ONLINETEST_AVERAGE_POS)
+        self._rmap._if.write(self._rmap.ONLINETEST_ADDR, rdata)
+
+    @property
+    def drift(self):
+        """Maximum drift between the expected value and the actual value for the online tests."""
+        rdata = self._rmap._if.read(self._rmap.ONLINETEST_ADDR)
+        return (rdata >> self._rmap.ONLINETEST_DRIFT_POS) & self._rmap.ONLINETEST_DRIFT_MSK
+
+    @drift.setter
+    def drift(self, val):
+        rdata = self._rmap._if.read(self._rmap.ONLINETEST_ADDR)
+        rdata = rdata & (~(self._rmap.ONLINETEST_DRIFT_MSK << self._rmap.ONLINETEST_DRIFT_POS))
+        rdata = rdata | (val << self._rmap.ONLINETEST_DRIFT_POS)
+        self._rmap._if.write(self._rmap.ONLINETEST_ADDR, rdata)
+
+    @property
+    def valid(self):
+        """This signal is fallen to '0' when the online test becomes invalid, must be manually cleared."""
+        rdata = self._rmap._if.read(self._rmap.ONLINETEST_ADDR)
+        return (rdata >> self._rmap.ONLINETEST_VALID_POS) & self._rmap.ONLINETEST_VALID_MSK
+
+    @property
+    def clear(self):
+        """This signal clears the 'valid' signal back to '1'."""
+        return 0
+
+    @clear.setter
+    def clear(self, val):
+        rdata = self._rmap._if.read(self._rmap.ONLINETEST_ADDR)
+        rdata = rdata & (~(self._rmap.ONLINETEST_CLEAR_MSK << self._rmap.ONLINETEST_CLEAR_POS))
+        rdata = rdata | (val << self._rmap.ONLINETEST_CLEAR_POS)
+        self._rmap._if.write(self._rmap.ONLINETEST_ADDR, rdata)
+
+
 class _RegFifoctrl:
     def __init__(self, rmap):
         self._rmap = rmap
@@ -286,8 +335,19 @@ class RegMap:
     ALARM_DETECTED_POS = 16
     ALARM_DETECTED_MSK = 0x1
 
+    # ONLINETEST - Register for online testing.
+    ONLINETEST_ADDR = 0x0018
+    ONLINETEST_AVERAGE_POS = 0
+    ONLINETEST_AVERAGE_MSK = 0xffff
+    ONLINETEST_DRIFT_POS = 16
+    ONLINETEST_DRIFT_MSK = 0x3fff
+    ONLINETEST_VALID_POS = 30
+    ONLINETEST_VALID_MSK = 0x1
+    ONLINETEST_CLEAR_POS = 31
+    ONLINETEST_CLEAR_MSK = 0x1
+
     # FIFOCTRL - Control register for the FIFO, into read the PTRNG random data output
-    FIFOCTRL_ADDR = 0x0018
+    FIFOCTRL_ADDR = 0x001c
     FIFOCTRL_CLEAR_POS = 0
     FIFOCTRL_CLEAR_MSK = 0x1
     FIFOCTRL_PACKBITS_POS = 1
@@ -306,7 +366,7 @@ class RegMap:
     FIFOCTRL_BURSTSIZE_MSK = 0xffff
 
     # FIFODATA - Data register for the FIFO to read the PTRNG random data output
-    FIFODATA_ADDR = 0x001c
+    FIFODATA_ADDR = 0x0020
     FIFODATA_DATA_POS = 0
     FIFODATA_DATA_MSK = 0xffffffff
 
@@ -386,6 +446,19 @@ class RegMap:
     @property
     def alarm_bf(self):
         return _RegAlarm(self)
+
+    @property
+    def onlinetest(self):
+        """Register for online testing."""
+        return self._if.read(self.ONLINETEST_ADDR)
+
+    @onlinetest.setter
+    def onlinetest(self, val):
+        self._if.write(self.ONLINETEST_ADDR, val)
+
+    @property
+    def onlinetest_bf(self):
+        return _RegOnlinetest(self)
 
     @property
     def fifoctrl(self):

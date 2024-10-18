@@ -45,6 +45,15 @@ port(
     -- ALARM.DETECTED
     csr_alarm_detected_in : in std_logic;
 
+    -- ONLINETEST.AVERAGE
+    csr_onlinetest_average_out : out std_logic_vector(15 downto 0);
+    -- ONLINETEST.DRIFT
+    csr_onlinetest_drift_out : out std_logic_vector(13 downto 0);
+    -- ONLINETEST.VALID
+    csr_onlinetest_valid_in : in std_logic;
+    -- ONLINETEST.CLEAR
+    csr_onlinetest_clear_out : out std_logic;
+
     -- FIFOCTRL.CLEAR
     csr_fifoctrl_clear_out : out std_logic;
     -- FIFOCTRL.PACKBITS
@@ -121,6 +130,15 @@ signal csr_alarm_ren : std_logic;
 signal csr_alarm_ren_ff : std_logic;
 signal csr_alarm_threshold_ff : std_logic_vector(15 downto 0);
 signal csr_alarm_detected_ff : std_logic;
+
+signal csr_onlinetest_rdata : std_logic_vector(31 downto 0);
+signal csr_onlinetest_wen : std_logic;
+signal csr_onlinetest_ren : std_logic;
+signal csr_onlinetest_ren_ff : std_logic;
+signal csr_onlinetest_average_ff : std_logic_vector(15 downto 0);
+signal csr_onlinetest_drift_ff : std_logic_vector(13 downto 0);
+signal csr_onlinetest_valid_ff : std_logic;
+signal csr_onlinetest_clear_ff : std_logic;
 
 signal csr_fifoctrl_rdata : std_logic_vector(31 downto 0);
 signal csr_fifoctrl_wen : std_logic;
@@ -558,13 +576,132 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x18] - FIFOCTRL - Control register for the FIFO, into read the PTRNG random data output
+-- [0x18] - ONLINETEST - Register for online testing.
+--------------------------------------------------------------------------------
+
+csr_onlinetest_wen <= wen when (waddr = std_logic_vector(to_unsigned(24, ADDR_W))) else '0'; -- 0x18
+
+csr_onlinetest_ren <= ren when (raddr = std_logic_vector(to_unsigned(24, ADDR_W))) else '0'; -- 0x18
+process (clk, rst) begin
+if (rst = '1') then
+    csr_onlinetest_ren_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+        csr_onlinetest_ren_ff <= csr_onlinetest_ren;
+end if;
+end process;
+
+-----------------------
+-- Bit field:
+-- ONLINETEST(15 downto 0) - AVERAGE - Average expected value for the online test.
+-- access: rw, hardware: o
+-----------------------
+
+csr_onlinetest_rdata(15 downto 0) <= csr_onlinetest_average_ff;
+
+csr_onlinetest_average_out <= csr_onlinetest_average_ff;
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_onlinetest_average_ff <= "0000000000000000"; -- 0x0
+elsif rising_edge(clk) then
+        if (csr_onlinetest_wen = '1') then
+            if (wstrb(0) = '1') then
+                csr_onlinetest_average_ff(7 downto 0) <= wdata(7 downto 0);
+            end if;
+            if (wstrb(1) = '1') then
+                csr_onlinetest_average_ff(15 downto 8) <= wdata(15 downto 8);
+            end if;
+        else
+            csr_onlinetest_average_ff <= csr_onlinetest_average_ff;
+        end if;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- ONLINETEST(29 downto 16) - DRIFT - Maximum drift between the expected value and the actual value for the online tests.
+-- access: rw, hardware: o
+-----------------------
+
+csr_onlinetest_rdata(29 downto 16) <= csr_onlinetest_drift_ff;
+
+csr_onlinetest_drift_out <= csr_onlinetest_drift_ff;
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_onlinetest_drift_ff <= "00000000000000"; -- 0x0
+elsif rising_edge(clk) then
+        if (csr_onlinetest_wen = '1') then
+            if (wstrb(2) = '1') then
+                csr_onlinetest_drift_ff(7 downto 0) <= wdata(23 downto 16);
+            end if;
+            if (wstrb(3) = '1') then
+                csr_onlinetest_drift_ff(13 downto 8) <= wdata(29 downto 24);
+            end if;
+        else
+            csr_onlinetest_drift_ff <= csr_onlinetest_drift_ff;
+        end if;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- ONLINETEST(30) - VALID - This signal is fallen to '0' when the online test becomes invalid, must be manually cleared.
+-- access: ro, hardware: i
+-----------------------
+
+csr_onlinetest_rdata(30) <= csr_onlinetest_valid_ff;
+
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_onlinetest_valid_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+            csr_onlinetest_valid_ff <= csr_onlinetest_valid_in;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- ONLINETEST(31) - CLEAR - This signal clears the 'valid' signal back to '1'.
+-- access: wosc, hardware: o
+-----------------------
+
+csr_onlinetest_rdata(31) <= '0';
+
+csr_onlinetest_clear_out <= csr_onlinetest_clear_ff;
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_onlinetest_clear_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+        if (csr_onlinetest_wen = '1') then
+            if (wstrb(3) = '1') then
+                csr_onlinetest_clear_ff <= wdata(31);
+            end if;
+        else
+            csr_onlinetest_clear_ff <= '0';
+        end if;
+end if;
+end process;
+
+
+
+--------------------------------------------------------------------------------
+-- CSR:
+-- [0x1c] - FIFOCTRL - Control register for the FIFO, into read the PTRNG random data output
 --------------------------------------------------------------------------------
 csr_fifoctrl_rdata(31 downto 23) <= (others => '0');
 
-csr_fifoctrl_wen <= wen when (waddr = std_logic_vector(to_unsigned(24, ADDR_W))) else '0'; -- 0x18
+csr_fifoctrl_wen <= wen when (waddr = std_logic_vector(to_unsigned(28, ADDR_W))) else '0'; -- 0x1c
 
-csr_fifoctrl_ren <= ren when (raddr = std_logic_vector(to_unsigned(24, ADDR_W))) else '0'; -- 0x18
+csr_fifoctrl_ren <= ren when (raddr = std_logic_vector(to_unsigned(28, ADDR_W))) else '0'; -- 0x1c
 process (clk, rst) begin
 if (rst = '1') then
     csr_fifoctrl_ren_ff <= '0'; -- 0x0
@@ -741,11 +878,11 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x1c] - FIFODATA - Data register for the FIFO to read the PTRNG random data output
+-- [0x20] - FIFODATA - Data register for the FIFO to read the PTRNG random data output
 --------------------------------------------------------------------------------
 
 
-csr_fifodata_ren <= ren when (raddr = std_logic_vector(to_unsigned(28, ADDR_W))) else '0'; -- 0x1c
+csr_fifodata_ren <= ren when (raddr = std_logic_vector(to_unsigned(32, ADDR_W))) else '0'; -- 0x20
 process (clk, rst) begin
 if (rst = '1') then
     csr_fifodata_ren_ff <= '0'; -- 0x0
@@ -809,8 +946,10 @@ elsif rising_edge(clk) then
         elsif raddr = std_logic_vector(to_unsigned(20, ADDR_W)) then -- 0x14
             rdata_ff <= csr_alarm_rdata;
         elsif raddr = std_logic_vector(to_unsigned(24, ADDR_W)) then -- 0x18
-            rdata_ff <= csr_fifoctrl_rdata;
+            rdata_ff <= csr_onlinetest_rdata;
         elsif raddr = std_logic_vector(to_unsigned(28, ADDR_W)) then -- 0x1c
+            rdata_ff <= csr_fifoctrl_rdata;
+        elsif raddr = std_logic_vector(to_unsigned(32, ADDR_W)) then -- 0x20
             rdata_ff <= csr_fifodata_rdata;
         else 
             rdata_ff <= "10111010101011011011111011101111"; -- 0xbaadbeef

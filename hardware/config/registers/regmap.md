@@ -28,8 +28,9 @@ Base address: 0x00000000
 | [FREQCOUNT](#freqcount)  | 0x000c     | Frequency counter control register. |
 | [FREQDIVIDER](#freqdivider) | 0x0010     | Clock divider register, applies on oscillator RO0 |
 | [ALARM](#alarm)          | 0x0014     | Register for the total failure alarm. |
-| [FIFOCTRL](#fifoctrl)    | 0x0018     | Control register for the FIFO, into read the PTRNG random data output |
-| [FIFODATA](#fifodata)    | 0x001c     | Data register for the FIFO to read the PTRNG random data output |
+| [ONLINETEST](#onlinetest) | 0x0018     | Register for online testing. |
+| [FIFOCTRL](#fifoctrl)    | 0x001c     | Control register for the FIFO, into read the PTRNG random data output |
+| [FIFODATA](#fifodata)    | 0x0020     | Data register for the FIFO to read the PTRNG random data output |
 
 ## ID
 
@@ -130,11 +131,29 @@ Reset value: 0x00000000
 
 Back to [Register map](#register-map-summary).
 
+## ONLINETEST
+
+Register for online testing.
+
+Address offset: 0x0018
+
+Reset value: 0x00000000
+
+
+| Name             | Bits   | Mode            | Reset      | Description |
+| :---             | :---   | :---            | :---       | :---        |
+| CLEAR            | 31     | wosc            | 0x0        | This signal clears the 'valid' signal back to '1'. |
+| VALID            | 30     | ro              | 0x0        | This signal is fallen to '0' when the online test becomes invalid, must be manually cleared. |
+| DRIFT            | 29:16  | rw              | 0x000      | Maximum drift between the expected value and the actual value for the online tests. |
+| AVERAGE          | 15:0   | rw              | 0x0000     | Average expected value for the online test. |
+
+Back to [Register map](#register-map-summary).
+
 ## FIFOCTRL
 
 Control register for the FIFO, into read the PTRNG random data output
 
-Address offset: 0x0018
+Address offset: 0x001c
 
 Reset value: 0x00000002
 
@@ -157,7 +176,7 @@ Back to [Register map](#register-map-summary).
 
 Data register for the FIFO to read the PTRNG random data output
 
-Address offset: 0x001c
+Address offset: 0x0020
 
 Reset value: 0x00000000
 
