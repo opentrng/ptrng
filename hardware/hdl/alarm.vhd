@@ -17,7 +17,7 @@ entity alarm is
 		-- Digitizer type (see constants package)
 		digitizer: in natural;
 		-- Raw Random Number input data (RRN)
-		raw_random_input: in std_logic_vector (RAND_WIDTH-1 downto 0);
+		raw_random_number: in std_logic_vector (RAND_WIDTH-1 downto 0);
 		-- RRN data input validation
 		raw_random_valid: in std_logic;
 		-- Threshold value to trigger the failure
@@ -51,11 +51,11 @@ begin
 			-- For ERO/MURO count for long runs of same value
 			elsif digitizer = ERO or digitizer = MURO then
 				if raw_random_valid = '1' then
-					if raw_random_input = value then
+					if raw_random_number = value then
 						counter <= counter + 1;
 					else
 						counter <= (others => '0');
-						value <= raw_random_input;
+						value <= raw_random_number;
 					end if;
 				end if;
 

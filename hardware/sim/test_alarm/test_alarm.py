@@ -16,7 +16,7 @@ async def default_failure(dut):
 async def ero_or_muro_failure(dut):
 	dut.digitizer.value = 1
 	dut.threshold.value = 10
-	dut.raw_random_input.value = 0
+	dut.raw_random_number.value = 0
 	dut.raw_random_valid.value = 0
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
@@ -36,13 +36,13 @@ async def ero_or_muro_failure(dut):
 async def ero_or_muro_no_failure(dut):
 	dut.digitizer.value = 1
 	dut.threshold.value = 10
-	dut.raw_random_input.value = 0
+	dut.raw_random_number.value = 0
 	dut.raw_random_valid.value = 0
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
 	for i in range(dut.threshold.value):
 		await RisingEdge(dut.clk)
-		dut.raw_random_input.value = i
+		dut.raw_random_number.value = i
 		dut.raw_random_valid.value = 1
 		await RisingEdge(dut.clk)
 		dut.raw_random_valid.value = 0
@@ -54,7 +54,8 @@ async def ero_or_muro_no_failure(dut):
 async def coso_failure(dut):
 	dut.digitizer.value = 3
 	dut.threshold.value = 10
-	dut.raw_random_valid.value = 0
+	dut.raw_random_number.value = 0
+	dut.raw_random_valid.value = 1
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
 	await Signal.Skip(dut.clk, 2) # Skip the reset
@@ -66,13 +67,14 @@ async def coso_failure(dut):
 async def coso_no_failure(dut):
 	dut.digitizer.value = 3
 	dut.threshold.value = 10
+	dut.raw_random_number.value = 0
 	dut.raw_random_valid.value = 0
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
 	await Signal.Skip(dut.clk, 2) # Skip the reset
 	for i in range(dut.threshold.value):
 		await RisingEdge(dut.clk)
-		dut.raw_random_input.value = i
+		dut.raw_random_number.value = i
 		dut.raw_random_valid.value = 1
 	assert dut.detected.value == 0, "No failure should have been detected"
 	await Signal.Skip(dut.clk, 10)

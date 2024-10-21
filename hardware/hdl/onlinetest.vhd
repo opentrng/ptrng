@@ -21,7 +21,7 @@ entity onlinetest is
 		-- Clear-to-set the valid ouptut
 		clear: in std_logic;
 		-- Raw Random Number input data (RRN)
-		raw_random_input: in std_logic_vector (RAND_WIDTH-1 downto 0);
+		raw_random_number: in std_logic_vector (RAND_WIDTH-1 downto 0);
 		-- RRN data input validation
 		raw_random_valid: in std_logic;
 		-- Average accepted value
@@ -73,7 +73,7 @@ begin
 
 	-- Write each incoming RRN into FIFO and read last RRN to be substracted from accumulator
 	fifo_write_en <= raw_random_valid;
-	fifo_in <= raw_random_input;
+	fifo_in <= raw_random_number;
 	fifo_read_en <= raw_random_valid when fifo_almost_full = '1' else '0';
 	
 	-- Averaging FIFO

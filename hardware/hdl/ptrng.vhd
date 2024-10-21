@@ -103,7 +103,7 @@ begin
 		clk => clk,
 		reset => reset,
 		digitizer => DIGITIZER_GEN,
-		raw_random_input => raw_random_number,
+		raw_random_number => raw_random_number,
 		raw_random_valid => raw_random_valid,
 		threshold => alarm_threshold,
 		detected => alarm_detected
@@ -119,14 +119,14 @@ begin
 		clk => clk,
 		reset => reset,
 		clear => onlinetest_clear,
-		raw_random_input => raw_random_number,
+		raw_random_number => raw_random_number,
 		raw_random_valid => raw_random_valid,
 		average => onlinetest_average,
 		drift => onlinetest_drift,
 		valid => onlinetest_valid
 	);
 
-	-- Conditioner
+	-- Conditioning refers to algorithmic post-processing
 	-- TODO
 	intermediate_random_number <= raw_random_number;
 	intermediate_random_valid <= raw_random_valid;

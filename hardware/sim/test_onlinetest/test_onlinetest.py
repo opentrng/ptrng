@@ -8,7 +8,7 @@ DEPTH = 128
 @cocotb.test()
 async def valid_test(dut):
 	dut.clear.value = 0
-	dut.raw_random_input.value = 128
+	dut.raw_random_number.value = 128
 	dut.raw_random_valid.value = 1
 	dut.average.value = 128 * DEPTH
 	dut.drift.value = 10
@@ -22,7 +22,7 @@ async def valid_test(dut):
 @cocotb.test()
 async def invalid_test(dut):
 	dut.clear.value = 0
-	dut.raw_random_input.value = 128
+	dut.raw_random_number.value = 128
 	dut.raw_random_valid.value = 1
 	dut.average.value = 100
 	dut.drift.value = 10
