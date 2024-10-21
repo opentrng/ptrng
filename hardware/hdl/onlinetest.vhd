@@ -10,7 +10,7 @@ entity onlinetest is
 	generic (
 		-- Width for the cumulative sum depth
 		DEPTH: natural;
-		-- Width for the RRN output
+		-- Width for the RRN input
 		RAND_WIDTH: natural
 	);
 	port (

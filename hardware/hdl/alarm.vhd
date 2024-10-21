@@ -6,7 +6,7 @@ use work.constants.all;
 -- Total failure alarm on RRN. The total failure detection method depends on the digitizer type, the detection it triggered when the internal counter is greater or equal than the input threshold parameter.
 entity alarm is
 	generic (
-		-- Width for the RRN output
+		-- Width for the RRN input
 		RAND_WIDTH: natural
 	);
 	port (
