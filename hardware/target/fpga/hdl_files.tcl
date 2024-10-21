@@ -11,6 +11,7 @@ set hdl_files [list \
 	[list "work" [file normalize "${hardware}/hdl/freqcounter.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/alarm.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/onlinetest.vhd"]] \
+	[list "work" [file normalize "${hardware}/hdl/conditioner.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/ptrng.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/prefetch.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/top.vhd"]] \

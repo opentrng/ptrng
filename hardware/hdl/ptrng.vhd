@@ -64,8 +64,8 @@ architecture rtl of ptrng is
 	signal raw_random_valid: std_logic;
 
 	-- IRN from entropy source
-	signal intermediate_random_number: std_logic_vector (RAND_WIDTH-1 downto 0);
-	signal intermediate_random_valid: std_logic;
+	signal inter_random_number: std_logic_vector (RAND_WIDTH-1 downto 0);
+	signal inter_random_valid: std_logic;
 
 	-- Packed data bits
 	signal packed_data: std_logic_vector (RAND_WIDTH-1 downto 0);
@@ -127,9 +127,18 @@ begin
 	);
 
 	-- Conditioning refers to algorithmic post-processing
-	-- TODO
-	intermediate_random_number <= raw_random_number;
-	intermediate_random_valid <= raw_random_valid;
+	conditioner: entity work.conditioner
+	generic map (
+		RAND_WIDTH => RAND_WIDTH
+	)
+	port map (
+		clk => clk,
+		reset => reset,
+		raw_random_number => raw_random_number,
+		raw_random_valid => raw_random_valid,
+		inter_random_number => inter_random_number,
+		inter_random_valid => inter_random_valid
+	);
 
 	-- LSB packing into words
 	bitpacker: entity work.bitpacker
@@ -139,8 +148,8 @@ begin
 	port map (
 		clk => clk,
 		reset => reset,
-		data_in => intermediate_random_number(0),
-		valid_in => intermediate_random_valid,
+		data_in => inter_random_number(0),
+		valid_in => inter_random_valid,
 		data_out => packed_data,
 		valid_out => packed_valid
 	);
@@ -155,8 +164,8 @@ begin
 				data <=  packed_data;
 				valid <= packed_valid;
 			else
-				data <= intermediate_random_number;
-				valid <= intermediate_random_valid;
+				data <= inter_random_number;
+				valid <= inter_random_valid;
 			end if;
 		end if;
 	end process;
