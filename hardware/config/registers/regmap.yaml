@@ -21,13 +21,19 @@ regmap:
     description: Global control register for the OpenTRNG's PTRNG
     bitfields:
     -   name: RESET
-        description: Synchronous reset active to `'1'`
+        description: Synchronous reset active to '1'
         width: 1
         lsb: 0
         access: wosc
         hardware: o
+    -   name: CONDITIONING
+        description: Enable or disable the algorithmic post processing to convert RRN to IRN active to '1', bypass at '0'.
+        width: 1
+        lsb: 1
+        access: rw
+        hardware: o
 -   name: RING
-    description: Ring-oscillator enable register (enable bits are active at `'1'`).
+    description: Ring-oscillator enable register (enable bits are active at '1').
     bitfields:
     -   name: EN
         description: The bit at index _i_ in the bitfield enables the RO number _i_
@@ -39,19 +45,19 @@ regmap:
     description: Frequency counter control register.
     bitfields:
     -   name: EN
-        description: Enable the frequency counter (active at `'1'`)
+        description: Enable the frequency counter (active at '1')
         width: 1
         lsb: 0
         access: rw
         hardware: o
     -   name: START
-        description: Write `'1'` to start the frequency counter measure
+        description: Write '1' to start the frequency counter measure
         width: 1
         lsb: 1
         access: wosc
         hardware: o
     -   name: DONE
-        description: This field is set to `'1'` when the measure is done and ready to be read
+        description: This field is set to '1' when the measure is done and ready to be read
         width: 1
         lsb: 2
         access: ro
@@ -69,7 +75,7 @@ regmap:
         access: ro
         hardware: i
     -   name: OVERFLOW
-        description: Flag set to `'1'` if an overflow occurred during measurement
+        description: Flag set to '1' if an overflow occurred during measurement
         width: 1
         lsb: 31
         access: ro
@@ -107,8 +113,6 @@ regmap:
         lsb: 0
         access: rw
         hardware: o
-# -   name: ACCUMULATOR
-# -   name: ENTROPY
 -   name: ALARM
     description: Register for the total failure alarm.
     bitfields:

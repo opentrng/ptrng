@@ -24,7 +24,7 @@ Base address: 0x00000000
 | :---                     | :---       | :---        |
 | [ID](#id)                | 0x0000     | OpenTRNG's PTRNG identification register for UID and revision number. |
 | [CONTROL](#control)      | 0x0004     | Global control register for the OpenTRNG's PTRNG |
-| [RING](#ring)            | 0x0008     | Ring-oscillator enable register (enable bits are active at `'1'`). |
+| [RING](#ring)            | 0x0008     | Ring-oscillator enable register (enable bits are active at '1'). |
 | [FREQCOUNT](#freqcount)  | 0x000c     | Frequency counter control register. |
 | [FREQDIVIDER](#freqdivider) | 0x0010     | Clock divider register, applies on oscillator RO0 |
 | [ALARM](#alarm)          | 0x0014     | Register for the total failure alarm. |
@@ -59,14 +59,15 @@ Reset value: 0x00000000
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
-| -                | 31:1   | -               | 0x0000000  | Reserved |
-| RESET            | 0      | wosc            | 0x0        | Synchronous reset active to `'1'` |
+| -                | 31:2   | -               | 0x0000000  | Reserved |
+| CONDITIONING     | 1      | rw              | 0x0        | Enable or disable the algorithmic post processing to convert RRN to IRN active to '1', bypass at '0'. |
+| RESET            | 0      | wosc            | 0x0        | Synchronous reset active to '1' |
 
 Back to [Register map](#register-map-summary).
 
 ## RING
 
-Ring-oscillator enable register (enable bits are active at `'1'`).
+Ring-oscillator enable register (enable bits are active at '1').
 
 Address offset: 0x0008
 
@@ -90,12 +91,12 @@ Reset value: 0x00000000
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
-| OVERFLOW         | 31     | ro              | 0x0        | Flag set to `'1'` if an overflow occurred during measurement |
+| OVERFLOW         | 31     | ro              | 0x0        | Flag set to '1' if an overflow occurred during measurement |
 | VALUE            | 30:8   | ro              | 0x00000    | Measured value (unit in cycles of the system clock) |
 | SELECT           | 7:3    | rw              | 0x0        | Select the index of the ring-oscillator for frequency measurement |
-| DONE             | 2      | ro              | 0x0        | This field is set to `'1'` when the measure is done and ready to be read |
-| START            | 1      | wosc            | 0x0        | Write `'1'` to start the frequency counter measure |
-| EN               | 0      | rw              | 0x0        | Enable the frequency counter (active at `'1'`) |
+| DONE             | 2      | ro              | 0x0        | This field is set to '1' when the measure is done and ready to be read |
+| START            | 1      | wosc            | 0x0        | Write '1' to start the frequency counter measure |
+| EN               | 0      | rw              | 0x0        | Enable the frequency counter (active at '1') |
 
 Back to [Register map](#register-map-summary).
 

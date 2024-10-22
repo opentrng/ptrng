@@ -12,14 +12,16 @@ entity conditioner is
 		clk: in std_logic;
 		-- Asynchronous reset active to '1'
 		reset: in std_logic;
+		-- Enable the conditioner at '1', when '0' this bloc is a simple bypass
+		enable: in std_logic;
 		-- Raw Random Number input data (RRN)
 		raw_random_number: in std_logic_vector (RAND_WIDTH-1 downto 0);
 		-- RRN data input validation
 		raw_random_valid: in std_logic;
 		-- Intermediate Random Number ouput data (IRN)
-		inter_random_number: out std_logic_vector (RAND_WIDTH-1 downto 0);
+		intermediate_random_number: out std_logic_vector (RAND_WIDTH-1 downto 0);
 		-- IRN data output validation
-		inter_random_valid: out std_logic
+		intermediate_random_valid: out std_logic
 	);
 end entity;
 
@@ -35,18 +37,23 @@ begin
 	begin
 		if reset = '1' then
 			previous <= (others => '0');
-			inter_random_valid <= '0';
+			intermediate_random_valid <= '0';
 		elsif rising_edge(clk) then
-			if raw_random_valid = '1' then
-				previous <= raw_random_number;
-				if raw_random_number /= previous then
-					inter_random_number <= raw_random_number;
-					inter_random_valid <= '1';
+			if enable = '1' then
+				if raw_random_valid = '1' then
+					previous <= raw_random_number;
+					if raw_random_number /= previous then
+						intermediate_random_number <= raw_random_number;
+						intermediate_random_valid <= '1';
+					else
+						intermediate_random_valid <= '0';
+					end if;
 				else
-					inter_random_valid <= '0';
+					intermediate_random_valid <= '0';
 				end if;
 			else
-				inter_random_valid <= '0';
+				intermediate_random_number <= raw_random_number;
+				intermediate_random_valid <= raw_random_valid;
 			end if;
 		end if;
 	end process;

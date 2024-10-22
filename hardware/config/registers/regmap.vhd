@@ -20,6 +20,8 @@ port(
 
     -- CONTROL.RESET
     csr_control_reset_out : out std_logic;
+    -- CONTROL.CONDITIONING
+    csr_control_conditioning_out : out std_logic;
 
     -- RING.EN
     csr_ring_en_out : out std_logic_vector(31 downto 0);
@@ -99,7 +101,10 @@ signal csr_id_rev_ff : std_logic_vector(15 downto 0);
 
 signal csr_control_rdata : std_logic_vector(31 downto 0);
 signal csr_control_wen : std_logic;
+signal csr_control_ren : std_logic;
+signal csr_control_ren_ff : std_logic;
 signal csr_control_reset_ff : std_logic;
+signal csr_control_conditioning_ff : std_logic;
 
 signal csr_ring_rdata : std_logic_vector(31 downto 0);
 signal csr_ring_wen : std_logic;
@@ -223,13 +228,22 @@ end process;
 -- CSR:
 -- [0x4] - CONTROL - Global control register for the OpenTRNG's PTRNG
 --------------------------------------------------------------------------------
-csr_control_rdata(31 downto 1) <= (others => '0');
+csr_control_rdata(31 downto 2) <= (others => '0');
 
 csr_control_wen <= wen when (waddr = std_logic_vector(to_unsigned(4, ADDR_W))) else '0'; -- 0x4
 
+csr_control_ren <= ren when (raddr = std_logic_vector(to_unsigned(4, ADDR_W))) else '0'; -- 0x4
+process (clk, rst) begin
+if (rst = '1') then
+    csr_control_ren_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+        csr_control_ren_ff <= csr_control_ren;
+end if;
+end process;
+
 -----------------------
 -- Bit field:
--- CONTROL(0) - RESET - Synchronous reset active to `'1'`
+-- CONTROL(0) - RESET - Synchronous reset active to '1'
 -- access: wosc, hardware: o
 -----------------------
 
@@ -253,9 +267,35 @@ end process;
 
 
 
+-----------------------
+-- Bit field:
+-- CONTROL(1) - CONDITIONING - Enable or disable the algorithmic post processing to convert RRN to IRN active to '1', bypass at '0'.
+-- access: rw, hardware: o
+-----------------------
+
+csr_control_rdata(1) <= csr_control_conditioning_ff;
+
+csr_control_conditioning_out <= csr_control_conditioning_ff;
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_control_conditioning_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+        if (csr_control_wen = '1') then
+            if (wstrb(0) = '1') then
+                csr_control_conditioning_ff <= wdata(1);
+            end if;
+        else
+            csr_control_conditioning_ff <= csr_control_conditioning_ff;
+        end if;
+end if;
+end process;
+
+
+
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x8] - RING - Ring-oscillator enable register (enable bits are active at `'1'`).
+-- [0x8] - RING - Ring-oscillator enable register (enable bits are active at '1').
 --------------------------------------------------------------------------------
 
 csr_ring_wen <= wen when (waddr = std_logic_vector(to_unsigned(8, ADDR_W))) else '0'; -- 0x8
@@ -322,7 +362,7 @@ end process;
 
 -----------------------
 -- Bit field:
--- FREQCOUNT(0) - EN - Enable the frequency counter (active at `'1'`)
+-- FREQCOUNT(0) - EN - Enable the frequency counter (active at '1')
 -- access: rw, hardware: o
 -----------------------
 
@@ -348,7 +388,7 @@ end process;
 
 -----------------------
 -- Bit field:
--- FREQCOUNT(1) - START - Write `'1'` to start the frequency counter measure
+-- FREQCOUNT(1) - START - Write '1' to start the frequency counter measure
 -- access: wosc, hardware: o
 -----------------------
 
@@ -374,7 +414,7 @@ end process;
 
 -----------------------
 -- Bit field:
--- FREQCOUNT(2) - DONE - This field is set to `'1'` when the measure is done and ready to be read
+-- FREQCOUNT(2) - DONE - This field is set to '1' when the measure is done and ready to be read
 -- access: ro, hardware: i
 -----------------------
 
@@ -438,7 +478,7 @@ end process;
 
 -----------------------
 -- Bit field:
--- FREQCOUNT(31) - OVERFLOW - Flag set to `'1'` if an overflow occurred during measurement
+-- FREQCOUNT(31) - OVERFLOW - Flag set to '1' if an overflow occurred during measurement
 -- access: ro, hardware: i
 -----------------------
 

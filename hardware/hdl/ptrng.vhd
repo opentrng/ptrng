@@ -31,10 +31,6 @@ entity ptrng is
 		freqcount_value: out std_logic_vector (REG_WIDTH-5-4-1 downto 0);
 		-- Sampling clock divider (applies on RO0 for ERO and MURO)
 		freqdivider: in std_logic_vector (REG_WIDTH-1 downto 0);
-		-- Length of the entropy accumulator
-		--accumulator: in std_logic_vector (31 downto 0);
-		-- Enable the raw signal conditionner
-		--conditioning: in std_logic;
 		-- Threshold for triggering the total failure alarm
 		alarm_threshold: in std_logic_vector(15 downto 0);
 		-- Total failure alarm, risen to '1' when total failure event is detected
@@ -47,6 +43,8 @@ entity ptrng is
 		onlinetest_drift: in std_logic_vector (13 downto 0);
 		-- Set to '1' when the online test is valid (need to be cleared)
 		onlinetest_valid: out std_logic;
+		-- Enable the raw signal conditionner
+		conditioning: in std_logic;
 		-- When 'packbits' is pulled to '1', LSB from IRN are packed into 32bits word before being outputed to 'data' port
 		packbits: in std_logic;
 		-- Random data output
@@ -64,8 +62,8 @@ architecture rtl of ptrng is
 	signal raw_random_valid: std_logic;
 
 	-- IRN from entropy source
-	signal inter_random_number: std_logic_vector (RAND_WIDTH-1 downto 0);
-	signal inter_random_valid: std_logic;
+	signal intermediate_random_number: std_logic_vector (RAND_WIDTH-1 downto 0);
+	signal intermediate_random_valid: std_logic;
 
 	-- Packed data bits
 	signal packed_data: std_logic_vector (RAND_WIDTH-1 downto 0);
@@ -134,10 +132,11 @@ begin
 	port map (
 		clk => clk,
 		reset => reset,
+		enable => conditioning,
 		raw_random_number => raw_random_number,
 		raw_random_valid => raw_random_valid,
-		inter_random_number => inter_random_number,
-		inter_random_valid => inter_random_valid
+		intermediate_random_number => intermediate_random_number,
+		intermediate_random_valid => intermediate_random_valid
 	);
 
 	-- LSB packing into words
@@ -148,8 +147,8 @@ begin
 	port map (
 		clk => clk,
 		reset => reset,
-		data_in => inter_random_number(0),
-		valid_in => inter_random_valid,
+		data_in => intermediate_random_number(0),
+		valid_in => intermediate_random_valid,
 		data_out => packed_data,
 		valid_out => packed_valid
 	);
@@ -164,8 +163,8 @@ begin
 				data <=  packed_data;
 				valid <= packed_valid;
 			else
-				data <= inter_random_number;
-				valid <= inter_random_valid;
+				data <= intermediate_random_number;
+				valid <= intermediate_random_valid;
 			end if;
 		end if;
 	end process;

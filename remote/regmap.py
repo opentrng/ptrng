@@ -30,7 +30,7 @@ class _RegControl:
 
     @property
     def reset(self):
-        """Synchronous reset active to `'1'`"""
+        """Synchronous reset active to '1'"""
         return 0
 
     @reset.setter
@@ -38,6 +38,19 @@ class _RegControl:
         rdata = self._rmap._if.read(self._rmap.CONTROL_ADDR)
         rdata = rdata & (~(self._rmap.CONTROL_RESET_MSK << self._rmap.CONTROL_RESET_POS))
         rdata = rdata | (val << self._rmap.CONTROL_RESET_POS)
+        self._rmap._if.write(self._rmap.CONTROL_ADDR, rdata)
+
+    @property
+    def conditioning(self):
+        """Enable or disable the algorithmic post processing to convert RRN to IRN active to '1', bypass at '0'."""
+        rdata = self._rmap._if.read(self._rmap.CONTROL_ADDR)
+        return (rdata >> self._rmap.CONTROL_CONDITIONING_POS) & self._rmap.CONTROL_CONDITIONING_MSK
+
+    @conditioning.setter
+    def conditioning(self, val):
+        rdata = self._rmap._if.read(self._rmap.CONTROL_ADDR)
+        rdata = rdata & (~(self._rmap.CONTROL_CONDITIONING_MSK << self._rmap.CONTROL_CONDITIONING_POS))
+        rdata = rdata | (val << self._rmap.CONTROL_CONDITIONING_POS)
         self._rmap._if.write(self._rmap.CONTROL_ADDR, rdata)
 
 
@@ -65,7 +78,7 @@ class _RegFreqcount:
 
     @property
     def en(self):
-        """Enable the frequency counter (active at `'1'`)"""
+        """Enable the frequency counter (active at '1')"""
         rdata = self._rmap._if.read(self._rmap.FREQCOUNT_ADDR)
         return (rdata >> self._rmap.FREQCOUNT_EN_POS) & self._rmap.FREQCOUNT_EN_MSK
 
@@ -78,7 +91,7 @@ class _RegFreqcount:
 
     @property
     def start(self):
-        """Write `'1'` to start the frequency counter measure"""
+        """Write '1' to start the frequency counter measure"""
         return 0
 
     @start.setter
@@ -90,7 +103,7 @@ class _RegFreqcount:
 
     @property
     def done(self):
-        """This field is set to `'1'` when the measure is done and ready to be read"""
+        """This field is set to '1' when the measure is done and ready to be read"""
         rdata = self._rmap._if.read(self._rmap.FREQCOUNT_ADDR)
         return (rdata >> self._rmap.FREQCOUNT_DONE_POS) & self._rmap.FREQCOUNT_DONE_MSK
 
@@ -115,7 +128,7 @@ class _RegFreqcount:
 
     @property
     def overflow(self):
-        """Flag set to `'1'` if an overflow occurred during measurement"""
+        """Flag set to '1' if an overflow occurred during measurement"""
         rdata = self._rmap._if.read(self._rmap.FREQCOUNT_ADDR)
         return (rdata >> self._rmap.FREQCOUNT_OVERFLOW_POS) & self._rmap.FREQCOUNT_OVERFLOW_MSK
 
@@ -302,8 +315,10 @@ class RegMap:
     CONTROL_ADDR = 0x0004
     CONTROL_RESET_POS = 0
     CONTROL_RESET_MSK = 0x1
+    CONTROL_CONDITIONING_POS = 1
+    CONTROL_CONDITIONING_MSK = 0x1
 
-    # RING - Ring-oscillator enable register (enable bits are active at `'1'`).
+    # RING - Ring-oscillator enable register (enable bits are active at '1').
     RING_ADDR = 0x0008
     RING_EN_POS = 0
     RING_EN_MSK = 0xffffffff
@@ -385,7 +400,7 @@ class RegMap:
     @property
     def control(self):
         """Global control register for the OpenTRNG's PTRNG"""
-        return 0
+        return self._if.read(self.CONTROL_ADDR)
 
     @control.setter
     def control(self, val):
@@ -397,7 +412,7 @@ class RegMap:
 
     @property
     def ring(self):
-        """Ring-oscillator enable register (enable bits are active at `'1'`)."""
+        """Ring-oscillator enable register (enable bits are active at '1')."""
         return self._if.read(self.RING_ADDR)
 
     @ring.setter

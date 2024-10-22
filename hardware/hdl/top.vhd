@@ -58,6 +58,7 @@ architecture rtl of top is
 	signal onlinetest_drift: std_logic_vector(13 downto 0);
 	signal onlinetest_valid: std_logic;
 	signal onlinetest_clear: std_logic;
+	signal conditioning: std_logic;
 	signal packbits: std_logic;
 	
 	-- PTRNG
@@ -149,6 +150,7 @@ begin
 
 		-- Registers for the user
 		csr_control_reset_out => ptrng_reset,
+		csr_control_conditioning_out => conditioning,
 		csr_ring_en_out => ring_en,
 		csr_freqcount_en_out => freqcount_en,
 		csr_freqcount_start_out => freqcount_start,
@@ -199,6 +201,7 @@ begin
 		onlinetest_average => onlinetest_average,
 		onlinetest_drift => onlinetest_drift,
 		onlinetest_valid => onlinetest_valid,
+		conditioning => conditioning,
 		packbits => packbits,
 		data => ptrng_data,
 		valid => ptrng_valid
