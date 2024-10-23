@@ -8,10 +8,12 @@ use extras.fifos.all;
 -- Bloc responsible for online tests, which basically consists in calculating the moving cummulative sum of RRNs and comparing this cumsum to the average expected value +/- the drift.
 entity onlinetest is
 	generic (
-		-- Width for the cumulative sum depth
-		DEPTH: natural;
+		-- Width for the configuration registers
+		REG_WIDTH: natural;
 		-- Width for the RRN input
-		RAND_WIDTH: natural
+		RAND_WIDTH: natural;
+		-- Depth for the cumulative sum
+		DEPTH: natural
 	);
 	port (
 		-- Base clock
@@ -25,9 +27,9 @@ entity onlinetest is
 		-- RRN data input validation
 		raw_random_valid: in std_logic;
 		-- Average accepted value
-		average: in std_logic_vector (15 downto 0);
+		average: in std_logic_vector (REG_WIDTH/2-1 downto 0);
 		-- Maximum drift between accepted value and calculated value
-		drift: in std_logic_vector (13 downto 0);
+		drift: in std_logic_vector (REG_WIDTH/2-2-1 downto 0);
 		-- Set to '1' when the total failure event is detected
 		valid: out std_logic
 	);
@@ -36,7 +38,7 @@ end entity;
 -- RTL implementation of the online test
 architecture rtl of onlinetest is
 
-	constant MARGIN: natural := 10;
+	constant MARGIN: natural := 8;
 
 	signal fifo_in: std_logic_vector (RAND_WIDTH-1 downto 0);
 	signal fifo_out: std_logic_vector (RAND_WIDTH-1 downto 0);

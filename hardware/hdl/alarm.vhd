@@ -6,6 +6,8 @@ use work.constants.all;
 -- Total failure alarm on RRN. The total failure detection method depends on the digitizer type, the detection it triggered when the internal counter is greater or equal than the input threshold parameter.
 entity alarm is
 	generic (
+		-- Width for the configuration registers
+		REG_WIDTH: natural;
 		-- Width for the RRN input
 		RAND_WIDTH: natural
 	);
@@ -21,7 +23,7 @@ entity alarm is
 		-- RRN data input validation
 		raw_random_valid: in std_logic;
 		-- Threshold value to trigger the failure
-		threshold: in std_logic_vector (15 downto 0);
+		threshold: in std_logic_vector (REG_WIDTH/2-1 downto 0);
 		-- Set to '1' when the total failure event is detected
 		detected: out std_logic
 	);
@@ -30,7 +32,7 @@ end entity;
 -- RTL implementation of the total failure alarm
 architecture rtl of alarm is
 
-	signal counter: std_logic_vector (15 downto 0) := (others => '0');
+	signal counter: std_logic_vector (REG_WIDTH/2-1 downto 0) := (others => '0');
 	signal value: std_logic_vector (RAND_WIDTH-1 downto 0) := (others => '0');
 
 begin
