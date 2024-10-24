@@ -151,13 +151,42 @@ class _RegFreqdivider:
         self._rmap._if.write(self._rmap.FREQDIVIDER_ADDR, rdata)
 
 
+class _RegMonitoring:
+    def __init__(self, rmap):
+        self._rmap = rmap
+
+    @property
+    def alarm(self):
+        """This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on PTRNG reset only."""
+        rdata = self._rmap._if.read(self._rmap.MONITORING_ADDR)
+        return (rdata >> self._rmap.MONITORING_ALARM_POS) & self._rmap.MONITORING_ALARM_MSK
+
+    @property
+    def valid(self):
+        """This signal is set to '1' when the online test is valid, when it falls to '0' (invalid) it must be manually cleared."""
+        rdata = self._rmap._if.read(self._rmap.MONITORING_ADDR)
+        return (rdata >> self._rmap.MONITORING_VALID_POS) & self._rmap.MONITORING_VALID_MSK
+
+    @property
+    def clear(self):
+        """This signal clears the online test to set the 'valid' signal back to '1'."""
+        return 0
+
+    @clear.setter
+    def clear(self, val):
+        rdata = self._rmap._if.read(self._rmap.MONITORING_ADDR)
+        rdata = rdata & (~(self._rmap.MONITORING_CLEAR_MSK << self._rmap.MONITORING_CLEAR_POS))
+        rdata = rdata | (val << self._rmap.MONITORING_CLEAR_POS)
+        self._rmap._if.write(self._rmap.MONITORING_ADDR, rdata)
+
+
 class _RegAlarm:
     def __init__(self, rmap):
         self._rmap = rmap
 
     @property
     def threshold(self):
-        """Threshold value for triggering the total failure alarm. The threshold is compared to a counter, alarm is triggered when the counter greater or equal than the threshold. The counting method depends on the digitizer (ERO/MURO/COSO...)"""
+        """Threshold value for triggering the total failure alarm. The threshold is compared to a counter and the alarm is triggered when the counter becomes greater or equal than the threshold. The counting method depends on the digitizer type (ERO, MURO, COSO...)"""
         rdata = self._rmap._if.read(self._rmap.ALARM_ADDR)
         return (rdata >> self._rmap.ALARM_THRESHOLD_POS) & self._rmap.ALARM_THRESHOLD_MSK
 
@@ -168,12 +197,6 @@ class _RegAlarm:
         rdata = rdata | (val << self._rmap.ALARM_THRESHOLD_POS)
         self._rmap._if.write(self._rmap.ALARM_ADDR, rdata)
 
-    @property
-    def detected(self):
-        """This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on read."""
-        rdata = self._rmap._if.read(self._rmap.ALARM_ADDR)
-        return (rdata >> self._rmap.ALARM_DETECTED_POS) & self._rmap.ALARM_DETECTED_MSK
-
 
 class _RegOnlinetest:
     def __init__(self, rmap):
@@ -181,7 +204,7 @@ class _RegOnlinetest:
 
     @property
     def average(self):
-        """Average expected value for the online test."""
+        """Average expected value for the online test internal value."""
         rdata = self._rmap._if.read(self._rmap.ONLINETEST_ADDR)
         return (rdata >> self._rmap.ONLINETEST_AVERAGE_POS) & self._rmap.ONLINETEST_AVERAGE_MSK
 
@@ -193,34 +216,16 @@ class _RegOnlinetest:
         self._rmap._if.write(self._rmap.ONLINETEST_ADDR, rdata)
 
     @property
-    def drift(self):
-        """Maximum drift between the expected value and the actual value for the online tests."""
+    def deviation(self):
+        """Maximum difference between the average expected value and the current internal value for the online test."""
         rdata = self._rmap._if.read(self._rmap.ONLINETEST_ADDR)
-        return (rdata >> self._rmap.ONLINETEST_DRIFT_POS) & self._rmap.ONLINETEST_DRIFT_MSK
+        return (rdata >> self._rmap.ONLINETEST_DEVIATION_POS) & self._rmap.ONLINETEST_DEVIATION_MSK
 
-    @drift.setter
-    def drift(self, val):
+    @deviation.setter
+    def deviation(self, val):
         rdata = self._rmap._if.read(self._rmap.ONLINETEST_ADDR)
-        rdata = rdata & (~(self._rmap.ONLINETEST_DRIFT_MSK << self._rmap.ONLINETEST_DRIFT_POS))
-        rdata = rdata | (val << self._rmap.ONLINETEST_DRIFT_POS)
-        self._rmap._if.write(self._rmap.ONLINETEST_ADDR, rdata)
-
-    @property
-    def valid(self):
-        """This signal is fallen to '0' when the online test becomes invalid, must be manually cleared."""
-        rdata = self._rmap._if.read(self._rmap.ONLINETEST_ADDR)
-        return (rdata >> self._rmap.ONLINETEST_VALID_POS) & self._rmap.ONLINETEST_VALID_MSK
-
-    @property
-    def clear(self):
-        """This signal clears the 'valid' signal back to '1'."""
-        return 0
-
-    @clear.setter
-    def clear(self, val):
-        rdata = self._rmap._if.read(self._rmap.ONLINETEST_ADDR)
-        rdata = rdata & (~(self._rmap.ONLINETEST_CLEAR_MSK << self._rmap.ONLINETEST_CLEAR_POS))
-        rdata = rdata | (val << self._rmap.ONLINETEST_CLEAR_POS)
+        rdata = rdata & (~(self._rmap.ONLINETEST_DEVIATION_MSK << self._rmap.ONLINETEST_DEVIATION_POS))
+        rdata = rdata | (val << self._rmap.ONLINETEST_DEVIATION_POS)
         self._rmap._if.write(self._rmap.ONLINETEST_ADDR, rdata)
 
 
@@ -343,26 +348,29 @@ class RegMap:
     FREQDIVIDER_VALUE_POS = 0
     FREQDIVIDER_VALUE_MSK = 0xffffffff
 
-    # ALARM - Register for the total failure alarm.
-    ALARM_ADDR = 0x0014
-    ALARM_THRESHOLD_POS = 0
-    ALARM_THRESHOLD_MSK = 0xffff
-    ALARM_DETECTED_POS = 16
-    ALARM_DETECTED_MSK = 0x1
+    # MONITORING - Register for monitoring the total failure alarm and the online tests.
+    MONITORING_ADDR = 0x0014
+    MONITORING_ALARM_POS = 0
+    MONITORING_ALARM_MSK = 0x1
+    MONITORING_VALID_POS = 1
+    MONITORING_VALID_MSK = 0x1
+    MONITORING_CLEAR_POS = 2
+    MONITORING_CLEAR_MSK = 0x1
 
-    # ONLINETEST - Register for online testing.
-    ONLINETEST_ADDR = 0x0018
+    # ALARM - Register for configuring the total failure alarm.
+    ALARM_ADDR = 0x0018
+    ALARM_THRESHOLD_POS = 0
+    ALARM_THRESHOLD_MSK = 0xffffffff
+
+    # ONLINETEST - Register for configuring the online test.
+    ONLINETEST_ADDR = 0x001c
     ONLINETEST_AVERAGE_POS = 0
     ONLINETEST_AVERAGE_MSK = 0xffff
-    ONLINETEST_DRIFT_POS = 16
-    ONLINETEST_DRIFT_MSK = 0x3fff
-    ONLINETEST_VALID_POS = 30
-    ONLINETEST_VALID_MSK = 0x1
-    ONLINETEST_CLEAR_POS = 31
-    ONLINETEST_CLEAR_MSK = 0x1
+    ONLINETEST_DEVIATION_POS = 16
+    ONLINETEST_DEVIATION_MSK = 0xffff
 
     # FIFOCTRL - Control register for the FIFO, into read the PTRNG random data output
-    FIFOCTRL_ADDR = 0x001c
+    FIFOCTRL_ADDR = 0x0020
     FIFOCTRL_CLEAR_POS = 0
     FIFOCTRL_CLEAR_MSK = 0x1
     FIFOCTRL_PACKBITS_POS = 1
@@ -381,7 +389,7 @@ class RegMap:
     FIFOCTRL_BURSTSIZE_MSK = 0xffff
 
     # FIFODATA - Data register for the FIFO to read the PTRNG random data output
-    FIFODATA_ADDR = 0x0020
+    FIFODATA_ADDR = 0x0024
     FIFODATA_DATA_POS = 0
     FIFODATA_DATA_MSK = 0xffffffff
 
@@ -450,8 +458,21 @@ class RegMap:
         return _RegFreqdivider(self)
 
     @property
+    def monitoring(self):
+        """Register for monitoring the total failure alarm and the online tests."""
+        return self._if.read(self.MONITORING_ADDR)
+
+    @monitoring.setter
+    def monitoring(self, val):
+        self._if.write(self.MONITORING_ADDR, val)
+
+    @property
+    def monitoring_bf(self):
+        return _RegMonitoring(self)
+
+    @property
     def alarm(self):
-        """Register for the total failure alarm."""
+        """Register for configuring the total failure alarm."""
         return self._if.read(self.ALARM_ADDR)
 
     @alarm.setter
@@ -464,7 +485,7 @@ class RegMap:
 
     @property
     def onlinetest(self):
-        """Register for online testing."""
+        """Register for configuring the online test."""
         return self._if.read(self.ONLINETEST_ADDR)
 
     @onlinetest.setter

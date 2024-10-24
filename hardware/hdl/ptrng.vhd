@@ -32,15 +32,15 @@ entity ptrng is
 		-- Sampling clock divider (applies on RO0 for ERO and MURO)
 		freqdivider: in std_logic_vector (REG_WIDTH-1 downto 0);
 		-- Threshold for triggering the total failure alarm
-		alarm_threshold: in std_logic_vector(REG_WIDTH/2-1 downto 0);
+		alarm_threshold: in std_logic_vector(REG_WIDTH-1 downto 0);
 		-- Total failure alarm, risen to '1' when total failure event is detected
 		alarm_detected: out std_logic;
 		-- Clear-to-set the online test
 		onlinetest_clear: in std_logic;
 		-- Expected average value for online test
 		onlinetest_average: in std_logic_vector (REG_WIDTH/2-1 downto 0);
-		-- Maximum drift to expected value for online test to be valid
-		onlinetest_drift: in std_logic_vector (REG_WIDTH/2-2-1 downto 0);
+		-- Maximum deviation to expected value for online test to be valid
+		onlinetest_deviation: in std_logic_vector (REG_WIDTH/2-1 downto 0);
 		-- Set to '1' when the online test is valid (need to be cleared)
 		onlinetest_valid: out std_logic;
 		-- Enable the raw signal conditionner
@@ -122,7 +122,7 @@ begin
 		raw_random_number => raw_random_number,
 		raw_random_valid => raw_random_valid,
 		average => onlinetest_average,
-		drift => onlinetest_drift,
+		deviation => onlinetest_deviation,
 		valid => onlinetest_valid
 	);
 

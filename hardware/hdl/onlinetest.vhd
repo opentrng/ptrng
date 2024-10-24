@@ -28,8 +28,8 @@ entity onlinetest is
 		raw_random_valid: in std_logic;
 		-- Average accepted value
 		average: in std_logic_vector (REG_WIDTH/2-1 downto 0);
-		-- Maximum drift between accepted value and calculated value
-		drift: in std_logic_vector (REG_WIDTH/2-2-1 downto 0);
+		-- Maximum deviation between accepted value and calculated value
+		deviation: in std_logic_vector (REG_WIDTH/2-1 downto 0);
 		-- Set to '1' when the total failure event is detected
 		valid: out std_logic
 	);
@@ -47,7 +47,7 @@ architecture rtl of onlinetest is
 	signal fifo_almost_empty: std_logic;
 	signal fifo_almost_full: std_logic;
 	
-	signal cumsum_value: std_logic_vector (RAND_WIDTH-1 downto 0);
+	signal cumsum_value: std_logic_vector (REG_WIDTH+RAND_WIDTH-1 downto 0);
 	signal cumsum_valid: std_logic;
 
 begin
@@ -107,7 +107,7 @@ begin
 				valid <= '1';
 			else
 				if cumsum_valid = '1' then
-					if cumsum_value < average - drift or cumsum_value > average + drift then
+					if cumsum_value < average - deviation or cumsum_value > average + deviation then
 						valid <= '0';
 					end if;
 				end if;

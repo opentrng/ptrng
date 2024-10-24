@@ -52,12 +52,12 @@ architecture rtl of top is
 	signal freqcount_select: std_logic_vector (4 downto 0);
 	signal freqcount_value: std_logic_vector (22 downto 0);
 	signal freqdivider: std_logic_vector (31 downto 0);
-	signal alarm_threshold: std_logic_vector(15 downto 0);
+	signal alarm_threshold: std_logic_vector(31 downto 0);
 	signal alarm_detected: std_logic;
-	signal onlinetest_average: std_logic_vector(15 downto 0);
-	signal onlinetest_drift: std_logic_vector(13 downto 0);
-	signal onlinetest_valid: std_logic;
 	signal onlinetest_clear: std_logic;
+	signal onlinetest_valid: std_logic;
+	signal onlinetest_average: std_logic_vector(15 downto 0);
+	signal onlinetest_deviation: std_logic_vector(15 downto 0);
 	signal conditioning: std_logic;
 	signal packbits: std_logic;
 	
@@ -160,11 +160,11 @@ begin
 		csr_freqcount_overflow_in => freqcount_overflow,
 		csr_freqdivider_value_out => freqdivider,
 		csr_alarm_threshold_out => alarm_threshold,
-		csr_alarm_detected_in => alarm_detected,
-		csr_onlinetest_clear_out => onlinetest_clear,
+		csr_monitoring_alarm_in => alarm_detected,
+		csr_monitoring_clear_out => onlinetest_clear,
+		csr_monitoring_valid_in => onlinetest_valid,
 		csr_onlinetest_average_out => onlinetest_average,
-		csr_onlinetest_drift_out => onlinetest_drift,
-		csr_onlinetest_valid_in => onlinetest_valid,
+		csr_onlinetest_deviation_out => onlinetest_deviation,
 		csr_fifoctrl_clear_out => fifo_clear,
 		csr_fifoctrl_packbits_out => packbits,
 		csr_fifoctrl_empty_in => fifo_empty,
@@ -199,7 +199,7 @@ begin
 		alarm_detected => alarm_detected,
 		onlinetest_clear => onlinetest_clear,
 		onlinetest_average => onlinetest_average,
-		onlinetest_drift => onlinetest_drift,
+		onlinetest_deviation => onlinetest_deviation,
 		onlinetest_valid => onlinetest_valid,
 		conditioning => conditioning,
 		packbits => packbits,

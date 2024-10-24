@@ -27,10 +27,11 @@ Base address: 0x00000000
 | [RING](#ring)            | 0x0008     | Ring-oscillator enable register (enable bits are active at '1'). |
 | [FREQCOUNT](#freqcount)  | 0x000c     | Frequency counter control register. |
 | [FREQDIVIDER](#freqdivider) | 0x0010     | Clock divider register, applies on oscillator RO0 |
-| [ALARM](#alarm)          | 0x0014     | Register for the total failure alarm. |
-| [ONLINETEST](#onlinetest) | 0x0018     | Register for online testing. |
-| [FIFOCTRL](#fifoctrl)    | 0x001c     | Control register for the FIFO, into read the PTRNG random data output |
-| [FIFODATA](#fifodata)    | 0x0020     | Data register for the FIFO to read the PTRNG random data output |
+| [MONITORING](#monitoring) | 0x0014     | Register for monitoring the total failure alarm and the online tests. |
+| [ALARM](#alarm)          | 0x0018     | Register for configuring the total failure alarm. |
+| [ONLINETEST](#onlinetest) | 0x001c     | Register for configuring the online test. |
+| [FIFOCTRL](#fifoctrl)    | 0x0020     | Control register for the FIFO, into read the PTRNG random data output |
+| [FIFODATA](#fifodata)    | 0x0024     | Data register for the FIFO to read the PTRNG random data output |
 
 ## ID
 
@@ -115,9 +116,9 @@ Reset value: 0x00000000
 
 Back to [Register map](#register-map-summary).
 
-## ALARM
+## MONITORING
 
-Register for the total failure alarm.
+Register for monitoring the total failure alarm and the online tests.
 
 Address offset: 0x0014
 
@@ -126,15 +127,16 @@ Reset value: 0x00000000
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
-| -                | 31:17  | -               | 0x000      | Reserved |
-| DETECTED         | 16     | roc             | 0x0        | This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on read. |
-| THRESHOLD        | 15:0   | rw              | 0x0000     | Threshold value for triggering the total failure alarm. The threshold is compared to a counter, alarm is triggered when the counter greater or equal than the threshold. The counting method depends on the digitizer (ERO/MURO/COSO...) |
+| -                | 31:3   | -               | 0x0000000  | Reserved |
+| CLEAR            | 2      | wosc            | 0x0        | This signal clears the online test to set the 'valid' signal back to '1'. |
+| VALID            | 1      | ro              | 0x0        | This signal is set to '1' when the online test is valid, when it falls to '0' (invalid) it must be manually cleared. |
+| ALARM            | 0      | roc             | 0x0        | This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on PTRNG reset only. |
 
 Back to [Register map](#register-map-summary).
 
-## ONLINETEST
+## ALARM
 
-Register for online testing.
+Register for configuring the total failure alarm.
 
 Address offset: 0x0018
 
@@ -143,10 +145,23 @@ Reset value: 0x00000000
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
-| CLEAR            | 31     | wosc            | 0x0        | This signal clears the 'valid' signal back to '1'. |
-| VALID            | 30     | ro              | 0x0        | This signal is fallen to '0' when the online test becomes invalid, must be manually cleared. |
-| DRIFT            | 29:16  | rw              | 0x000      | Maximum drift between the expected value and the actual value for the online tests. |
-| AVERAGE          | 15:0   | rw              | 0x0000     | Average expected value for the online test. |
+| THRESHOLD        | 31:0   | rw              | 0x00000000 | Threshold value for triggering the total failure alarm. The threshold is compared to a counter and the alarm is triggered when the counter becomes greater or equal than the threshold. The counting method depends on the digitizer type (ERO, MURO, COSO...) |
+
+Back to [Register map](#register-map-summary).
+
+## ONLINETEST
+
+Register for configuring the online test.
+
+Address offset: 0x001c
+
+Reset value: 0x00000000
+
+
+| Name             | Bits   | Mode            | Reset      | Description |
+| :---             | :---   | :---            | :---       | :---        |
+| DEVIATION        | 31:16  | rw              | 0x0000     | Maximum difference between the average expected value and the current internal value for the online test. |
+| AVERAGE          | 15:0   | rw              | 0x0000     | Average expected value for the online test internal value. |
 
 Back to [Register map](#register-map-summary).
 
@@ -154,7 +169,7 @@ Back to [Register map](#register-map-summary).
 
 Control register for the FIFO, into read the PTRNG random data output
 
-Address offset: 0x001c
+Address offset: 0x0020
 
 Reset value: 0x00000002
 
@@ -177,7 +192,7 @@ Back to [Register map](#register-map-summary).
 
 Data register for the FIFO to read the PTRNG random data output
 
-Address offset: 0x0020
+Address offset: 0x0024
 
 Reset value: 0x00000000
 

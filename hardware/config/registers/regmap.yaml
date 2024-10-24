@@ -113,47 +113,50 @@ regmap:
         lsb: 0
         access: rw
         hardware: o
--   name: ALARM
-    description: Register for the total failure alarm.
+-   name: MONITORING
+    description: Register for monitoring the total failure alarm and the online tests.
     bitfields:
-    -   name: THRESHOLD
-        description: Threshold value for triggering the total failure alarm. The threshold is compared to a counter, alarm is triggered when the counter greater or equal than the threshold. The counting method depends on the digitizer (ERO/MURO/COSO...)
-        width: 16
-        lsb: 0
-        access: rw
-        hardware: o
-    -   name: DETECTED
-        description: This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on read.
+    -   name: ALARM
+        description: This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on PTRNG reset only.
         width: 1
-        lsb: 16
+        lsb: 0
         access: roc
         hardware: i
--   name: ONLINETEST
-    description: Register for online testing.
-    bitfields:
-    -   name: AVERAGE
-        description: Average expected value for the online test.
-        width: 16
-        lsb: 0
-        access: rw
-        hardware: o
-    -   name: DRIFT
-        description: Maximum drift between the expected value and the actual value for the online tests.
-        width: 14
-        lsb: 16
-        access: rw
-        hardware: o
     -   name: VALID
-        description: This signal is fallen to '0' when the online test becomes invalid, must be manually cleared.
+        description: This signal is set to '1' when the online test is valid, when it falls to '0' (invalid) it must be manually cleared.
         width: 1
-        lsb: 30
+        lsb: 1
         access: ro
         hardware: i
     -   name: CLEAR
-        description: This signal clears the 'valid' signal back to '1'.
+        description: This signal clears the online test to set the 'valid' signal back to '1'.
         width: 1
-        lsb: 31
+        lsb: 2
         access: wosc
+        hardware: o
+-   name: ALARM
+    description: Register for configuring the total failure alarm.
+    bitfields:
+    -   name: THRESHOLD
+        description: Threshold value for triggering the total failure alarm. The threshold is compared to a counter and the alarm is triggered when the counter becomes greater or equal than the threshold. The counting method depends on the digitizer type (ERO, MURO, COSO...)
+        width: 32
+        lsb: 0
+        access: rw
+        hardware: o
+-   name: ONLINETEST
+    description: Register for configuring the online test.
+    bitfields:
+    -   name: AVERAGE
+        description: Average expected value for the online test internal value.
+        width: 16
+        lsb: 0
+        access: rw
+        hardware: o
+    -   name: DEVIATION
+        description: Maximum difference between the average expected value and the current internal value for the online test.
+        width: 16
+        lsb: 16
+        access: rw
         hardware: o
 -   name: FIFOCTRL
     description: Control register for the FIFO, into read the PTRNG random data output

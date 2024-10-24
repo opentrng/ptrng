@@ -11,7 +11,7 @@ async def valid_test(dut):
 	dut.raw_random_number.value = 128
 	dut.raw_random_valid.value = 1
 	dut.average.value = 128 * DEPTH
-	dut.drift.value = 10
+	dut.deviation.value = 10
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
 	await Signal.Skip(dut.clk, 2) # Skip the reset
@@ -25,7 +25,7 @@ async def invalid_test(dut):
 	dut.raw_random_number.value = 128
 	dut.raw_random_valid.value = 1
 	dut.average.value = 100
-	dut.drift.value = 10
+	dut.deviation.value = 10
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
 	await Signal.Skip(dut.clk, 2) # Skip the reset
