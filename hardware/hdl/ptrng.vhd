@@ -62,6 +62,8 @@ architecture rtl of ptrng is
 	signal raw_random_valid: std_logic;
 
 	-- IRN from entropy source
+	signal conditioned_number: std_logic_vector (RAND_WIDTH-1 downto 0);
+	signal conditioned_valid: std_logic;
 	signal intermediate_random_number: std_logic_vector (RAND_WIDTH-1 downto 0);
 	signal intermediate_random_valid: std_logic;
 
@@ -137,9 +139,25 @@ begin
 		enable => conditioning,
 		raw_random_number => raw_random_number,
 		raw_random_valid => raw_random_valid,
-		intermediate_random_number => intermediate_random_number,
-		intermediate_random_valid => intermediate_random_valid
+		conditioned_number => conditioned_number,
+		conditioned_valid => conditioned_valid
 	);
+
+	-- Bypass the conditioner if disabled
+	process (clk, reset)
+	begin
+		if reset = '1' then
+			intermediate_random_valid <= '0';
+		elsif rising_edge(clk) then
+			if conditioning = '1' then
+				intermediate_random_number <=  conditioned_number;
+				intermediate_random_valid <= conditioned_valid;
+			else
+				intermediate_random_number <= raw_random_number;
+				intermediate_random_valid <= raw_random_valid;
+			end if;
+		end if;
+	end process;
 
 	-- LSB packing into words
 	bitpacker: entity work.bitpacker

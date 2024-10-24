@@ -23,22 +23,22 @@ async def basic_tests(dut):
 
 	dut.raw_random_number.value = 3
 	await Signal.PulseBit(dut.raw_random_valid, dut.clk)
-	irn_simulation = await append_bit(dut.clk, dut.intermediate_random_number, dut.intermediate_random_valid, irn_simulation)
+	irn_simulation = await append_bit(dut.clk, dut.conditioned_number, dut.conditioned_valid, irn_simulation)
 	dut.raw_random_number.value = 4
 	await Signal.PulseBit(dut.raw_random_valid, dut.clk)
-	irn_simulation = await append_bit(dut.clk, dut.intermediate_random_number, dut.intermediate_random_valid, irn_simulation)
+	irn_simulation = await append_bit(dut.clk, dut.conditioned_number, dut.conditioned_valid, irn_simulation)
 	dut.raw_random_number.value = 3
 	await Signal.PulseBit(dut.raw_random_valid, dut.clk)
-	irn_simulation = await append_bit(dut.clk, dut.intermediate_random_number, dut.intermediate_random_valid, irn_simulation)
+	irn_simulation = await append_bit(dut.clk, dut.conditioned_number, dut.conditioned_valid, irn_simulation)
 	dut.raw_random_number.value = 3
 	await Signal.PulseBit(dut.raw_random_valid, dut.clk)
-	irn_simulation = await append_bit(dut.clk, dut.intermediate_random_number, dut.intermediate_random_valid, irn_simulation)
+	irn_simulation = await append_bit(dut.clk, dut.conditioned_number, dut.conditioned_valid, irn_simulation)
 	dut.raw_random_number.value = 3
 	await Signal.PulseBit(dut.raw_random_valid, dut.clk)
-	irn_simulation = await append_bit(dut.clk, dut.intermediate_random_number, dut.intermediate_random_valid, irn_simulation)
+	irn_simulation = await append_bit(dut.clk, dut.conditioned_number, dut.conditioned_valid, irn_simulation)
 	dut.raw_random_number.value = 4
 	await Signal.PulseBit(dut.raw_random_valid, dut.clk)
-	irn_simulation = await append_bit(dut.clk, dut.intermediate_random_number, dut.intermediate_random_valid, irn_simulation)
+	irn_simulation = await append_bit(dut.clk, dut.conditioned_number, dut.conditioned_valid, irn_simulation)
 
 	await Signal.Skip(dut.clk, 10)
 	assert irn_simulation == irn_reference
