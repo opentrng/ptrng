@@ -9,8 +9,8 @@ parser.add_argument("-size", required=True, type=float, help="numer of bits to g
 parser.add_argument("-freq0", required=True, type=float, help="base frequency (in Hz) of the sampling ring-oscillator (RO0)")
 parser.add_argument("-freq1", required=True, type=float, help="frequency (in Hz) of the sampled ring-oscillator (RO1)")
 parser.add_argument("-div", required=True, type=int, help="divisor for the sampling clock (sampling frequency will be RO0/div)")
-parser.add_argument("-a1", type=float, default=emulator.A1_F500M, help="thermal noise amplitude factor (default {:e})".format(emulator.A1_F500M))
-parser.add_argument("-a2", type=float, default=emulator.A2_F500M, help="flicker noise amplitude factor (default {:e})".format(emulator.A2_F500M))
+parser.add_argument("-a1", type=float, default=emulator.A1_F100M, help="thermal noise amplitude factor (default {:e})".format(emulator.A1_F100M))
+parser.add_argument("-a2", type=float, default=emulator.A2_F100M, help="flicker noise amplitude factor (default {:e})".format(emulator.A2_F100M))
 parser.add_argument("filename", type=str, help="output file (text format)")
 args=parser.parse_args()
 

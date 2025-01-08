@@ -8,8 +8,8 @@ parser = argparse.ArgumentParser(description="Emulates the MURO and generate a s
 parser.add_argument("-size", required=True, type=float, help="numer of bits to generate")
 parser.add_argument("-freq", required=True, type=float, nargs='+', help="frequency (in Hz) of the ring-oscillators RO0 to ROt")
 parser.add_argument("-div", required=True, type=int, help="divisor for the sampling clock (sampling frequency will be RO0/div)")
-parser.add_argument("-a1", type=float, default=emulator.A1_F500M, help="thermal noise amplitude factor (default {:e})".format(emulator.A1_F500M))
-parser.add_argument("-a2", type=float, default=emulator.A2_F500M, help="flicker noise amplitude factor (default {:e})".format(emulator.A2_F500M))
+parser.add_argument("-a1", type=float, default=emulator.A1_F100M, help="thermal noise amplitude factor (default {:e})".format(emulator.A1_F100M))
+parser.add_argument("-a2", type=float, default=emulator.A2_F100M, help="flicker noise amplitude factor (default {:e})".format(emulator.A2_F100M))
 parser.add_argument("filename", type=str, help="output file (text format)")
 args=parser.parse_args()
 
