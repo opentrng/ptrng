@@ -31,7 +31,8 @@ while len(bits) < int(args.size):
 	for f in args.freq[1:]:
 		ro = emulator.generate_periods(emulator.GENPERIODS, f, args.a1, args.a2)
 		rox = np.vstack((rox, ro))
-	bits = np.append(bits, emulator.muro(args.div, ro0, rox))
+	b, v, r = emulator.muro(args.div, ro0, rox)
+	bits = np.append(bits, b)
 
 # Give the raw bit bias
 print("Output bits bias: {:.2f}".format(np.mean(bits)))
