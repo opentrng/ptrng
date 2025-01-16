@@ -4,16 +4,19 @@ use ieee.std_logic_1164.all;
 -- The MURO wrapper converts the std_logic_vector input ports for RO1-ROt to an entity with t=5 RO inputs (RO0-RO5).
 entity murowrapper is
 	generic (
-		t: integer := 5
+		REG_WIDTH: natural;
+		t: natural := 5
 	);
 	port (
+		reset: in std_logic;
 		ro0: in std_logic;
 		ro1: in std_logic;
 		ro2: in std_logic;
 		ro3: in std_logic;
 		ro4: in std_logic;
 		ro5: in std_logic;
-		div: in std_logic_vector (31 downto 0);
+		divider: in std_logic_vector (REG_WIDTH-1 downto 0);
+		changed: in std_logic;
 		clk: out std_logic;
 		data: out std_logic
 	);
@@ -32,12 +35,15 @@ begin
 	-- Wrapping the MURO with fixed generic
 	wrapped: entity work.muro
 	generic map (
+		REG_WIDTH => REG_WIDTH,
 		t => t
 	)
 	port map (
+		reset => reset,
 		ro0 => ro0,
 		rox => rox,
-		div => div,
+		divider => divider,
+		changed => changed,
 		clk => clk,
 		data => data
 	);
