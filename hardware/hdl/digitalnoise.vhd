@@ -33,8 +33,10 @@ entity digitalnoise is
 		freqcount_overflow: out std_logic;
 		-- Frequency estimation output (for the selected ROs)
 		freqcount_value: out std_logic_vector (REG_WIDTH-5-4-1 downto 0);
-		-- Sampling clock divider (applies on RO0 for ERO and MURO)
-		freqdivider: in std_logic_vector (REG_WIDTH-1 downto 0);
+		-- Sampling clock divider value (applies on RO0 for ERO and MURO)
+		freqdivider_value: in std_logic_vector (REG_WIDTH-1 downto 0);
+		-- Enable strobing when frequency divider changes
+		freqdivider_en: in std_logic;
 		-- Raw Random Number output data (RRN)
 		data: out std_logic_vector (RAND_WIDTH-1 downto 0);
 		-- RRN data output valid
@@ -53,7 +55,7 @@ architecture rtl of digitalnoise is
 
 	-- Digitizer
 	signal digit_clk: std_logic;
-	signal digit_data: std_logic_vector (RAND_WIDTH-1 downto 0) := (others => '0');
+	signal digit_data: std_logic_vector (RAND_WIDTH-1 downto 0);
 	signal digit_valid: std_logic;
 	
 	-- CDC
@@ -109,6 +111,7 @@ begin
 		overflow => freqcount_overflow,
 		result => freqcount_value
 	);
+
 	selected_mon <= mon(conv_integer(freqcount_select));
 
 	-- Digitizer 
@@ -118,8 +121,10 @@ begin
 		RAND_WIDTH => RAND_WIDTH
 	)
 	port map (
+		reset => reset,
 		osc => osc,
-		freqdivider => freqdivider,
+		freqdivider_value => freqdivider_value,
+		freqdivider_en => freqdivider_en,
 		digit_clk => digit_clk,
 		digit_data => digit_data,
 		digit_valid => digit_valid
