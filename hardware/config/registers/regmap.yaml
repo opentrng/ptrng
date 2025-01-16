@@ -112,7 +112,7 @@ regmap:
         width: 32
         lsb: 0
         access: rw
-        hardware: o
+        hardware: oa
 -   name: MONITORING
     description: Register for monitoring the total failure alarm and the online tests.
     bitfields:

@@ -40,6 +40,7 @@ port(
     csr_freqcount_overflow_in : in std_logic;
 
     -- FREQDIVIDER.VALUE
+    csr_freqdivider_value_waccess : out std_logic;
     csr_freqdivider_value_out : out std_logic_vector(31 downto 0);
 
     -- MONITORING.ALARM
@@ -520,8 +521,9 @@ end process;
 -----------------------
 -- Bit field:
 -- FREQDIVIDER(31 downto 0) - VALUE - Clock divider value (1 means no division, 2 division by two, ...)
--- access: rw, hardware: o
+-- access: rw, hardware: oa
 -----------------------
+csr_freqdivider_value_waccess <= wready and csr_freqdivider_wen;
 
 csr_freqdivider_rdata(31 downto 0) <= csr_freqdivider_value_ff;
 
