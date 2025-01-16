@@ -10,7 +10,7 @@ except:
 # Define the UART interface for read and write operations
 class CmdProc:
 	def __init__(self):
-		self.port = serial.Serial(tty, timeout=5)
+		self.port = serial.Serial(tty, timeout=1)
 		self.port.baudrate = 115200
 
 	def read(self, address):
