@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
+use work.constants.all;
 use work.settings.all;
 
 -- The digitizer takes the ring-oscillator signals as input and instanciante the sampling architecture specified in 'settings.vhd'. It outputs the sampling clock and the sampled data.
@@ -12,10 +13,14 @@ entity digitizer is
 		RAND_WIDTH: natural
 	);
 	port (
+		-- Asynchronous reset
+		reset: in std_logic;
 		-- Ring-oscillator inputs
 		osc: in std_logic_vector (T downto 0);
-		-- Sampling clock divider (applies on RO0 for ERO and MURO)
-		freqdivider: in std_logic_vector (REG_WIDTH-1 downto 0);
+		-- Sampling clock divider value (applies on RO0 for ERO and MURO)
+		freqdivider_value: in std_logic_vector (REG_WIDTH-1 downto 0);
+		-- Enable strobing when frequency divider changes
+		freqdivider_en: in std_logic;
 		-- Sampling clock (osc(0))
 		digit_clk: out std_logic;
 		-- Sampled data
@@ -38,8 +43,10 @@ begin
 			FACTOR_WIDTH => 32
 		)
 		port map (
+			reset => reset,
 			original => osc(0),
-			factor => freqdivider,
+			factor => freqdivider_value,
+			changed => freqdivider_en,
 			divided => digit_clk
 		);
 		process (digit_clk)
@@ -54,10 +61,15 @@ begin
 	-- Instantiate the ERO
 	elsif DIGITIZER_GEN = ERO generate
 		ero: entity work.ero
+		generic map (
+			REG_WIDTH => REG_WIDTH
+		)
 		port map (
+			reset => reset,
 			ro0 => osc(0),
 			ro1 => osc(1),
-			div => freqdivider,
+			divider => freqdivider_value,
+			changed => freqdivider_en,
 			clk => digit_clk,
 			data => digit_data(0),
 			valid => digit_valid
@@ -67,12 +79,15 @@ begin
 	elsif DIGITIZER_GEN = MURO generate
 		muro: entity work.muro
 		generic map (
+			REG_WIDTH => REG_WIDTH,
 			t => T
 		)
 		port map (
+			reset => reset,
 			ro0 => osc(0),
 			rox => osc(T downto 1),
-			div => freqdivider,
+			divider => freqdivider_value,
+			changed => freqdivider_en,
 			clk => digit_clk,
 			data => digit_data(0),
 			valid => digit_valid
@@ -85,6 +100,7 @@ begin
 			DATA_WIDTH => 16
 		)
 		port map (
+			reset => reset,
 			ro0 => osc(0),
 			ro1 => osc(1),
 			clk => digit_clk,
