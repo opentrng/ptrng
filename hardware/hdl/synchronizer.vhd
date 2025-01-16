@@ -19,6 +19,8 @@ entity synchronizer is
 		data_in_en: in std_logic;
 		-- Cross to this clock
 		clk_to: in std_logic;
+		-- Synchronous clear active to '1' (sync to 'clk_to')
+		clear: in std_logic;
 		-- Ouput data, sync to 'clk_to'
 		data_out: out std_logic_vector (DATA_WIDTH-1 downto 0);
 		-- Valid signal for 'data_out'
@@ -66,13 +68,16 @@ begin
 		if reset = '1' then
 			data_out_en <= '0';
 		elsif rising_edge(clk_to) then
-			if valid = '1' then
-				data_out <= data;
-				data_out_en <= '1';
-			else
+			if clear = '1' then
 				data_out_en <= '0';
+			else
+				if valid = '1' then
+					data_out <= data;
+					data_out_en <= '1';
+				else
+					data_out_en <= '0';
+				end if;
 			end if;
-			
 		end if;
 	end process;
 

@@ -15,6 +15,8 @@ entity freqcounter is
 		clk: in std_logic;
 		-- Asynchronous reset
 		reset: in std_logic;
+		-- Synchronous clear active to '1'
+		clear: in std_logic;
 		-- Signal to estimate its frequency
 		source: in std_logic;
 		-- Global enable for the entity
@@ -43,9 +45,9 @@ architecture rtl of freqcounter is
 begin
 
 	-- Count the number of periods of 'source'
-	process (source, reset, start)
+	process (source, reset, clear, start)
 	begin
-		if reset = '1' or start = '1' then
+		if reset = '1' or clear = '1' or start = '1' then
 			counter <= (others => '0');
 		elsif rising_edge(source) then
 			if enable = '1' and counting = '1' then
@@ -67,7 +69,7 @@ begin
 			done <= '0';
 			overflow <= '0';
 		elsif rising_edge(clk) then
-			if enable = '1' then
+			if clear = '0' and enable = '1' then
 				if busy = '0' then
 					if start = '1' then
 						duration <= (others => '0');
@@ -96,6 +98,7 @@ begin
 					end if;
 				end if;
 			else
+				result <= (others => '0');
 				duration <= (others => '0');
 				busy <= '0';
 				counting <= '0';

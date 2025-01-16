@@ -14,6 +14,7 @@ async def test_count_frequency(dut):
 	await cocotb.start(Clock(dut.source, 333, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
 	await Signal.SetBitAfter(dut.enable, 20, units="ns")
+	await Signal.PulseBit(dut.clear, dut.clk)
 	await Signal.PulseBit(dut.start, dut.clk)
 	await RisingEdge(dut.done)
 	assert dut.result.value == 30, "Wrong measured frequency, result should be 30"
@@ -26,6 +27,7 @@ async def test_counter_overflow(dut):
 	dut.start.value = 0
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await cocotb.start(Clock(dut.source, 333, units="ns").start())
+	await Signal.PulseBit(dut.clear, dut.clk)
 	await Signal.PulseBit(dut.start, dut.clk)
 	await Signal.Skip(dut.clk, 100)
 	dut.counter.value = Deposit((2**24)-1)
@@ -41,6 +43,7 @@ async def test_duration_overflow(dut):
 	dut.start.value = 0
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await cocotb.start(Clock(dut.source, 333, units="ns").start())
+	await Signal.PulseBit(dut.clear, dut.clk)
 	await Signal.PulseBit(dut.start, dut.clk)
 	await Signal.Skip(dut.clk, 100)
 	dut.duration.value = Deposit(1001)

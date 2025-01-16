@@ -19,6 +19,8 @@ entity digitalnoise is
 		clk: in std_logic;
 		-- Asynchronous reset active to '1'
 		reset: in std_logic;
+		-- Synchronous clear active to '1'
+		clear: in std_logic;
 		-- Ring-oscillator enable signal (bit index i enables ROi)
 		ring_en: in std_logic_vector (REG_WIDTH-1 downto 0);
 		-- Enable the all the frequency counters
@@ -104,6 +106,7 @@ begin
 	port map (
 		clk => clk,
 		reset => reset,
+		clear => clear,
 		source => selected_mon,
 		enable => freqcount_en,
 		start => freqcount_start,
@@ -142,6 +145,7 @@ begin
 		data_in => digit_data,
 		data_in_en => digit_valid,
 		clk_to => clk,
+		clear => clear,
 		data_out => data,
 		data_out_en => valid
 	);

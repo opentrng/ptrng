@@ -9,6 +9,7 @@ async def test_resynchronize(dut):
 	await cocotb.start(Clock(dut.clk_from, 41, units="ns").start())
 	await cocotb.start(Clock(dut.clk_to, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
+	await Signal.PulseBit(dut.clear, dut.clk_to)
 	dut.data_in.value = 0
 	dut.data_in_en.value = 0
 	for i in range(10):
