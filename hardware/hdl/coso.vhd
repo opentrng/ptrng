@@ -5,9 +5,11 @@ use ieee.std_logic_unsigned.all;
 -- This entity defines the Coherent Sampling Ring Oscillator entropy source, where the first ring oscillator RO0 is used to sample RO1, resulting in the generation of a beat signal. A counter, incremented by RO0, measures the period of the beat signal. The COSO's random output bit is derived from the counter least significant bit (LSB). Additionally, the raw counter value is accessible on output port. Both of these signals are synchronized with the output clock 'clk'.
 entity coso is
 	generic (
-		DATA_WIDTH : natural := 32
+		DATA_WIDTH : natural
 	);
 	port (
+		-- Asynchronous reset
+		reset: in std_logic;
 		-- Sampling ring-oscillator input
 		ro0: in std_logic;
 		-- Sampled ring-oscillator input
@@ -28,24 +30,23 @@ architecture rtl of coso is
 
 	signal beat: std_logic := '0';
 	signal prev: std_logic := '0';
-	signal reset: std_logic := '0';
 	constant MAX: std_logic_vector (DATA_WIDTH-1 downto 0) := (others => '1');
-	signal counter: std_logic_vector (DATA_WIDTH-1 downto 0) := (others => '0');
-	signal value: std_logic_vector (DATA_WIDTH-1 downto 0) := (others => '0');
+	signal counter: std_logic_vector (DATA_WIDTH-1 downto 0);
+	signal value: std_logic_vector (DATA_WIDTH-1 downto 0);
 
 begin
 
 	-- Sample RO1 with RO0 to create the beat signal
-	process (ro0)
+	process (ro0, reset)
 	begin
-		if rising_edge(ro0) then
+		if reset = '1' then
+			beat <= '0';
+			prev <= '0';
+		elsif rising_edge(ro0) then
 			beat <= ro1;
 			prev <= beat;
 		end if;
 	end process;
-
-	-- Detect beat rising edge to create counter reset
-	reset <= '1' when beat = '1' and prev = '0' else '0';
 
 	-- Count the full period of the beat in steps of RO0
 	process (ro0, reset)
@@ -53,16 +54,22 @@ begin
 		if reset = '1' then
 			counter <= (others => '0');
 		elsif rising_edge(ro0) then
-			if counter /= MAX then
-				counter <= counter + 1;
+			if beat = '1' and prev = '0' then
+				counter <= (others => '0');
+			else
+				if counter < MAX then
+					counter <= counter + 1;
+				end if;
 			end if;
 		end if;
 	end process;
 
 	-- Resample the value of the counter
-	process (beat)
+	process (beat, reset)
 	begin
-		if rising_edge(beat) then
+		if reset = '1' then
+			value <= (others => '0');
+		elsif rising_edge(beat) then
 			value <= counter;
 		end if;
 	end process;
