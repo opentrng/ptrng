@@ -35,17 +35,17 @@ architecture rtl of freqcounter is
 
 	constant MAX: natural := 2**W-1;
 	signal counting: std_logic := '0';
-	signal counter: std_logic_vector (W-1 downto 0) := (others => '0');
+	signal counter: std_logic_vector (W-1 downto 0);
 	signal busy: std_logic := '0';
 	signal finished: std_logic := '0';
-	signal duration: std_logic_vector (W-1 downto 0) := (others => '0');
+	signal duration: std_logic_vector (W-1 downto 0);
 
 begin
 
 	-- Count the number of periods of 'source'
-	process (source, start)
+	process (source, reset, start)
 	begin
-		if start = '1' then
+		if reset = '1' or start = '1' then
 			counter <= (others => '0');
 		elsif rising_edge(source) then
 			if enable = '1' and counting = '1' then
