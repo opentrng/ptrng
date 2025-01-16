@@ -6,7 +6,7 @@ use ieee.std_logic_unsigned.all;
 entity synchronizer is
 	generic (
 		-- With of data ports
-		DATA_WIDTH: natural := 32
+		DATA_WIDTH: natural
 	);
 	port (
 		-- Asynchronous reset
