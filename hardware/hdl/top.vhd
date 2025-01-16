@@ -51,7 +51,8 @@ architecture rtl of top is
 	signal freqcount_overflow: std_logic;
 	signal freqcount_select: std_logic_vector (4 downto 0);
 	signal freqcount_value: std_logic_vector (22 downto 0);
-	signal freqdivider: std_logic_vector (31 downto 0);
+	signal freqdivider_value: std_logic_vector (31 downto 0);
+	signal freqdivider_en: std_logic;
 	signal alarm_threshold: std_logic_vector(31 downto 0);
 	signal alarm_detected: std_logic;
 	signal onlinetest_clear: std_logic;
@@ -158,7 +159,8 @@ begin
 		csr_freqcount_select_out => freqcount_select,
 		csr_freqcount_value_in => freqcount_value,
 		csr_freqcount_overflow_in => freqcount_overflow,
-		csr_freqdivider_value_out => freqdivider,
+		csr_freqdivider_value_out => freqdivider_value,
+		csr_freqdivider_value_waccess => freqdivider_en,
 		csr_alarm_threshold_out => alarm_threshold,
 		csr_monitoring_alarm_in => alarm_detected,
 		csr_monitoring_clear_out => onlinetest_clear,
@@ -186,7 +188,8 @@ begin
 	)
 	port map (
 		clk => clk,
-		reset => ptrng_reset,
+		reset => hw_reset,
+		clear => ptrng_reset,
 		ring_en => ring_en,
 		freqcount_en => freqcount_en,
 		freqcount_select => freqcount_select,
@@ -194,7 +197,8 @@ begin
 		freqcount_done => freqcount_done,
 		freqcount_overflow => freqcount_overflow,
 		freqcount_value => freqcount_value,
-		freqdivider => freqdivider,
+		freqdivider_value => freqdivider_value,
+		freqdivider_en => freqdivider_en,
 		alarm_threshold => alarm_threshold,
 		alarm_detected => alarm_detected,
 		onlinetest_clear => onlinetest_clear,
@@ -215,7 +219,7 @@ begin
 	)
 	port map (
 		clock => clk,
-		reset => hw_reset or fifo_clear,
+		reset => ptrng_reset or fifo_clear,
 		wr_data => fifo_data_write,
 		we => fifo_write_en,
 		rd_data => fifo_prefetch_data,
@@ -234,12 +238,16 @@ begin
 		if hw_reset = '1' then
 			fifo_write_en <= '0';
 		elsif rising_edge(clk) then
-			if fifo_full = '1' then
+			if ptrng_reset = '1' then
 				fifo_write_en <= '0';
 			else
-				fifo_write_en <= ptrng_valid;
+				if fifo_full = '1' then
+					fifo_write_en <= '0';
+				else
+					fifo_write_en <= ptrng_valid;
+				end if;
+				fifo_data_write <= ptrng_data;
 			end if;
-			fifo_data_write <= ptrng_data;
 		end if;
 	end process;
 
@@ -249,7 +257,7 @@ begin
 	port map (
 		clk => clk,
 		reset => hw_reset,
-		clear => fifo_clear,
+		clear => ptrng_reset or fifo_clear,
 		input_available => not fifo_empty,
 		input_read_en => fifo_prefetch_read,
 		input_data => fifo_prefetch_data,

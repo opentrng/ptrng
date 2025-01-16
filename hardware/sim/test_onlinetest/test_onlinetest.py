@@ -14,6 +14,7 @@ async def valid_test(dut):
 	dut.deviation.value = 10
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
+	await Signal.PulseBit(dut.clear, dut.clk)
 	await Signal.Skip(dut.clk, 2) # Skip the reset
 	await Signal.Skip(dut.clk, DEPTH+1)
 	assert dut.valid.value == 1, "Online test should be valid"
@@ -28,6 +29,7 @@ async def invalid_test(dut):
 	dut.deviation.value = 10
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
+	await Signal.PulseBit(dut.clear, dut.clk)
 	await Signal.Skip(dut.clk, 2) # Skip the reset
 	await Signal.Skip(dut.clk, DEPTH+1)
 	assert dut.valid.value == 0, "Online test should NOT be valid"

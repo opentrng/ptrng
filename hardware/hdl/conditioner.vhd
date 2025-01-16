@@ -12,6 +12,8 @@ entity conditioner is
 		clk: in std_logic;
 		-- Asynchronous reset active to '1'
 		reset: in std_logic;
+		-- Synchronous clear active to '1'
+		clear: in std_logic;
 		-- Enable the conditioner at '1'
 		enable: in std_logic;
 		-- Raw Random Number input data (RRN)
@@ -38,24 +40,32 @@ begin
 	begin
 		if reset = '1' then
 			previous <= (others => '0');
-			conditioned_valid <= '0';
 			evenodd <= '0';
+			conditioned_valid <= '0';
+			
 		elsif rising_edge(clk) then
-			if enable = '1' then
-				if raw_random_valid = '1' then
-					previous <= raw_random_number;
-					evenodd <= not evenodd;
-					if raw_random_number /= previous and evenodd = '1' then
-						conditioned_number <= previous;
-						conditioned_valid <= '1';
+			if clear = '1' then
+				previous <= (others => '0');
+				evenodd <= '0';
+				conditioned_valid <= '0';
+				conditioned_number <= (others => '0');
+			else
+				if enable = '1' then
+					if raw_random_valid = '1' then
+						previous <= raw_random_number;
+						evenodd <= not evenodd;
+						if raw_random_number /= previous and evenodd = '1' then
+							conditioned_number <= previous;
+							conditioned_valid <= '1';
+						else
+							conditioned_valid <= '0';
+						end if;
 					else
 						conditioned_valid <= '0';
 					end if;
 				else
 					conditioned_valid <= '0';
 				end if;
-			else
-				conditioned_valid <= '0';
 			end if;
 		end if;
 	end process;

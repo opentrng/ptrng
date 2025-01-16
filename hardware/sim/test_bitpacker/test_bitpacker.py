@@ -20,6 +20,7 @@ async def write_32bits_word(dut, value):
 async def pack_10_words(dut):
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
+	await Signal.PulseBit(dut.clear, dut.clk)
 	value = 0xABCD0123
 	for i in range(10):
 		await write_32bits_word(dut, value)

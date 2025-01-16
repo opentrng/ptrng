@@ -15,6 +15,8 @@ entity ptrng is
 		clk: in std_logic;
 		-- Asynchronous reset active to '1'
 		reset: in std_logic;
+		-- Synchronous clear active to '1'
+		clear: in std_logic;
 		-- Ring-oscillator enable signal (bit index i enables ROi)
 		ring_en: in std_logic_vector (REG_WIDTH-1 downto 0);
 		-- Enable the all the frequency counters
@@ -29,8 +31,10 @@ entity ptrng is
 		freqcount_overflow: out std_logic;
 		-- Frequency estimation output (for the selected ROs)
 		freqcount_value: out std_logic_vector (REG_WIDTH-5-4-1 downto 0);
-		-- Sampling clock divider (applies on RO0 for ERO and MURO)
-		freqdivider: in std_logic_vector (REG_WIDTH-1 downto 0);
+		-- Sampling clock divider value (applies on RO0 for ERO and MURO)
+		freqdivider_value: in std_logic_vector (REG_WIDTH-1 downto 0);
+		-- Enable strobing when frequency divider changes
+		freqdivider_en: in std_logic;
 		-- Threshold for triggering the total failure alarm
 		alarm_threshold: in std_logic_vector(REG_WIDTH-1 downto 0);
 		-- Total failure alarm, risen to '1' when total failure event is detected
@@ -82,6 +86,7 @@ begin
 	port map (
 		clk => clk,
 		reset => reset,
+		clear => clear,
 		ring_en => ring_en,
 		freqcount_en => freqcount_en,
 		freqcount_select => freqcount_select,
@@ -89,7 +94,8 @@ begin
 		freqcount_done => freqcount_done,
 		freqcount_overflow => freqcount_overflow,
 		freqcount_value => freqcount_value,
-		freqdivider => freqdivider,
+		freqdivider_value => freqdivider_value,
+		freqdivider_en => freqdivider_en,
 		data => raw_random_number,
 		valid => raw_random_valid
 	);
@@ -103,6 +109,7 @@ begin
 	port map (
 		clk => clk,
 		reset => reset,
+		clear => clear,
 		digitizer => DIGITIZER_GEN,
 		raw_random_number => raw_random_number,
 		raw_random_valid => raw_random_valid,
@@ -120,7 +127,7 @@ begin
 	port map (
 		clk => clk,
 		reset => reset,
-		clear => onlinetest_clear,
+		clear => clear or onlinetest_clear,
 		raw_random_number => raw_random_number,
 		raw_random_valid => raw_random_valid,
 		average => onlinetest_average,
@@ -136,6 +143,7 @@ begin
 	port map (
 		clk => clk,
 		reset => reset,
+		clear => clear,
 		enable => conditioning,
 		raw_random_number => raw_random_number,
 		raw_random_valid => raw_random_valid,
@@ -149,12 +157,16 @@ begin
 		if reset = '1' then
 			intermediate_random_valid <= '0';
 		elsif rising_edge(clk) then
-			if conditioning = '1' then
-				intermediate_random_number <=  conditioned_number;
-				intermediate_random_valid <= conditioned_valid;
+			if clear = '1' then
+				intermediate_random_valid <= '0';
 			else
-				intermediate_random_number <= raw_random_number;
-				intermediate_random_valid <= raw_random_valid;
+				if conditioning = '1' then
+					intermediate_random_number <=  conditioned_number;
+					intermediate_random_valid <= conditioned_valid;
+				else
+					intermediate_random_number <= raw_random_number;
+					intermediate_random_valid <= raw_random_valid;
+				end if;
 			end if;
 		end if;
 	end process;
@@ -167,6 +179,7 @@ begin
 	port map (
 		clk => clk,
 		reset => reset,
+		clear => clear,
 		data_in => intermediate_random_number(0),
 		valid_in => intermediate_random_valid,
 		data_out => packed_data,
@@ -179,12 +192,17 @@ begin
 		if reset = '1' then
 			valid <= '0';
 		elsif rising_edge(clk) then
-			if packbits = '1' then
-				data <=  packed_data;
-				valid <= packed_valid;
+			if clear = '1' then
+				data <= (others => '0');
+				valid <= '0';
 			else
-				data <= intermediate_random_number;
-				valid <= intermediate_random_valid;
+				if packbits = '1' then
+					data <=  packed_data;
+					valid <= packed_valid;
+				else
+					data <= intermediate_random_number;
+					valid <= intermediate_random_valid;
+				end if;
 			end if;
 		end if;
 	end process;

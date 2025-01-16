@@ -14,6 +14,8 @@ entity bitpacker is
 		clk: in std_logic;
 		-- Asynchronous reset active to '1'
 		reset: in std_logic;
+		-- Synchronous clear active to '1'
+		clear: in std_logic;
 		-- Input bits
 		data_in: in std_logic;
 		-- Validate the bit input
@@ -42,9 +44,13 @@ begin
 			counter <= (others => '0');
 			pipe <= '0';
 		elsif rising_edge(clk) then
-			if valid_in = '1' then
-				counter <= counter + 1;
-				pipe <= '1';
+			if clear = '1' then
+				pipe <= '0';
+			else
+				if valid_in = '1' then
+					counter <= counter + 1;
+					pipe <= '1';
+				end if;
 			end if;
 		end if;
 	end process;
@@ -55,8 +61,12 @@ begin
 		if reset = '1' then
 			shift_reg <= (others => '0');
 		elsif rising_edge(clk) then
-			if valid_in = '1' then
-				shift_reg <= data_in & shift_reg(W-1 downto 1);
+			if clear = '1' then
+				shift_reg <= (others => '0');
+			else
+				if valid_in = '1' then
+					shift_reg <= data_in & shift_reg(W-1 downto 1);
+				end if;
 			end if;
 		end if;
 	end process;
@@ -67,13 +77,18 @@ begin
 		if reset = '1' then
 			valid_out <= '0';
 		elsif rising_edge(clk) then
-			if counter = 0 then
-				if pipe = '1' then
-					valid_out <= valid_in;
-					data_out <= shift_reg;
-				end if;
-			else
+			if clear = '1' then
+				data_out <= (others => '0');
 				valid_out <= '0';
+			else
+				if counter = 0 then
+					if pipe = '1' then
+						valid_out <= valid_in;
+						data_out <= shift_reg;
+					end if;
+				else
+					valid_out <= '0';
+				end if;
 			end if;
 		end if;
 	end process;

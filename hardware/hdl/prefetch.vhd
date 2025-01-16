@@ -64,6 +64,7 @@ begin
 				busy <= '0';
 				fetch <= '0';
 				output_ready <= '0';
+				output_data <= (others => '0');
 			end if;
 		end if;
 	end process;

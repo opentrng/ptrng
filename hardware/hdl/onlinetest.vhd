@@ -20,7 +20,7 @@ entity onlinetest is
 		clk: in std_logic;
 		-- Asynchronous reset active to '1'
 		reset: in std_logic;
-		-- Clear-to-set the valid ouptut
+		-- Synchronous clear active to '1'
 		clear: in std_logic;
 		-- Raw Random Number input data (RRN)
 		raw_random_number: in std_logic_vector (RAND_WIDTH-1 downto 0);
@@ -59,16 +59,20 @@ begin
 			cumsum_value <= (others => '0');
 			cumsum_valid <= '0';
 		elsif rising_edge(clk) then
-			if raw_random_valid = '1' then
-				if fifo_read_en = '1' then
-					cumsum_value <= (cumsum_value + fifo_in) - fifo_out;
-					cumsum_valid <= '1';
+			if clear = '1' then
+				cumsum_valid <= '0';
+			else
+				if raw_random_valid = '1' then
+					if fifo_read_en = '1' then
+						cumsum_value <= (cumsum_value + fifo_in) - fifo_out;
+						cumsum_valid <= '1';
+					else
+						cumsum_value <= cumsum_value + fifo_in ;
+						cumsum_valid <= '0';
+					end if;
 				else
-					cumsum_value <= cumsum_value + fifo_in ;
 					cumsum_valid <= '0';
 				end if;
-			else
-				cumsum_valid <= '0';
 			end if;
 		end if;
 	end process;
@@ -86,7 +90,7 @@ begin
 	)
 	port map (
 		clock => clk,
-		reset => reset,
+		reset => clear,
 		wr_data => fifo_in,
 		we => fifo_write_en,
 		rd_data => fifo_out,

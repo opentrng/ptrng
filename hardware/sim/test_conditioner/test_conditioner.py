@@ -19,6 +19,7 @@ async def binary_test(dut):
 
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
+	await Signal.PulseBit(dut.clear, dut.clk)
 	await Signal.Skip(dut.clk, 2) # Skip the reset
 
 	dut.raw_random_number.value = 1
@@ -59,6 +60,7 @@ async def extended_test(dut):
 
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
+	await Signal.PulseBit(dut.clear, dut.clk)
 	await Signal.Skip(dut.clk, 2) # Skip the reset
 
 	dut.raw_random_number.value = 3

@@ -16,6 +16,8 @@ entity alarm is
 		clk: in std_logic;
 		-- Asynchronous reset active to '1'
 		reset: in std_logic;
+		-- Synchronous clear active to '1'
+		clear: in std_logic;
 		-- Digitizer type (see in constants package)
 		digitizer: in natural;
 		-- Raw Random Number input data (RRN)
@@ -43,35 +45,38 @@ begin
 		if reset = '1' then
 			counter <= (others => '0');
 		elsif rising_edge(clk) then
-
-			-- In test mode increase the counter each RRN
-			if digitizer = TEST then
-				if raw_random_valid = '1' then
-					counter <= counter + 1;
-				end if;
-
-			-- For ERO/MURO count for long runs of same value
-			elsif digitizer = ERO or digitizer = MURO then
-				if raw_random_valid = '1' then
-					if raw_random_number = value then
-						counter <= counter + 1;
-					else
-						counter <= (others => '0');
-						value <= raw_random_number;
-					end if;
-				end if;
-
-			-- For COSO reset the counter each time there is a valid RRN
-			elsif digitizer = COSO then
-				if raw_random_valid = '1' then
-					counter <= (others => '0');
-				else
-					counter <= counter + 1;
-				end if;
-
-			-- If no valid digitizer is set the counter highest value to trig the event
+			if clear = '1' then
+				counter <= (others => '0');
 			else
-				counter <= (others => '1');
+				-- In test mode increase the counter each RRN
+				if digitizer = TEST then
+					if raw_random_valid = '1' then
+						counter <= counter + 1;
+					end if;
+
+				-- For ERO/MURO count for long runs of same value
+				elsif digitizer = ERO or digitizer = MURO then
+					if raw_random_valid = '1' then
+						if raw_random_number = value then
+							counter <= counter + 1;
+						else
+							counter <= (others => '0');
+							value <= raw_random_number;
+						end if;
+					end if;
+
+				-- For COSO reset the counter each time there is a valid RRN
+				elsif digitizer = COSO then
+					if raw_random_valid = '1' then
+						counter <= (others => '0');
+					else
+						counter <= counter + 1;
+					end if;
+
+				-- If no valid digitizer is set the counter highest value to trig the event
+				else
+					counter <= (others => '1');
+				end if;
 			end if;
 		end if;
 	end process;
@@ -82,8 +87,12 @@ begin
 		if reset = '1' then
 			detected <= '0';
 		elsif rising_edge(clk) then
-			if counter >= threshold then
-				detected <= '1';
+			if clear = '1' then
+				detected <= '0';
+			else
+				if counter >= threshold then
+					detected <= '1';
+				end if;
 			end if;
 		end if;
 	end process;
