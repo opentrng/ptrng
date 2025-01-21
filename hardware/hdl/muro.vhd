@@ -51,11 +51,9 @@ begin
 	);
 
 	-- Sample RO1 with RO0/div
-	process (ro0_div, reset)
+	process (ro0_div)
 	begin
-		if reset = '1' then
-			sampled <= (others => '0');
-		elsif rising_edge(ro0_div) then
+		if rising_edge(ro0_div) then
 			sampled <= rox;
 		end if;
 	end process;

@@ -8,8 +8,6 @@ entity coso is
 		DATA_WIDTH : natural
 	);
 	port (
-		-- Asynchronous reset
-		reset: in std_logic;
 		-- Sampling ring-oscillator input
 		ro0: in std_logic;
 		-- Sampled ring-oscillator input
@@ -37,23 +35,18 @@ architecture rtl of coso is
 begin
 
 	-- Sample RO1 with RO0 to create the beat signal
-	process (ro0, reset)
+	process (ro0)
 	begin
-		if reset = '1' then
-			beat <= '0';
-			prev <= '0';
-		elsif rising_edge(ro0) then
+		if rising_edge(ro0) then
 			beat <= ro1;
 			prev <= beat;
 		end if;
 	end process;
 
 	-- Count the full period of the beat in steps of RO0
-	process (ro0, reset)
+	process (ro0)
 	begin
-		if reset = '1' then
-			counter <= (others => '0');
-		elsif rising_edge(ro0) then
+		if rising_edge(ro0) then
 			if beat = '1' and prev = '0' then
 				counter <= (others => '0');
 			else
@@ -65,11 +58,9 @@ begin
 	end process;
 
 	-- Resample the value of the counter
-	process (beat, reset)
+	process (beat)
 	begin
-		if reset = '1' then
-			value <= (others => '0');
-		elsif rising_edge(beat) then
+		if rising_edge(beat) then
 			value <= counter;
 		end if;
 	end process;

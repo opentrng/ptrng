@@ -100,7 +100,6 @@ begin
 			DATA_WIDTH => 16
 		)
 		port map (
-			reset => reset,
 			ro0 => osc(0),
 			ro1 => osc(1),
 			clk => digit_clk,

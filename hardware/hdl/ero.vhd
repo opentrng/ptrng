@@ -48,11 +48,9 @@ begin
 	);
 
 	-- Sample RO1 with RO0/div
-	process (ro0_div, reset)
+	process (ro0_div)
 	begin
-		if reset = '1' then
-			data <= '0';
-		elsif rising_edge(ro0_div) then
+		if rising_edge(ro0_div) then
 			data <= ro1;
 		end if;
 	end process;
