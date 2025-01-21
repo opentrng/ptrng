@@ -9,7 +9,11 @@ use extras.fifos.all;
 entity top is
 	generic (
 		-- Frequency (Hz) of the oscillator (clk)
-		CLK_REF: natural := 100_000_000
+		CLK_REF: natural;
+		-- Size of the FIFO to store generated number before read to from UART
+		FIFO_SIZE: natural;
+		-- Size of the data frame sent to the PC through the UART (FIFO size must be at least 2x bigger)
+		BURST_SIZE: natural
 	);
 	port (
 		-- Oscillator input
@@ -67,10 +71,6 @@ architecture rtl of top is
 	signal ptrng_valid: std_logic;
 
 	-- FIFO
-	constant BURST_SIZE: natural := 512;
-	constant FIFO_SIZE: natural := 4*BURST_SIZE;
-	constant FIFO_ALMOSTEMPTY: natural := BURST_SIZE;
-	constant FIFO_ALMOSTFULL: natural := BURST_SIZE;
 	signal fifo_clear: std_logic;
 	signal fifo_empty: std_logic;
 	signal fifo_full: std_logic;
@@ -226,8 +226,8 @@ begin
 		re => fifo_prefetch_read,
 		empty => fifo_empty,
 		full => fifo_full,
-		almost_empty_thresh => FIFO_ALMOSTEMPTY,
-		almost_full_thresh => FIFO_ALMOSTFULL,
+		almost_empty_thresh => BURST_SIZE,
+		almost_full_thresh => BURST_SIZE,
 		almost_empty => fifo_almost_empty,
 		almost_full => fifo_almost_full
 	);
@@ -238,7 +238,7 @@ begin
 		if hw_reset = '1' then
 			fifo_write_en <= '0';
 		elsif rising_edge(clk) then
-			if ptrng_reset = '1' then
+			if ptrng_reset = '1' or fifo_clear = '1' then
 				fifo_write_en <= '0';
 			else
 				if fifo_full = '1' then

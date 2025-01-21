@@ -7,5 +7,7 @@ VHDL_SOURCES_extras += ../../lib/vhdl-extras/rtl/extras/fifos.vhdl ../../lib/vhd
 TOPLEVEL = top
 MODULE = test_top
 
+SIM_ARGS += -gCLK_REF=100_000_000 -gFIFO_SIZE=16 -gBURST_SIZE=4
+
 include ../config.mk
 include $(shell cocotb-config --makefiles)/Makefile.sim

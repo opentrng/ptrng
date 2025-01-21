@@ -31,7 +31,9 @@ begin
 	-- Wrap the top
 	top: entity work.top
 	generic map (
-		CLK_REF => 100_000_000
+		CLK_REF => 100_000_000,
+		FIFO_SIZE => 512*4,
+		BURST_SIZE => 512
 	)
 	port map (
 		clk	=> CLK100MHZ,
