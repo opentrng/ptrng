@@ -53,12 +53,16 @@ begin
 		if reset = '1' then
 			valid <= '0';
 		elsif rising_edge(clk_to) then
-			if digit_clk_tap(1) = '0' and digit_clk_tap(0) = '1' then
-				data <= data_in;
-				valid <= '1';
-			else
+			if clear = '1' then
 				valid <= '0';
-			end if;
+			else
+				if digit_clk_tap(1) = '0' and digit_clk_tap(0) = '1' then
+					data <= data_in;
+					valid <= '1';
+				else
+					valid <= '0';
+				end if;
+			end  if;
 		end if;
 	end process;
 	

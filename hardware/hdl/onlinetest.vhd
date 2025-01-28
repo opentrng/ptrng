@@ -64,11 +64,9 @@ begin
 						cumsum_value <= (cumsum_value + fifo_in) - fifo_out;
 						cumsum_valid <= '1';
 					else
-						cumsum_value <= cumsum_value + fifo_in ;
-						--cumsum_valid <= '0';
+						cumsum_value <= cumsum_value + fifo_in;
 					end if;
 				else
-					--cumsum_valid <= '0';
 				end if;
 			end if;
 		end if;

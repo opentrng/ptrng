@@ -193,7 +193,6 @@ begin
 			valid <= '0';
 		elsif rising_edge(clk) then
 			if clear = '1' then
-				data <= (others => '0');
 				valid <= '0';
 			else
 				if packbits = '1' then
