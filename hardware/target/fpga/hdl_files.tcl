@@ -13,7 +13,7 @@ set hdl_files [list \
 	[list "work" [file normalize "${hardware}/hdl/onlinetest.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/conditioner.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/ptrng.vhd"]] \
-	[list "work" [file normalize "${hardware}/hdl/prefetch.vhd"]] \
+	[list "work" [file normalize "${hardware}/hdl/fifo.vhd"]] \
 	[list "work" [file normalize "${hardware}/hdl/top.vhd"]] \
 ]
 
@@ -25,7 +25,3 @@ lappend hdl_files [list "work" [file normalize "${hardware}/config/digitalnoise/
 # Add required HDL sources files from libraries
 lappend hdl_files [list "work" [file normalize "${hardware}/lib/fluart/fluart.vhdl"]]
 lappend hdl_files [list "work" [file normalize "${hardware}/lib/cmd_proc/cmd_proc.vhdl"]]
-lappend hdl_files [list "extras" [file normalize "${hardware}/lib/vhdl-extras/rtl/extras/synchronizing.vhdl"]]
-lappend hdl_files [list "extras" [file normalize "${hardware}/lib/vhdl-extras/rtl/extras_2008/sizing_2008.vhdl"]]
-lappend hdl_files [list "extras" [file normalize "${hardware}/lib/vhdl-extras/rtl/extras/memory.vhdl"]]
-lappend hdl_files [list "extras" [file normalize "${hardware}/lib/vhdl-extras/rtl/extras/fifos.vhdl"]]

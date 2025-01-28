@@ -2,9 +2,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
-library extras;
-use extras.fifos.all;
-
 -- Bloc responsible for online tests, which basically consists in calculating the moving cummulative sum of RRNs and comparing this cumsum to the average expected value +/- the drift.
 entity onlinetest is
 	generic (
@@ -68,10 +65,10 @@ begin
 						cumsum_valid <= '1';
 					else
 						cumsum_value <= cumsum_value + fifo_in ;
-						cumsum_valid <= '0';
+						--cumsum_valid <= '0';
 					end if;
 				else
-					cumsum_valid <= '0';
+					--cumsum_valid <= '0';
 				end if;
 			end if;
 		end if;
@@ -83,20 +80,21 @@ begin
 	fifo_read_en <= raw_random_valid when fifo_almost_full = '1' else '0';
 	
 	-- Averaging FIFO
-	averaging_fifo: entity extras.simple_fifo
+	averaging_fifo: entity work.fifo
 	generic map (
-		MEM_SIZE => DEPTH+MARGIN,
-		SYNC_READ => false
+		SIZE => DEPTH+MARGIN,
+		ALMOST_EMPTY_SIZE => MARGIN,
+		ALMOST_FULL_SIZE => DEPTH,
+		DATA_WIDTH => RAND_WIDTH
 	)
 	port map (
-		clock => clk,
-		reset => clear,
-		wr_data => fifo_in,
-		we => fifo_write_en,
-		rd_data => fifo_out,
-		re => fifo_read_en,
-		almost_empty_thresh => MARGIN,
-		almost_full_thresh => MARGIN,
+		clk => clk,
+		reset => reset,
+		clear => clear,
+		data_in => fifo_in,
+		wr => fifo_write_en,
+		data_out => fifo_out,
+		rd => fifo_read_en,
 		almost_empty => fifo_almost_empty,
 		almost_full => fifo_almost_full
 	);

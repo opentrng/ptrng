@@ -1,5 +1,4 @@
-VHDL_SOURCES += ../../hdl/onlinetest.vhd
-VHDL_SOURCES_extras += ../../lib/vhdl-extras/rtl/extras/fifos.vhdl ../../lib/vhdl-extras/rtl/extras/memory.vhdl ../../lib/vhdl-extras/rtl/extras/synchronizing.vhdl ../../lib/vhdl-extras/rtl/extras_2008/sizing_2008.vhdl
+VHDL_SOURCES += ../../hdl/onlinetest.vhd ../../hdl/fifo.vhd
 
 TOPLEVEL = onlinetest
 MODULE = test_onlinetest

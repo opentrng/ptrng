@@ -3,9 +3,6 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use work.settings.all;
 
-library extras;
-use extras.synchronizing.all;
-
 -- The digital noise block generates the raw random numbers (RRN). This block contains the ring-oscillators, their sampling architecture and the clock domain crossing to the system clock in order the RRN to be used in the upper design.
 entity digitalnoise is
 	generic (

@@ -1,6 +1,3 @@
-[submodule "hardware/lib/vhdl-extras"]
-	path = hardware/lib/vhdl-extras
-	url = https://github.com/fpebaypeyroula/vhdl-extras.git
 [submodule "hardware/lib/fluart"]
 	path = hardware/lib/fluart
 	url = https://github.com/fpebaypeyroula/fluart.git
