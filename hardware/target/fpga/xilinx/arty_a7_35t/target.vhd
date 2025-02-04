@@ -32,7 +32,7 @@ begin
 	top: entity work.top
 	generic map (
 		CLK_REF => 100_000_000,
-		FIFO_SIZE => 512*4,
+		FIFO_SIZE => 512*64,
 		BURST_SIZE => 512
 	)
 	port map (
