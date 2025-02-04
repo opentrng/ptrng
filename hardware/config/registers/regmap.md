@@ -24,12 +24,12 @@ Base address: 0x00000000
 | :---                     | :---       | :---        |
 | [ID](#id)                | 0x0000     | OpenTRNG's PTRNG identification register for UID and revision number. |
 | [CONTROL](#control)      | 0x0004     | Global control register for the OpenTRNG's PTRNG |
-| [RING](#ring)            | 0x0008     | Ring-oscillator enable register (enable bits are active at '1'). |
-| [FREQCOUNT](#freqcount)  | 0x000c     | Frequency counter control register. |
+| [RING](#ring)            | 0x0008     | Ring-oscillator enable register (enable bits are active at '1') |
+| [FREQCOUNT](#freqcount)  | 0x000c     | Frequency counter control register |
 | [FREQDIVIDER](#freqdivider) | 0x0010     | Clock divider register, applies on oscillator RO0 |
-| [MONITORING](#monitoring) | 0x0014     | Register for monitoring the total failure alarm and the online tests. |
-| [ALARM](#alarm)          | 0x0018     | Register for configuring the total failure alarm. |
-| [ONLINETEST](#onlinetest) | 0x001c     | Register for configuring the online test. |
+| [MONITORING](#monitoring) | 0x0014     | Register for monitoring the total failure alarm and the online tests |
+| [ALARM](#alarm)          | 0x0018     | Register for configuring the total failure alarm |
+| [ONLINETEST](#onlinetest) | 0x001c     | Register for configuring the online test |
 | [FIFOCTRL](#fifoctrl)    | 0x0020     | Control register for the FIFO, into read the PTRNG random data output |
 | [FIFODATA](#fifodata)    | 0x0024     | Data register for the FIFO to read the PTRNG random data output |
 
@@ -61,14 +61,14 @@ Reset value: 0x00000000
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
 | -                | 31:2   | -               | 0x0000000  | Reserved |
-| CONDITIONING     | 1      | rw              | 0x0        | Enable or disable the algorithmic post processing to convert RRN to IRN active to '1', bypass at '0'. |
+| CONDITIONING     | 1      | rw              | 0x0        | Enable or disable the algorithmic post processing to convert RRN to IRN active to '1', bypass at '0' |
 | RESET            | 0      | wosc            | 0x0        | Synchronous reset active to '1' |
 
 Back to [Register map](#register-map-summary).
 
 ## RING
 
-Ring-oscillator enable register (enable bits are active at '1').
+Ring-oscillator enable register (enable bits are active at '1')
 
 Address offset: 0x0008
 
@@ -83,7 +83,7 @@ Back to [Register map](#register-map-summary).
 
 ## FREQCOUNT
 
-Frequency counter control register.
+Frequency counter control register
 
 Address offset: 0x000c
 
@@ -118,7 +118,7 @@ Back to [Register map](#register-map-summary).
 
 ## MONITORING
 
-Register for monitoring the total failure alarm and the online tests.
+Register for monitoring the total failure alarm and the online tests
 
 Address offset: 0x0014
 
@@ -128,15 +128,15 @@ Reset value: 0x00000000
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
 | -                | 31:3   | -               | 0x0000000  | Reserved |
-| CLEAR            | 2      | wosc            | 0x0        | This signal clears the online test to set the 'valid' signal back to '1'. |
-| VALID            | 1      | ro              | 0x0        | This signal is set to '1' when the online test is valid, when it falls to '0' (invalid) it must be manually cleared. |
-| ALARM            | 0      | roc             | 0x0        | This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on PTRNG reset only. |
+| CLEAR            | 2      | wosc            | 0x0        | This signal clears the online test to set the 'valid' signal back to '1' |
+| VALID            | 1      | ro              | 0x0        | This signal is set to '1' when the online test is valid, when it falls to '0' (invalid) it must be manually cleared |
+| ALARM            | 0      | roc             | 0x0        | This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on PTRNG reset only |
 
 Back to [Register map](#register-map-summary).
 
 ## ALARM
 
-Register for configuring the total failure alarm.
+Register for configuring the total failure alarm
 
 Address offset: 0x0018
 
@@ -151,7 +151,7 @@ Back to [Register map](#register-map-summary).
 
 ## ONLINETEST
 
-Register for configuring the online test.
+Register for configuring the online test
 
 Address offset: 0x001c
 
@@ -160,8 +160,8 @@ Reset value: 0x00000000
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
-| DEVIATION        | 31:16  | rw              | 0x0000     | Maximum difference between the average expected value and the current internal value for the online test. |
-| AVERAGE          | 15:0   | rw              | 0x0000     | Average expected value for the online test internal value. |
+| DEVIATION        | 31:16  | rw              | 0x0000     | Maximum difference between the average expected value and the current internal value for the online test |
+| AVERAGE          | 15:0   | rw              | 0x0000     | Average expected value for the online test internal value |
 
 Back to [Register map](#register-map-summary).
 
@@ -171,7 +171,7 @@ Control register for the FIFO, into read the PTRNG random data output
 
 Address offset: 0x0020
 
-Reset value: 0x00000002
+Reset value: 0x00000000
 
 
 | Name             | Bits   | Mode            | Reset      | Description |
@@ -183,7 +183,7 @@ Reset value: 0x00000002
 | ALMOSTEMPTY      | 4      | ro              | 0x0        | Almost empty flag |
 | FULL             | 3      | ro              | 0x0        | Full flag |
 | EMPTY            | 2      | ro              | 0x0        | Empty flag |
-| PACKBITS         | 1      | rw              | 0x1        | Pack LSBs from each IRN into 32bits words (LSB to be read first); else all 32bits of IRN are written into the FIFO. |
+| NOPACKING        | 1      | rw              | 0x0        | When packing is disabled IRN as written as 32-bit words in the FIFO instead of packing their LSB into 32-bit words |
 | CLEAR            | 0      | wosc            | 0x0        | Clear the FIFO |
 
 Back to [Register map](#register-map-summary).

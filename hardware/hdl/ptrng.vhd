@@ -49,8 +49,8 @@ entity ptrng is
 		onlinetest_valid: out std_logic;
 		-- Enable the raw signal conditionner
 		conditioning: in std_logic;
-		-- When 'packbits' is pulled to '1', LSB from IRN are packed into 32bits word before being outputed to 'data' port
-		packbits: in std_logic;
+		-- When 'nopacking' is pulled to '1', IRN as written as entire words in FIFO instead of packing only LSB bits
+		nopacking: in std_logic;
 		-- Random data output
 		data: out std_logic_vector (RAND_WIDTH-1 downto 0);
 		-- Random data output valid
@@ -179,7 +179,7 @@ begin
 	port map (
 		clk => clk,
 		reset => reset,
-		clear => clear,
+		clear => clear or nopacking,
 		data_in => intermediate_random_number(0),
 		valid_in => intermediate_random_valid,
 		data_out => packed_data,
@@ -195,12 +195,12 @@ begin
 			if clear = '1' then
 				valid <= '0';
 			else
-				if packbits = '1' then
-					data <=  packed_data;
-					valid <= packed_valid;
-				else
+				if nopacking = '1' then
 					data <= intermediate_random_number;
 					valid <= intermediate_random_valid;
+				else
+					data <=  packed_data;
+					valid <= packed_valid;
 				end if;
 			end if;
 		end if;

@@ -65,7 +65,7 @@ architecture rtl of top is
 	signal onlinetest_average: std_logic_vector(15 downto 0);
 	signal onlinetest_deviation: std_logic_vector(15 downto 0);
 	signal conditioning: std_logic;
-	signal packbits: std_logic;
+	signal nopacking: std_logic;
 	
 	-- PTRNG
 	signal ptrng_data: std_logic_vector (DATA_WIDTH-1 downto 0);
@@ -112,7 +112,7 @@ begin
 	)
 	port map (
 		clk => clk,
-		reset => hw_reset or rx_brk or rx_err,
+		reset => rx_brk or rx_err, --hw_reset or rx_brk or rx_err,
 		rx_data => rx_data,
 		rx_data_valid => rx_data_valid,
 		tx_data => tx_data,
@@ -161,7 +161,7 @@ begin
 		csr_onlinetest_average_out => onlinetest_average,
 		csr_onlinetest_deviation_out => onlinetest_deviation,
 		csr_fifoctrl_clear_out => fifo_clear,
-		csr_fifoctrl_packbits_out => packbits,
+		csr_fifoctrl_nopacking_out => nopacking,
 		csr_fifoctrl_empty_in => fifo_empty,
 		csr_fifoctrl_full_in => fifo_full,
 		csr_fifoctrl_almostempty_in => fifo_almost_empty,
@@ -199,7 +199,7 @@ begin
 		onlinetest_deviation => onlinetest_deviation,
 		onlinetest_valid => onlinetest_valid,
 		conditioning => conditioning,
-		packbits => packbits,
+		nopacking => nopacking,
 		data => ptrng_data,
 		valid => ptrng_valid
 	);

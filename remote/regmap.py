@@ -42,7 +42,7 @@ class _RegControl:
 
     @property
     def conditioning(self):
-        """Enable or disable the algorithmic post processing to convert RRN to IRN active to '1', bypass at '0'."""
+        """Enable or disable the algorithmic post processing to convert RRN to IRN active to '1', bypass at '0'"""
         rdata = self._rmap._if.read(self._rmap.CONTROL_ADDR)
         return (rdata >> self._rmap.CONTROL_CONDITIONING_POS) & self._rmap.CONTROL_CONDITIONING_MSK
 
@@ -157,19 +157,19 @@ class _RegMonitoring:
 
     @property
     def alarm(self):
-        """This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on PTRNG reset only."""
+        """This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on PTRNG reset only"""
         rdata = self._rmap._if.read(self._rmap.MONITORING_ADDR)
         return (rdata >> self._rmap.MONITORING_ALARM_POS) & self._rmap.MONITORING_ALARM_MSK
 
     @property
     def valid(self):
-        """This signal is set to '1' when the online test is valid, when it falls to '0' (invalid) it must be manually cleared."""
+        """This signal is set to '1' when the online test is valid, when it falls to '0' (invalid) it must be manually cleared"""
         rdata = self._rmap._if.read(self._rmap.MONITORING_ADDR)
         return (rdata >> self._rmap.MONITORING_VALID_POS) & self._rmap.MONITORING_VALID_MSK
 
     @property
     def clear(self):
-        """This signal clears the online test to set the 'valid' signal back to '1'."""
+        """This signal clears the online test to set the 'valid' signal back to '1'"""
         return 0
 
     @clear.setter
@@ -204,7 +204,7 @@ class _RegOnlinetest:
 
     @property
     def average(self):
-        """Average expected value for the online test internal value."""
+        """Average expected value for the online test internal value"""
         rdata = self._rmap._if.read(self._rmap.ONLINETEST_ADDR)
         return (rdata >> self._rmap.ONLINETEST_AVERAGE_POS) & self._rmap.ONLINETEST_AVERAGE_MSK
 
@@ -217,7 +217,7 @@ class _RegOnlinetest:
 
     @property
     def deviation(self):
-        """Maximum difference between the average expected value and the current internal value for the online test."""
+        """Maximum difference between the average expected value and the current internal value for the online test"""
         rdata = self._rmap._if.read(self._rmap.ONLINETEST_ADDR)
         return (rdata >> self._rmap.ONLINETEST_DEVIATION_POS) & self._rmap.ONLINETEST_DEVIATION_MSK
 
@@ -246,16 +246,16 @@ class _RegFifoctrl:
         self._rmap._if.write(self._rmap.FIFOCTRL_ADDR, rdata)
 
     @property
-    def packbits(self):
-        """Pack LSBs from each IRN into 32bits words (LSB to be read first); else all 32bits of IRN are written into the FIFO."""
+    def nopacking(self):
+        """When packing is disabled IRN as written as 32-bit words in the FIFO instead of packing their LSB into 32-bit words"""
         rdata = self._rmap._if.read(self._rmap.FIFOCTRL_ADDR)
-        return (rdata >> self._rmap.FIFOCTRL_PACKBITS_POS) & self._rmap.FIFOCTRL_PACKBITS_MSK
+        return (rdata >> self._rmap.FIFOCTRL_NOPACKING_POS) & self._rmap.FIFOCTRL_NOPACKING_MSK
 
-    @packbits.setter
-    def packbits(self, val):
+    @nopacking.setter
+    def nopacking(self, val):
         rdata = self._rmap._if.read(self._rmap.FIFOCTRL_ADDR)
-        rdata = rdata & (~(self._rmap.FIFOCTRL_PACKBITS_MSK << self._rmap.FIFOCTRL_PACKBITS_POS))
-        rdata = rdata | (val << self._rmap.FIFOCTRL_PACKBITS_POS)
+        rdata = rdata & (~(self._rmap.FIFOCTRL_NOPACKING_MSK << self._rmap.FIFOCTRL_NOPACKING_POS))
+        rdata = rdata | (val << self._rmap.FIFOCTRL_NOPACKING_POS)
         self._rmap._if.write(self._rmap.FIFOCTRL_ADDR, rdata)
 
     @property
@@ -323,12 +323,12 @@ class RegMap:
     CONTROL_CONDITIONING_POS = 1
     CONTROL_CONDITIONING_MSK = 0x1
 
-    # RING - Ring-oscillator enable register (enable bits are active at '1').
+    # RING - Ring-oscillator enable register (enable bits are active at '1')
     RING_ADDR = 0x0008
     RING_EN_POS = 0
     RING_EN_MSK = 0xffffffff
 
-    # FREQCOUNT - Frequency counter control register.
+    # FREQCOUNT - Frequency counter control register
     FREQCOUNT_ADDR = 0x000c
     FREQCOUNT_EN_POS = 0
     FREQCOUNT_EN_MSK = 0x1
@@ -348,7 +348,7 @@ class RegMap:
     FREQDIVIDER_VALUE_POS = 0
     FREQDIVIDER_VALUE_MSK = 0xffffffff
 
-    # MONITORING - Register for monitoring the total failure alarm and the online tests.
+    # MONITORING - Register for monitoring the total failure alarm and the online tests
     MONITORING_ADDR = 0x0014
     MONITORING_ALARM_POS = 0
     MONITORING_ALARM_MSK = 0x1
@@ -357,12 +357,12 @@ class RegMap:
     MONITORING_CLEAR_POS = 2
     MONITORING_CLEAR_MSK = 0x1
 
-    # ALARM - Register for configuring the total failure alarm.
+    # ALARM - Register for configuring the total failure alarm
     ALARM_ADDR = 0x0018
     ALARM_THRESHOLD_POS = 0
     ALARM_THRESHOLD_MSK = 0xffffffff
 
-    # ONLINETEST - Register for configuring the online test.
+    # ONLINETEST - Register for configuring the online test
     ONLINETEST_ADDR = 0x001c
     ONLINETEST_AVERAGE_POS = 0
     ONLINETEST_AVERAGE_MSK = 0xffff
@@ -373,8 +373,8 @@ class RegMap:
     FIFOCTRL_ADDR = 0x0020
     FIFOCTRL_CLEAR_POS = 0
     FIFOCTRL_CLEAR_MSK = 0x1
-    FIFOCTRL_PACKBITS_POS = 1
-    FIFOCTRL_PACKBITS_MSK = 0x1
+    FIFOCTRL_NOPACKING_POS = 1
+    FIFOCTRL_NOPACKING_MSK = 0x1
     FIFOCTRL_EMPTY_POS = 2
     FIFOCTRL_EMPTY_MSK = 0x1
     FIFOCTRL_FULL_POS = 3
@@ -420,7 +420,7 @@ class RegMap:
 
     @property
     def ring(self):
-        """Ring-oscillator enable register (enable bits are active at '1')."""
+        """Ring-oscillator enable register (enable bits are active at '1')"""
         return self._if.read(self.RING_ADDR)
 
     @ring.setter
@@ -433,7 +433,7 @@ class RegMap:
 
     @property
     def freqcount(self):
-        """Frequency counter control register."""
+        """Frequency counter control register"""
         return self._if.read(self.FREQCOUNT_ADDR)
 
     @freqcount.setter
@@ -459,7 +459,7 @@ class RegMap:
 
     @property
     def monitoring(self):
-        """Register for monitoring the total failure alarm and the online tests."""
+        """Register for monitoring the total failure alarm and the online tests"""
         return self._if.read(self.MONITORING_ADDR)
 
     @monitoring.setter
@@ -472,7 +472,7 @@ class RegMap:
 
     @property
     def alarm(self):
-        """Register for configuring the total failure alarm."""
+        """Register for configuring the total failure alarm"""
         return self._if.read(self.ALARM_ADDR)
 
     @alarm.setter
@@ -485,7 +485,7 @@ class RegMap:
 
     @property
     def onlinetest(self):
-        """Register for configuring the online test."""
+        """Register for configuring the online test"""
         return self._if.read(self.ONLINETEST_ADDR)
 
     @onlinetest.setter

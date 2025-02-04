@@ -60,8 +60,8 @@ port(
 
     -- FIFOCTRL.CLEAR
     csr_fifoctrl_clear_out : out std_logic;
-    -- FIFOCTRL.PACKBITS
-    csr_fifoctrl_packbits_out : out std_logic;
+    -- FIFOCTRL.NOPACKING
+    csr_fifoctrl_nopacking_out : out std_logic;
     -- FIFOCTRL.EMPTY
     csr_fifoctrl_empty_in : in std_logic;
     -- FIFOCTRL.FULL
@@ -157,7 +157,7 @@ signal csr_fifoctrl_wen : std_logic;
 signal csr_fifoctrl_ren : std_logic;
 signal csr_fifoctrl_ren_ff : std_logic;
 signal csr_fifoctrl_clear_ff : std_logic;
-signal csr_fifoctrl_packbits_ff : std_logic;
+signal csr_fifoctrl_nopacking_ff : std_logic;
 signal csr_fifoctrl_empty_ff : std_logic;
 signal csr_fifoctrl_full_ff : std_logic;
 signal csr_fifoctrl_almostempty_ff : std_logic;
@@ -276,7 +276,7 @@ end process;
 
 -----------------------
 -- Bit field:
--- CONTROL(1) - CONDITIONING - Enable or disable the algorithmic post processing to convert RRN to IRN active to '1', bypass at '0'.
+-- CONTROL(1) - CONDITIONING - Enable or disable the algorithmic post processing to convert RRN to IRN active to '1', bypass at '0'
 -- access: rw, hardware: o
 -----------------------
 
@@ -302,7 +302,7 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x8] - RING - Ring-oscillator enable register (enable bits are active at '1').
+-- [0x8] - RING - Ring-oscillator enable register (enable bits are active at '1')
 --------------------------------------------------------------------------------
 
 csr_ring_wen <= wen when (waddr = std_logic_vector(to_unsigned(8, ADDR_W))) else '0'; -- 0x8
@@ -353,7 +353,7 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0xc] - FREQCOUNT - Frequency counter control register.
+-- [0xc] - FREQCOUNT - Frequency counter control register
 --------------------------------------------------------------------------------
 
 csr_freqcount_wen <= wen when (waddr = std_logic_vector(to_unsigned(12, ADDR_W))) else '0'; -- 0xc
@@ -556,7 +556,7 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x14] - MONITORING - Register for monitoring the total failure alarm and the online tests.
+-- [0x14] - MONITORING - Register for monitoring the total failure alarm and the online tests
 --------------------------------------------------------------------------------
 csr_monitoring_rdata(31 downto 3) <= (others => '0');
 
@@ -573,7 +573,7 @@ end process;
 
 -----------------------
 -- Bit field:
--- MONITORING(0) - ALARM - This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on PTRNG reset only.
+-- MONITORING(0) - ALARM - This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on PTRNG reset only
 -- access: roc, hardware: i
 -----------------------
 
@@ -595,7 +595,7 @@ end process;
 
 -----------------------
 -- Bit field:
--- MONITORING(1) - VALID - This signal is set to '1' when the online test is valid, when it falls to '0' (invalid) it must be manually cleared.
+-- MONITORING(1) - VALID - This signal is set to '1' when the online test is valid, when it falls to '0' (invalid) it must be manually cleared
 -- access: ro, hardware: i
 -----------------------
 
@@ -614,7 +614,7 @@ end process;
 
 -----------------------
 -- Bit field:
--- MONITORING(2) - CLEAR - This signal clears the online test to set the 'valid' signal back to '1'.
+-- MONITORING(2) - CLEAR - This signal clears the online test to set the 'valid' signal back to '1'
 -- access: wosc, hardware: o
 -----------------------
 
@@ -640,7 +640,7 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x18] - ALARM - Register for configuring the total failure alarm.
+-- [0x18] - ALARM - Register for configuring the total failure alarm
 --------------------------------------------------------------------------------
 
 csr_alarm_wen <= wen when (waddr = std_logic_vector(to_unsigned(24, ADDR_W))) else '0'; -- 0x18
@@ -691,7 +691,7 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x1c] - ONLINETEST - Register for configuring the online test.
+-- [0x1c] - ONLINETEST - Register for configuring the online test
 --------------------------------------------------------------------------------
 
 csr_onlinetest_wen <= wen when (waddr = std_logic_vector(to_unsigned(28, ADDR_W))) else '0'; -- 0x1c
@@ -707,7 +707,7 @@ end process;
 
 -----------------------
 -- Bit field:
--- ONLINETEST(15 downto 0) - AVERAGE - Average expected value for the online test internal value.
+-- ONLINETEST(15 downto 0) - AVERAGE - Average expected value for the online test internal value
 -- access: rw, hardware: o
 -----------------------
 
@@ -736,7 +736,7 @@ end process;
 
 -----------------------
 -- Bit field:
--- ONLINETEST(31 downto 16) - DEVIATION - Maximum difference between the average expected value and the current internal value for the online test.
+-- ONLINETEST(31 downto 16) - DEVIATION - Maximum difference between the average expected value and the current internal value for the online test
 -- access: rw, hardware: o
 -----------------------
 
@@ -808,24 +808,24 @@ end process;
 
 -----------------------
 -- Bit field:
--- FIFOCTRL(1) - PACKBITS - Pack LSBs from each IRN into 32bits words (LSB to be read first); else all 32bits of IRN are written into the FIFO.
+-- FIFOCTRL(1) - NOPACKING - When packing is disabled IRN as written as 32-bit words in the FIFO instead of packing their LSB into 32-bit words
 -- access: rw, hardware: o
 -----------------------
 
-csr_fifoctrl_rdata(1) <= csr_fifoctrl_packbits_ff;
+csr_fifoctrl_rdata(1) <= csr_fifoctrl_nopacking_ff;
 
-csr_fifoctrl_packbits_out <= csr_fifoctrl_packbits_ff;
+csr_fifoctrl_nopacking_out <= csr_fifoctrl_nopacking_ff;
 
 process (clk, rst) begin
 if (rst = '1') then
-    csr_fifoctrl_packbits_ff <= '1'; -- 0x1
+    csr_fifoctrl_nopacking_ff <= '0'; -- 0x0
 elsif rising_edge(clk) then
         if (csr_fifoctrl_wen = '1') then
             if (wstrb(0) = '1') then
-                csr_fifoctrl_packbits_ff <= wdata(1);
+                csr_fifoctrl_nopacking_ff <= wdata(1);
             end if;
         else
-            csr_fifoctrl_packbits_ff <= csr_fifoctrl_packbits_ff;
+            csr_fifoctrl_nopacking_ff <= csr_fifoctrl_nopacking_ff;
         end if;
 end if;
 end process;

@@ -10,13 +10,13 @@ parser.add_argument("-q", "--quiet", action='store_true', help="quiet mode, only
 args=parser.parse_args()
 assert args.index in range(32)
 
-# Open the UART to the register map
+# Open and check the UART to the register map
 interface = Fluart.CmdProc()
 reg = OpenTRNG.RegMap(interface)
-
-# Reset and check the board
-reg.control_bf.reset = 1
 interface.check(reg.id_bf.uid, reg.id_bf.rev)
+
+# Reset the PTRNG
+reg.control_bf.reset = 1
 
 # Enable the RO
 reg.ring_bf.en = 1 << args.index
@@ -46,4 +46,4 @@ while count<args.count or args.count==-1:
 		print(reg.freqcount_bf.value/10000)
 
 # Disable all the ROs
-reg.ring_bf.enable = 0x00000000
+reg.ring_bf.en = 0x00000000

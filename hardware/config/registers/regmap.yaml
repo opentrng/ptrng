@@ -27,13 +27,13 @@ regmap:
         access: wosc
         hardware: o
     -   name: CONDITIONING
-        description: Enable or disable the algorithmic post processing to convert RRN to IRN active to '1', bypass at '0'.
+        description: Enable or disable the algorithmic post processing to convert RRN to IRN active to '1', bypass at '0'
         width: 1
         lsb: 1
         access: rw
         hardware: o
 -   name: RING
-    description: Ring-oscillator enable register (enable bits are active at '1').
+    description: Ring-oscillator enable register (enable bits are active at '1')
     bitfields:
     -   name: EN
         description: The bit at index _i_ in the bitfield enables the RO number _i_
@@ -42,7 +42,7 @@ regmap:
         access: rw
         hardware: o
 -   name: FREQCOUNT
-    description: Frequency counter control register.
+    description: Frequency counter control register
     bitfields:
     -   name: EN
         description: Enable the frequency counter (active at '1')
@@ -80,30 +80,6 @@ regmap:
         lsb: 31
         access: ro
         hardware: i
-# -   name: REG_TYPE
-#     description: Register to select the type of sampling.
-#     bitfields:
-#     -   name : TYPE
-#         width: 8
-#         lsb: 0
-#         access: rw
-#         hardware: o
-#         enums:
-#         -   name: NONE
-#             description: No sampling
-#             value: 0
-#         -   name: TEST_LFSR
-#             description: LFSR for test purpose only
-#             value: 1
-#         -   name: ERO
-#             description: Elementary Ring-Oscillato
-#             value: 2
-#         -   name: MURO
-#             description: Multi Ring-Oscillator
-#             value: 3
-#         -   name: COSO
-#             description: Coherent Sampling Ring-Oscillator
-#             value: 4
 -   name: FREQDIVIDER
     description: Clock divider register, applies on oscillator RO0
     bitfields:
@@ -114,28 +90,28 @@ regmap:
         access: rw
         hardware: oa
 -   name: MONITORING
-    description: Register for monitoring the total failure alarm and the online tests.
+    description: Register for monitoring the total failure alarm and the online tests
     bitfields:
     -   name: ALARM
-        description: This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on PTRNG reset only.
+        description: This signal is triggered to '1' in the event of a total failure alarm, the alarm is cleared on PTRNG reset only
         width: 1
         lsb: 0
         access: roc
         hardware: i
     -   name: VALID
-        description: This signal is set to '1' when the online test is valid, when it falls to '0' (invalid) it must be manually cleared.
+        description: This signal is set to '1' when the online test is valid, when it falls to '0' (invalid) it must be manually cleared
         width: 1
         lsb: 1
         access: ro
         hardware: i
     -   name: CLEAR
-        description: This signal clears the online test to set the 'valid' signal back to '1'.
+        description: This signal clears the online test to set the 'valid' signal back to '1'
         width: 1
         lsb: 2
         access: wosc
         hardware: o
 -   name: ALARM
-    description: Register for configuring the total failure alarm.
+    description: Register for configuring the total failure alarm
     bitfields:
     -   name: THRESHOLD
         description: Threshold value for triggering the total failure alarm. The threshold is compared to a counter and the alarm is triggered when the counter becomes greater or equal than the threshold. The counting method depends on the digitizer type (ERO, MURO, COSO...)
@@ -144,16 +120,16 @@ regmap:
         access: rw
         hardware: o
 -   name: ONLINETEST
-    description: Register for configuring the online test.
+    description: Register for configuring the online test
     bitfields:
     -   name: AVERAGE
-        description: Average expected value for the online test internal value.
+        description: Average expected value for the online test internal value
         width: 16
         lsb: 0
         access: rw
         hardware: o
     -   name: DEVIATION
-        description: Maximum difference between the average expected value and the current internal value for the online test.
+        description: Maximum difference between the average expected value and the current internal value for the online test
         width: 16
         lsb: 16
         access: rw
@@ -167,9 +143,8 @@ regmap:
         lsb: 0
         access: wosc
         hardware: o
-    -   name: PACKBITS
-        description: Pack LSBs from each IRN into 32bits words (LSB to be read first); else all 32bits of IRN are written into the FIFO.
-        reset: 1
+    -   name: NOPACKING
+        description: When packing is disabled IRN as written as 32-bit words in the FIFO instead of packing their LSB into 32-bit words
         width: 1
         lsb: 1
         access: rw
