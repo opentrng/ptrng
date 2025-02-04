@@ -66,7 +66,9 @@ async def test_readfifo(dut):
 	await sim_uart_rx_byte(dut, 0x00)
 	await sim_uart_rx_byte(dut, 0x04)
 	
-	await Signal.Skip(dut.clk, 3000)
+	await Signal.Skip(dut.clk, 1000)
+	await Signal.PulseBit(dut.fifo_clear, dut.clk)
+	await Signal.Skip(dut.clk, 2000)
 	
 	await sim_uart_rx_byte(dut, 0x02)
 	await sim_uart_rx_byte(dut, 0x00)
