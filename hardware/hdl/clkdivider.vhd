@@ -25,26 +25,19 @@ end entity;
 -- The pulse divider can divide the clock by factors in interval [1, 2^FACTOR_WIDTH[ with a non balanced duty cycle.
 architecture pulse of clkdivider is
 
-	signal resync, store: std_logic;
 	signal divider: std_logic_vector (FACTOR_WIDTH-1 downto 0);
 	signal counter: std_logic_vector (FACTOR_WIDTH-1 downto 0);
 	signal pulse: std_logic;
 
 begin
 
-	-- Resynchronize the input signal to 'original' clock
-	process (original, reset)
+	-- Latch the division factor when reset of changed
+	process (reset, changed)
 	begin
 		if reset = '1' then
-			resync <= '0';
-			store <= '0';
 			divider <= (others => '0');
-		elsif rising_edge(original) then
-			resync <= changed;
-			store <= resync;
-			if store = '1' then
-				divider <= factor;
-			end if;
+		elsif changed = '1' then
+			divider <= factor;
 		end if;
 	end process;
 

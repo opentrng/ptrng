@@ -67,10 +67,10 @@ set_property LOCK_PINS {I0:{{ element['fixedlutpin'] }}} [get_cells top/ptrng/so
 
 {% if digitizer['type'] in ['ERO', 'MURO'] %}
 # Ignore false path between divider set from sys_clk domain and counter in RO0 domain
-set_false_path -from [get_cells {top/ptrng/source/digitizer/gen.*/clkdivider/divider_reg[*]}] -to [get_cells {top/ptrng/source/digitizer/gen.*/clkdivider/pulse_reg}]
-set_false_path -from [get_cells {top/ptrng/source/digitizer/gen.*/clkdivider/divider_reg[*]}] -to [get_cells {top/ptrng/source/digitizer/gen.*/clkdivider/counter_reg[*]}]
+set_false_path -from [get_cells {top/regmap/csr_freqdivider_value_ff_reg[*]}] -to [get_cells {top/ptrng/source/digitizer/gen.*/clkdivider/pulse_reg}]
+set_false_path -from [get_cells {top/regmap/csr_freqdivider_value_ff_reg[*]}] -to [get_cells {top/ptrng/source/digitizer/gen.*/clkdivider/counter_reg[*]}]
 {% elif digitizer['type'] in ['TEST'] %}
 # Ignore false path between divider set from sys_clk domain and counter in RO0 domain
-set_false_path -from [get_cells {top/ptrng/source/digitizer/gen.clkdivider/divider_reg[*]}] -to [get_cells {top/ptrng/source/digitizer/gen.clkdivider/pulse_reg}]
-set_false_path -from [get_cells {top/ptrng/source/digitizer/gen.clkdivider/divider_reg[*]}] -to [get_cells {top/ptrng/source/digitizer/gen.clkdivider/counter_reg[*]}]
+set_false_path -from [get_cells {top/regmap/csr_freqdivider_value_ff_reg[*]}] -to [get_cells {top/ptrng/source/digitizer/gen.clkdivider/pulse_reg}]
+set_false_path -from [get_cells {top/regmap/csr_freqdivider_value_ff_reg[*]}] -to [get_cells {top/ptrng/source/digitizer/gen.clkdivider/counter_reg[*]}]
 {% endif %}
