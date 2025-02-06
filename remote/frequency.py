@@ -22,8 +22,11 @@ reg.control_bf.reset = 1
 reg.ring_bf.en = 1 << args.index
 
 # Reset and enable the frequency counter
-reg.freqcount_bf.reset = 1
-reg.freqcount_bf.en = 1
+reg.freqctrl_bf.reset = 1
+reg.freqctrl_bf.en = 1
+
+# Division factor depending on system clock
+F = 100000.0
 
 # Read the results
 count = 0
@@ -31,19 +34,19 @@ while count<args.count or args.count==-1:
 	count += 1
 
 	# Select the ring and start the measurement
-	reg.freqcount_bf.select = args.index
-	reg.freqcount_bf.start = 1
+	reg.freqctrl_bf.select = args.index
+	reg.freqctrl_bf.start = 1
 
 	# Wait until the measurement is done
-	while reg.freqcount_bf.done==0:
+	while reg.freqctrl_bf.done==0:
 		True
 
 	# Print the result
 	if not args.quiet:
-		print("Measured frequency for RO{:d}: {:f}MHz".format(args.index, reg.freqcount_bf.value/10000))
-		print("Overflow: {:}".format(reg.freqcount_bf.overflow==1 if True else False))
+		print("Measured frequency for RO{:d}: {:f}MHz".format(args.index, reg.freqvalue_bf.value/F))
+		print("Overflow: {:}".format(reg.freqctrl_bf.overflow==1 if True else False))
 	else:
-		print(reg.freqcount_bf.value/10000)
+		print(reg.freqvalue_bf.value/F)
 
 # Disable all the ROs
 reg.ring_bf.en = 0x00000000

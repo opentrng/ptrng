@@ -31,7 +31,7 @@ entity digitalnoise is
 		-- Flag set to '1' if an overflow occured (for the selected ROs)
 		freqcount_overflow: out std_logic;
 		-- Frequency estimation output (for the selected ROs)
-		freqcount_value: out std_logic_vector (REG_WIDTH-5-4-1 downto 0);
+		freqcount_value: out std_logic_vector (REG_WIDTH-1 downto 0);
 		-- Sampling clock divider value (applies on RO0 for ERO and MURO)
 		freqdivider_value: in std_logic_vector (REG_WIDTH-1 downto 0);
 		-- Enable strobing when frequency divider changes
@@ -97,8 +97,8 @@ begin
 	-- One frequency counter for all ROs
 	freqcounter: entity work.freqcounter
 	generic map (
-		W => freqcount_value'Length,
-		N => 1_000_000
+		REG_WIDTH => REG_WIDTH,
+		N => 10_000_000
 	)
 	port map (
 		clk => clk,

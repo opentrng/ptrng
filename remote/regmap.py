@@ -72,22 +72,22 @@ class _RegRing:
         self._rmap._if.write(self._rmap.RING_ADDR, rdata)
 
 
-class _RegFreqcount:
+class _RegFreqctrl:
     def __init__(self, rmap):
         self._rmap = rmap
 
     @property
     def en(self):
         """Enable the frequency counter (active at '1')"""
-        rdata = self._rmap._if.read(self._rmap.FREQCOUNT_ADDR)
-        return (rdata >> self._rmap.FREQCOUNT_EN_POS) & self._rmap.FREQCOUNT_EN_MSK
+        rdata = self._rmap._if.read(self._rmap.FREQCTRL_ADDR)
+        return (rdata >> self._rmap.FREQCTRL_EN_POS) & self._rmap.FREQCTRL_EN_MSK
 
     @en.setter
     def en(self, val):
-        rdata = self._rmap._if.read(self._rmap.FREQCOUNT_ADDR)
-        rdata = rdata & (~(self._rmap.FREQCOUNT_EN_MSK << self._rmap.FREQCOUNT_EN_POS))
-        rdata = rdata | (val << self._rmap.FREQCOUNT_EN_POS)
-        self._rmap._if.write(self._rmap.FREQCOUNT_ADDR, rdata)
+        rdata = self._rmap._if.read(self._rmap.FREQCTRL_ADDR)
+        rdata = rdata & (~(self._rmap.FREQCTRL_EN_MSK << self._rmap.FREQCTRL_EN_POS))
+        rdata = rdata | (val << self._rmap.FREQCTRL_EN_POS)
+        self._rmap._if.write(self._rmap.FREQCTRL_ADDR, rdata)
 
     @property
     def start(self):
@@ -96,41 +96,46 @@ class _RegFreqcount:
 
     @start.setter
     def start(self, val):
-        rdata = self._rmap._if.read(self._rmap.FREQCOUNT_ADDR)
-        rdata = rdata & (~(self._rmap.FREQCOUNT_START_MSK << self._rmap.FREQCOUNT_START_POS))
-        rdata = rdata | (val << self._rmap.FREQCOUNT_START_POS)
-        self._rmap._if.write(self._rmap.FREQCOUNT_ADDR, rdata)
+        rdata = self._rmap._if.read(self._rmap.FREQCTRL_ADDR)
+        rdata = rdata & (~(self._rmap.FREQCTRL_START_MSK << self._rmap.FREQCTRL_START_POS))
+        rdata = rdata | (val << self._rmap.FREQCTRL_START_POS)
+        self._rmap._if.write(self._rmap.FREQCTRL_ADDR, rdata)
 
     @property
     def done(self):
         """This field is set to '1' when the measure is done and ready to be read"""
-        rdata = self._rmap._if.read(self._rmap.FREQCOUNT_ADDR)
-        return (rdata >> self._rmap.FREQCOUNT_DONE_POS) & self._rmap.FREQCOUNT_DONE_MSK
+        rdata = self._rmap._if.read(self._rmap.FREQCTRL_ADDR)
+        return (rdata >> self._rmap.FREQCTRL_DONE_POS) & self._rmap.FREQCTRL_DONE_MSK
 
     @property
     def select(self):
         """Select the index of the ring-oscillator for frequency measurement"""
-        rdata = self._rmap._if.read(self._rmap.FREQCOUNT_ADDR)
-        return (rdata >> self._rmap.FREQCOUNT_SELECT_POS) & self._rmap.FREQCOUNT_SELECT_MSK
+        rdata = self._rmap._if.read(self._rmap.FREQCTRL_ADDR)
+        return (rdata >> self._rmap.FREQCTRL_SELECT_POS) & self._rmap.FREQCTRL_SELECT_MSK
 
     @select.setter
     def select(self, val):
-        rdata = self._rmap._if.read(self._rmap.FREQCOUNT_ADDR)
-        rdata = rdata & (~(self._rmap.FREQCOUNT_SELECT_MSK << self._rmap.FREQCOUNT_SELECT_POS))
-        rdata = rdata | (val << self._rmap.FREQCOUNT_SELECT_POS)
-        self._rmap._if.write(self._rmap.FREQCOUNT_ADDR, rdata)
-
-    @property
-    def value(self):
-        """Measured value (unit in cycles of the system clock)"""
-        rdata = self._rmap._if.read(self._rmap.FREQCOUNT_ADDR)
-        return (rdata >> self._rmap.FREQCOUNT_VALUE_POS) & self._rmap.FREQCOUNT_VALUE_MSK
+        rdata = self._rmap._if.read(self._rmap.FREQCTRL_ADDR)
+        rdata = rdata & (~(self._rmap.FREQCTRL_SELECT_MSK << self._rmap.FREQCTRL_SELECT_POS))
+        rdata = rdata | (val << self._rmap.FREQCTRL_SELECT_POS)
+        self._rmap._if.write(self._rmap.FREQCTRL_ADDR, rdata)
 
     @property
     def overflow(self):
         """Flag set to '1' if an overflow occurred during measurement"""
-        rdata = self._rmap._if.read(self._rmap.FREQCOUNT_ADDR)
-        return (rdata >> self._rmap.FREQCOUNT_OVERFLOW_POS) & self._rmap.FREQCOUNT_OVERFLOW_MSK
+        rdata = self._rmap._if.read(self._rmap.FREQCTRL_ADDR)
+        return (rdata >> self._rmap.FREQCTRL_OVERFLOW_POS) & self._rmap.FREQCTRL_OVERFLOW_MSK
+
+
+class _RegFreqvalue:
+    def __init__(self, rmap):
+        self._rmap = rmap
+
+    @property
+    def value(self):
+        """Measured value (unit in cycles of the system clock)"""
+        rdata = self._rmap._if.read(self._rmap.FREQVALUE_ADDR)
+        return (rdata >> self._rmap.FREQVALUE_VALUE_POS) & self._rmap.FREQVALUE_VALUE_MSK
 
 
 class _RegFreqdivider:
@@ -328,28 +333,31 @@ class RegMap:
     RING_EN_POS = 0
     RING_EN_MSK = 0xffffffff
 
-    # FREQCOUNT - Frequency counter control register
-    FREQCOUNT_ADDR = 0x000c
-    FREQCOUNT_EN_POS = 0
-    FREQCOUNT_EN_MSK = 0x1
-    FREQCOUNT_START_POS = 1
-    FREQCOUNT_START_MSK = 0x1
-    FREQCOUNT_DONE_POS = 2
-    FREQCOUNT_DONE_MSK = 0x1
-    FREQCOUNT_SELECT_POS = 3
-    FREQCOUNT_SELECT_MSK = 0x1f
-    FREQCOUNT_VALUE_POS = 8
-    FREQCOUNT_VALUE_MSK = 0x7fffff
-    FREQCOUNT_OVERFLOW_POS = 31
-    FREQCOUNT_OVERFLOW_MSK = 0x1
+    # FREQCTRL - Frequency counter control register
+    FREQCTRL_ADDR = 0x000c
+    FREQCTRL_EN_POS = 0
+    FREQCTRL_EN_MSK = 0x1
+    FREQCTRL_START_POS = 1
+    FREQCTRL_START_MSK = 0x1
+    FREQCTRL_DONE_POS = 2
+    FREQCTRL_DONE_MSK = 0x1
+    FREQCTRL_SELECT_POS = 3
+    FREQCTRL_SELECT_MSK = 0x1f
+    FREQCTRL_OVERFLOW_POS = 31
+    FREQCTRL_OVERFLOW_MSK = 0x1
+
+    # FREQVALUE - Frequency counter register for reading the measured value
+    FREQVALUE_ADDR = 0x0010
+    FREQVALUE_VALUE_POS = 0
+    FREQVALUE_VALUE_MSK = 0xffffffff
 
     # FREQDIVIDER - Clock divider register, applies on oscillator RO0
-    FREQDIVIDER_ADDR = 0x0010
+    FREQDIVIDER_ADDR = 0x0014
     FREQDIVIDER_VALUE_POS = 0
     FREQDIVIDER_VALUE_MSK = 0xffffffff
 
     # MONITORING - Register for monitoring the total failure alarm and the online tests
-    MONITORING_ADDR = 0x0014
+    MONITORING_ADDR = 0x0018
     MONITORING_ALARM_POS = 0
     MONITORING_ALARM_MSK = 0x1
     MONITORING_VALID_POS = 1
@@ -358,19 +366,19 @@ class RegMap:
     MONITORING_CLEAR_MSK = 0x1
 
     # ALARM - Register for configuring the total failure alarm
-    ALARM_ADDR = 0x0018
+    ALARM_ADDR = 0x001c
     ALARM_THRESHOLD_POS = 0
     ALARM_THRESHOLD_MSK = 0xffffffff
 
     # ONLINETEST - Register for configuring the online test
-    ONLINETEST_ADDR = 0x001c
+    ONLINETEST_ADDR = 0x0020
     ONLINETEST_AVERAGE_POS = 0
     ONLINETEST_AVERAGE_MSK = 0xffff
     ONLINETEST_DEVIATION_POS = 16
     ONLINETEST_DEVIATION_MSK = 0xffff
 
     # FIFOCTRL - Control register for the FIFO, into read the PTRNG random data output
-    FIFOCTRL_ADDR = 0x0020
+    FIFOCTRL_ADDR = 0x0024
     FIFOCTRL_CLEAR_POS = 0
     FIFOCTRL_CLEAR_MSK = 0x1
     FIFOCTRL_NOPACKING_POS = 1
@@ -389,7 +397,7 @@ class RegMap:
     FIFOCTRL_BURSTSIZE_MSK = 0xffff
 
     # FIFODATA - Data register for the FIFO to read the PTRNG random data output
-    FIFODATA_ADDR = 0x0024
+    FIFODATA_ADDR = 0x0028
     FIFODATA_DATA_POS = 0
     FIFODATA_DATA_MSK = 0xffffffff
 
@@ -432,17 +440,26 @@ class RegMap:
         return _RegRing(self)
 
     @property
-    def freqcount(self):
+    def freqctrl(self):
         """Frequency counter control register"""
-        return self._if.read(self.FREQCOUNT_ADDR)
+        return self._if.read(self.FREQCTRL_ADDR)
 
-    @freqcount.setter
-    def freqcount(self, val):
-        self._if.write(self.FREQCOUNT_ADDR, val)
+    @freqctrl.setter
+    def freqctrl(self, val):
+        self._if.write(self.FREQCTRL_ADDR, val)
 
     @property
-    def freqcount_bf(self):
-        return _RegFreqcount(self)
+    def freqctrl_bf(self):
+        return _RegFreqctrl(self)
+
+    @property
+    def freqvalue(self):
+        """Frequency counter register for reading the measured value"""
+        return self._if.read(self.FREQVALUE_ADDR)
+
+    @property
+    def freqvalue_bf(self):
+        return _RegFreqvalue(self)
 
     @property
     def freqdivider(self):

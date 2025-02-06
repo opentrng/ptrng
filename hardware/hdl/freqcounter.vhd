@@ -6,7 +6,7 @@ use ieee.std_logic_unsigned.all;
 entity freqcounter is
 	generic (
 		-- Width of the result (and internal counters) in bits
-		W: natural;
+		REG_WIDTH: natural;
 		-- Number of periods of 'clk' to count
 		N: natural
 	);
@@ -28,19 +28,19 @@ entity freqcounter is
 		-- Flag set to '1' if an overflow occured (in the counter and for duration signal)
 		overflow: out std_logic;
 		-- Frequency estimation output
-		result: out std_logic_vector (W-1 downto 0)
+		result: out std_logic_vector (REG_WIDTH-1 downto 0)
 	);
 end entity;
 
 -- RTL architecture for the frequency counter.
 architecture rtl of freqcounter is
 
-	constant MAX: natural := 2**W-1;
+	constant MAX: std_logic_vector (REG_WIDTH-1 downto 0) := (others => '1');
 	signal counting: std_logic := '0';
-	signal counter: std_logic_vector (W-1 downto 0);
+	signal counter: std_logic_vector (REG_WIDTH-1 downto 0);
 	signal busy: std_logic := '0';
 	signal finished: std_logic := '0';
-	signal duration: std_logic_vector (W-1 downto 0);
+	signal duration: std_logic_vector (REG_WIDTH-1 downto 0);
 
 begin
 

@@ -25,13 +25,14 @@ Base address: 0x00000000
 | [ID](#id)                | 0x0000     | OpenTRNG's PTRNG identification register for UID and revision number. |
 | [CONTROL](#control)      | 0x0004     | Global control register for the OpenTRNG's PTRNG |
 | [RING](#ring)            | 0x0008     | Ring-oscillator enable register (enable bits are active at '1') |
-| [FREQCOUNT](#freqcount)  | 0x000c     | Frequency counter control register |
-| [FREQDIVIDER](#freqdivider) | 0x0010     | Clock divider register, applies on oscillator RO0 |
-| [MONITORING](#monitoring) | 0x0014     | Register for monitoring the total failure alarm and the online tests |
-| [ALARM](#alarm)          | 0x0018     | Register for configuring the total failure alarm |
-| [ONLINETEST](#onlinetest) | 0x001c     | Register for configuring the online test |
-| [FIFOCTRL](#fifoctrl)    | 0x0020     | Control register for the FIFO, into read the PTRNG random data output |
-| [FIFODATA](#fifodata)    | 0x0024     | Data register for the FIFO to read the PTRNG random data output |
+| [FREQCTRL](#freqctrl)    | 0x000c     | Frequency counter control register |
+| [FREQVALUE](#freqvalue)  | 0x0010     | Frequency counter register for reading the measured value |
+| [FREQDIVIDER](#freqdivider) | 0x0014     | Clock divider register, applies on oscillator RO0 |
+| [MONITORING](#monitoring) | 0x0018     | Register for monitoring the total failure alarm and the online tests |
+| [ALARM](#alarm)          | 0x001c     | Register for configuring the total failure alarm |
+| [ONLINETEST](#onlinetest) | 0x0020     | Register for configuring the online test |
+| [FIFOCTRL](#fifoctrl)    | 0x0024     | Control register for the FIFO, into read the PTRNG random data output |
+| [FIFODATA](#fifodata)    | 0x0028     | Data register for the FIFO to read the PTRNG random data output |
 
 ## ID
 
@@ -81,7 +82,7 @@ Reset value: 0x00000000
 
 Back to [Register map](#register-map-summary).
 
-## FREQCOUNT
+## FREQCTRL
 
 Frequency counter control register
 
@@ -93,7 +94,7 @@ Reset value: 0x00000000
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
 | OVERFLOW         | 31     | ro              | 0x0        | Flag set to '1' if an overflow occurred during measurement |
-| VALUE            | 30:8   | ro              | 0x00000    | Measured value (unit in cycles of the system clock) |
+| -                | 30:8   | -               | 0x00000    | Reserved |
 | SELECT           | 7:3    | rw              | 0x0        | Select the index of the ring-oscillator for frequency measurement |
 | DONE             | 2      | ro              | 0x0        | This field is set to '1' when the measure is done and ready to be read |
 | START            | 1      | wosc            | 0x0        | Write '1' to start the frequency counter measure |
@@ -101,11 +102,26 @@ Reset value: 0x00000000
 
 Back to [Register map](#register-map-summary).
 
+## FREQVALUE
+
+Frequency counter register for reading the measured value
+
+Address offset: 0x0010
+
+Reset value: 0x00000000
+
+
+| Name             | Bits   | Mode            | Reset      | Description |
+| :---             | :---   | :---            | :---       | :---        |
+| VALUE            | 31:0   | ro              | 0x00000000 | Measured value (unit in cycles of the system clock) |
+
+Back to [Register map](#register-map-summary).
+
 ## FREQDIVIDER
 
 Clock divider register, applies on oscillator RO0
 
-Address offset: 0x0010
+Address offset: 0x0014
 
 Reset value: 0x00000000
 
@@ -120,7 +136,7 @@ Back to [Register map](#register-map-summary).
 
 Register for monitoring the total failure alarm and the online tests
 
-Address offset: 0x0014
+Address offset: 0x0018
 
 Reset value: 0x00000000
 
@@ -138,7 +154,7 @@ Back to [Register map](#register-map-summary).
 
 Register for configuring the total failure alarm
 
-Address offset: 0x0018
+Address offset: 0x001c
 
 Reset value: 0x00000000
 
@@ -153,7 +169,7 @@ Back to [Register map](#register-map-summary).
 
 Register for configuring the online test
 
-Address offset: 0x001c
+Address offset: 0x0020
 
 Reset value: 0x00000000
 
@@ -169,7 +185,7 @@ Back to [Register map](#register-map-summary).
 
 Control register for the FIFO, into read the PTRNG random data output
 
-Address offset: 0x0020
+Address offset: 0x0024
 
 Reset value: 0x00000000
 
@@ -192,7 +208,7 @@ Back to [Register map](#register-map-summary).
 
 Data register for the FIFO to read the PTRNG random data output
 
-Address offset: 0x0024
+Address offset: 0x0028
 
 Reset value: 0x00000000
 

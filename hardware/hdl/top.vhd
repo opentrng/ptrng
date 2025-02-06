@@ -55,7 +55,7 @@ architecture rtl of top is
 	signal freqcount_done: std_logic;
 	signal freqcount_overflow: std_logic;
 	signal freqcount_select: std_logic_vector (4 downto 0);
-	signal freqcount_value: std_logic_vector (22 downto 0);
+	signal freqcount_value: std_logic_vector (DATA_WIDTH-1 downto 0);
 	signal freqdivider_value: std_logic_vector (DATA_WIDTH-1 downto 0);
 	signal freqdivider_en: std_logic;
 	signal alarm_threshold: std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -146,12 +146,12 @@ begin
 		csr_control_reset_out => ptrng_reset,
 		csr_control_conditioning_out => conditioning,
 		csr_ring_en_out => ring_en,
-		csr_freqcount_en_out => freqcount_en,
-		csr_freqcount_start_out => freqcount_start,
-		csr_freqcount_done_in => freqcount_done,
-		csr_freqcount_select_out => freqcount_select,
-		csr_freqcount_value_in => freqcount_value,
-		csr_freqcount_overflow_in => freqcount_overflow,
+		csr_freqctrl_en_out => freqcount_en,
+		csr_freqctrl_start_out => freqcount_start,
+		csr_freqctrl_done_in => freqcount_done,
+		csr_freqctrl_select_out => freqcount_select,
+		csr_freqctrl_overflow_in => freqcount_overflow,
+		csr_freqvalue_value_in => freqcount_value,
 		csr_freqdivider_value_out => freqdivider_value,
 		csr_freqdivider_value_waccess => freqdivider_en,
 		csr_alarm_threshold_out => alarm_threshold,

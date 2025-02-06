@@ -41,7 +41,7 @@ regmap:
         lsb: 0
         access: rw
         hardware: o
--   name: FREQCOUNT
+-   name: FREQCTRL
     description: Frequency counter control register
     bitfields:
     -   name: EN
@@ -68,16 +68,19 @@ regmap:
         lsb: 3
         access: rw
         hardware: o
-    -   name: VALUE
-        description: Measured value (unit in cycles of the system clock)
-        width: 23
-        lsb: 8
-        access: ro
-        hardware: i
     -   name: OVERFLOW
         description: Flag set to '1' if an overflow occurred during measurement
         width: 1
         lsb: 31
+        access: ro
+        hardware: i
+-   name: FREQVALUE
+    description: Frequency counter register for reading the measured value
+    bitfields:
+    -   name: VALUE
+        description: Measured value (unit in cycles of the system clock)
+        width: 32
+        lsb: 0
         access: ro
         hardware: i
 -   name: FREQDIVIDER
