@@ -2,6 +2,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library opentrng;
+
 -- Top for testing the PTRNG by writing configuration registers and reading data into a FIFO through an UART.
 entity top is
 	generic (
@@ -174,7 +176,7 @@ begin
 	);
 
 	-- Physical True Random Number Generator wrapped on the register map
-	ptrng: entity work.ptrng
+	ptrng: entity opentrng.ptrng
 	generic map (
 		REG_WIDTH => DATA_WIDTH,
 		RAND_WIDTH => DATA_WIDTH
@@ -205,7 +207,7 @@ begin
 	);
 
 	-- FIFO
-	fifo_to_uart: entity work.fifo
+	fifo_to_uart: entity opentrng.fifo
 	generic map (
 		SIZE => FIFO_SIZE,
 		ALMOST_EMPTY_SIZE => BURST_SIZE,

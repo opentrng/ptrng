@@ -1,8 +1,10 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
-use work.constants.all;
-use work.settings.all;
+
+library opentrng;
+use opentrng.constants.all;
+use opentrng.settings.all;
 
 -- The digitizer takes the ring-oscillator signals as input and instanciante the sampling architecture specified in 'settings.vhd'. It outputs the sampling clock and the sampled data.
 entity digitizer is
@@ -38,7 +40,7 @@ begin
 	gen: if DIGITIZER_GEN = TEST generate
 		signal counter: std_logic_vector (RAND_WIDTH-1 downto 0) := (others => '0');
 	begin
-		clkdivider: entity work.clkdivider
+		clkdivider: entity opentrng.clkdivider
 		generic map (
 			FACTOR_WIDTH => 32
 		)
@@ -60,7 +62,7 @@ begin
 
 	-- Instantiate the ERO
 	elsif DIGITIZER_GEN = ERO generate
-		ero: entity work.ero
+		ero: entity opentrng.ero
 		generic map (
 			REG_WIDTH => REG_WIDTH
 		)
@@ -77,7 +79,7 @@ begin
 
 	-- Instantiate the MURO
 	elsif DIGITIZER_GEN = MURO generate
-		muro: entity work.muro
+		muro: entity opentrng.muro
 		generic map (
 			REG_WIDTH => REG_WIDTH,
 			t => T
@@ -95,7 +97,7 @@ begin
 
 	-- Instantiate the COSO
 	elsif DIGITIZER_GEN = COSO generate
-		coso: entity work.coso
+		coso: entity opentrng.coso
 		generic map (
 			DATA_WIDTH => 16
 		)

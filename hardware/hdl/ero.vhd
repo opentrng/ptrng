@@ -35,7 +35,7 @@ architecture rtl of ero is
 begin
 
 	-- Divide RO0 clock by the divider factor
-	clkdivider: entity work.clkdivider
+	clkdivider: entity opentrng.clkdivider
 	generic map (
 		FACTOR_WIDTH => 32
 	)

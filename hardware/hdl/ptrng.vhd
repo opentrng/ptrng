@@ -1,6 +1,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use work.settings.all;
+
+library opentrng;
+use opentrng.settings.all;
 
 -- OpenTRNG's PTRNG base entity.
 entity ptrng is
@@ -78,7 +80,7 @@ architecture rtl of ptrng is
 begin
 
 	-- Digital noise source (no signal syncrhonized to rings outside of this block)
-	source: entity work.digitalnoise
+	source: entity opentrng.digitalnoise
 	generic map (
 		REG_WIDTH => REG_WIDTH,
 		RAND_WIDTH => RAND_WIDTH
@@ -101,7 +103,7 @@ begin
 	);
 
 	-- Total failure alarm
-	alarm: entity work.alarm
+	alarm: entity opentrng.alarm
 	generic map (
 		REG_WIDTH => REG_WIDTH,
 		RAND_WIDTH => RAND_WIDTH
@@ -118,7 +120,7 @@ begin
 	);
 
 	-- Online test
-	onlinetest: entity work.onlinetest
+	onlinetest: entity opentrng.onlinetest
 	generic map (
 		REG_WIDTH => REG_WIDTH,
 		RAND_WIDTH => RAND_WIDTH,
@@ -136,7 +138,7 @@ begin
 	);
 
 	-- Conditioning refers to algorithmic post-processing
-	conditioner: entity work.conditioner
+	conditioner: entity opentrng.conditioner
 	generic map (
 		RAND_WIDTH => RAND_WIDTH
 	)
@@ -172,7 +174,7 @@ begin
 	end process;
 
 	-- LSB packing into words
-	bitpacker: entity work.bitpacker
+	bitpacker: entity opentrng.bitpacker
 	generic map (
 		W => REG_WIDTH
 	)
