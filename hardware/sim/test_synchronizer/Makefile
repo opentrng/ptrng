@@ -1,4 +1,4 @@
-VHDL_SOURCES += ../../hdl/synchronizer.vhd
+VHDL_SOURCES_opentrng += ../../hdl/synchronizer.vhd
 TOPLEVEL = synchronizer
 MODULE = test_synchronizer
 

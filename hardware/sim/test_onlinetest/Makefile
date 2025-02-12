@@ -1,4 +1,4 @@
-VHDL_SOURCES += ../../hdl/onlinetest.vhd ../../hdl/fifo.vhd
+VHDL_SOURCES_opentrng += ../../hdl/onlinetest.vhd ../../hdl/fifo.vhd
 
 TOPLEVEL = onlinetest
 MODULE = test_onlinetest

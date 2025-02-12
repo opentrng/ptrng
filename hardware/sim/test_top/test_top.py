@@ -27,7 +27,7 @@ async def test_readfifo(dut):
 	sys_clk_period = 10
 	
 	# Force some register map settings
-	dut.packbits.value = 0
+	dut.nopacking.value = 1
 	dut.freqdivider_value.value = 50
 	
 	# Force some UART related signals

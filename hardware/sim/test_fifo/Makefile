@@ -1,4 +1,4 @@
-VHDL_SOURCES += ../../hdl/fifo.vhd
+VHDL_SOURCES_opentrng += ../../hdl/fifo.vhd
 
 TOPLEVEL = fifo
 MODULE = test_fifo
