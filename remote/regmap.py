@@ -54,6 +54,48 @@ class _RegControl:
         self._rmap._if.write(self._rmap.CONTROL_ADDR, rdata)
 
 
+class _RegTemperature:
+    def __init__(self, rmap):
+        self._rmap = rmap
+
+    @property
+    def value(self):
+        """Measured temperature value"""
+        rdata = self._rmap._if.read(self._rmap.TEMPERATURE_ADDR)
+        return (rdata >> self._rmap.TEMPERATURE_VALUE_POS) & self._rmap.TEMPERATURE_VALUE_MSK
+
+    @property
+    def en(self):
+        """Enable the temperature measurement bloc"""
+        rdata = self._rmap._if.read(self._rmap.TEMPERATURE_ADDR)
+        return (rdata >> self._rmap.TEMPERATURE_EN_POS) & self._rmap.TEMPERATURE_EN_MSK
+
+    @en.setter
+    def en(self, val):
+        rdata = self._rmap._if.read(self._rmap.TEMPERATURE_ADDR)
+        rdata = rdata & (~(self._rmap.TEMPERATURE_EN_MSK << self._rmap.TEMPERATURE_EN_POS))
+        rdata = rdata | (val << self._rmap.TEMPERATURE_EN_POS)
+        self._rmap._if.write(self._rmap.TEMPERATURE_ADDR, rdata)
+
+    @property
+    def start(self):
+        """Write '1' to start the temperature measure"""
+        return 0
+
+    @start.setter
+    def start(self, val):
+        rdata = self._rmap._if.read(self._rmap.TEMPERATURE_ADDR)
+        rdata = rdata & (~(self._rmap.TEMPERATURE_START_MSK << self._rmap.TEMPERATURE_START_POS))
+        rdata = rdata | (val << self._rmap.TEMPERATURE_START_POS)
+        self._rmap._if.write(self._rmap.TEMPERATURE_ADDR, rdata)
+
+    @property
+    def done(self):
+        """This field is set to '1' when the measure is done and ready to be read"""
+        rdata = self._rmap._if.read(self._rmap.TEMPERATURE_ADDR)
+        return (rdata >> self._rmap.TEMPERATURE_DONE_POS) & self._rmap.TEMPERATURE_DONE_MSK
+
+
 class _RegRing:
     def __init__(self, rmap):
         self._rmap = rmap
@@ -328,13 +370,24 @@ class RegMap:
     CONTROL_CONDITIONING_POS = 1
     CONTROL_CONDITIONING_MSK = 0x1
 
+    # TEMPERATURE - Register for controling temperature measurement bloc
+    TEMPERATURE_ADDR = 0x0008
+    TEMPERATURE_VALUE_POS = 0
+    TEMPERATURE_VALUE_MSK = 0xffff
+    TEMPERATURE_EN_POS = 16
+    TEMPERATURE_EN_MSK = 0x1
+    TEMPERATURE_START_POS = 17
+    TEMPERATURE_START_MSK = 0x1
+    TEMPERATURE_DONE_POS = 18
+    TEMPERATURE_DONE_MSK = 0x1
+
     # RING - Ring-oscillator enable register (enable bits are active at '1')
-    RING_ADDR = 0x0008
+    RING_ADDR = 0x000c
     RING_EN_POS = 0
     RING_EN_MSK = 0xffffffff
 
     # FREQCTRL - Frequency counter control register
-    FREQCTRL_ADDR = 0x000c
+    FREQCTRL_ADDR = 0x0010
     FREQCTRL_EN_POS = 0
     FREQCTRL_EN_MSK = 0x1
     FREQCTRL_START_POS = 1
@@ -347,17 +400,17 @@ class RegMap:
     FREQCTRL_OVERFLOW_MSK = 0x1
 
     # FREQVALUE - Frequency counter register for reading the measured value
-    FREQVALUE_ADDR = 0x0010
+    FREQVALUE_ADDR = 0x0014
     FREQVALUE_VALUE_POS = 0
     FREQVALUE_VALUE_MSK = 0xffffffff
 
     # FREQDIVIDER - Clock divider register, applies on oscillator RO0
-    FREQDIVIDER_ADDR = 0x0014
+    FREQDIVIDER_ADDR = 0x0018
     FREQDIVIDER_VALUE_POS = 0
     FREQDIVIDER_VALUE_MSK = 0xffffffff
 
     # MONITORING - Register for monitoring the total failure alarm and the online tests
-    MONITORING_ADDR = 0x0018
+    MONITORING_ADDR = 0x001c
     MONITORING_ALARM_POS = 0
     MONITORING_ALARM_MSK = 0x1
     MONITORING_VALID_POS = 1
@@ -366,19 +419,19 @@ class RegMap:
     MONITORING_CLEAR_MSK = 0x1
 
     # ALARM - Register for configuring the total failure alarm
-    ALARM_ADDR = 0x001c
+    ALARM_ADDR = 0x0020
     ALARM_THRESHOLD_POS = 0
     ALARM_THRESHOLD_MSK = 0xffffffff
 
     # ONLINETEST - Register for configuring the online test
-    ONLINETEST_ADDR = 0x0020
+    ONLINETEST_ADDR = 0x0024
     ONLINETEST_AVERAGE_POS = 0
     ONLINETEST_AVERAGE_MSK = 0xffff
     ONLINETEST_DEVIATION_POS = 16
     ONLINETEST_DEVIATION_MSK = 0xffff
 
     # FIFOCTRL - Control register for the FIFO, into read the PTRNG random data output
-    FIFOCTRL_ADDR = 0x0024
+    FIFOCTRL_ADDR = 0x0028
     FIFOCTRL_CLEAR_POS = 0
     FIFOCTRL_CLEAR_MSK = 0x1
     FIFOCTRL_NOPACKING_POS = 1
@@ -397,7 +450,7 @@ class RegMap:
     FIFOCTRL_BURSTSIZE_MSK = 0xffff
 
     # FIFODATA - Data register for the FIFO to read the PTRNG random data output
-    FIFODATA_ADDR = 0x0028
+    FIFODATA_ADDR = 0x002c
     FIFODATA_DATA_POS = 0
     FIFODATA_DATA_MSK = 0xffffffff
 
@@ -425,6 +478,19 @@ class RegMap:
     @property
     def control_bf(self):
         return _RegControl(self)
+
+    @property
+    def temperature(self):
+        """Register for controling temperature measurement bloc"""
+        return self._if.read(self.TEMPERATURE_ADDR)
+
+    @temperature.setter
+    def temperature(self, val):
+        self._if.write(self.TEMPERATURE_ADDR, val)
+
+    @property
+    def temperature_bf(self):
+        return _RegTemperature(self)
 
     @property
     def ring(self):

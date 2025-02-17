@@ -23,6 +23,15 @@ port(
     -- CONTROL.CONDITIONING
     csr_control_conditioning_out : out std_logic;
 
+    -- TEMPERATURE.VALUE
+    csr_temperature_value_in : in std_logic_vector(15 downto 0);
+    -- TEMPERATURE.EN
+    csr_temperature_en_out : out std_logic;
+    -- TEMPERATURE.START
+    csr_temperature_start_out : out std_logic;
+    -- TEMPERATURE.DONE
+    csr_temperature_done_in : in std_logic;
+
     -- RING.EN
     csr_ring_en_out : out std_logic_vector(31 downto 0);
 
@@ -108,6 +117,15 @@ signal csr_control_ren : std_logic;
 signal csr_control_ren_ff : std_logic;
 signal csr_control_reset_ff : std_logic;
 signal csr_control_conditioning_ff : std_logic;
+
+signal csr_temperature_rdata : std_logic_vector(31 downto 0);
+signal csr_temperature_wen : std_logic;
+signal csr_temperature_ren : std_logic;
+signal csr_temperature_ren_ff : std_logic;
+signal csr_temperature_value_ff : std_logic_vector(15 downto 0);
+signal csr_temperature_en_ff : std_logic;
+signal csr_temperature_start_ff : std_logic;
+signal csr_temperature_done_ff : std_logic;
 
 signal csr_ring_rdata : std_logic_vector(31 downto 0);
 signal csr_ring_wen : std_logic;
@@ -307,12 +325,119 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x8] - RING - Ring-oscillator enable register (enable bits are active at '1')
+-- [0x8] - TEMPERATURE - Register for controling temperature measurement bloc
+--------------------------------------------------------------------------------
+csr_temperature_rdata(31 downto 19) <= (others => '0');
+
+csr_temperature_wen <= wen when (waddr = std_logic_vector(to_unsigned(8, ADDR_W))) else '0'; -- 0x8
+
+csr_temperature_ren <= ren when (raddr = std_logic_vector(to_unsigned(8, ADDR_W))) else '0'; -- 0x8
+process (clk, rst) begin
+if (rst = '1') then
+    csr_temperature_ren_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+        csr_temperature_ren_ff <= csr_temperature_ren;
+end if;
+end process;
+
+-----------------------
+-- Bit field:
+-- TEMPERATURE(15 downto 0) - VALUE - Measured temperature value
+-- access: ro, hardware: i
+-----------------------
+
+csr_temperature_rdata(15 downto 0) <= csr_temperature_value_ff;
+
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_temperature_value_ff <= "0000000000000000"; -- 0x0
+elsif rising_edge(clk) then
+            csr_temperature_value_ff <= csr_temperature_value_in;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- TEMPERATURE(16) - EN - Enable the temperature measurement bloc
+-- access: rw, hardware: o
+-----------------------
+
+csr_temperature_rdata(16) <= csr_temperature_en_ff;
+
+csr_temperature_en_out <= csr_temperature_en_ff;
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_temperature_en_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+        if (csr_temperature_wen = '1') then
+            if (wstrb(2) = '1') then
+                csr_temperature_en_ff <= wdata(16);
+            end if;
+        else
+            csr_temperature_en_ff <= csr_temperature_en_ff;
+        end if;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- TEMPERATURE(17) - START - Write '1' to start the temperature measure
+-- access: wosc, hardware: o
+-----------------------
+
+csr_temperature_rdata(17) <= '0';
+
+csr_temperature_start_out <= csr_temperature_start_ff;
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_temperature_start_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+        if (csr_temperature_wen = '1') then
+            if (wstrb(2) = '1') then
+                csr_temperature_start_ff <= wdata(17);
+            end if;
+        else
+            csr_temperature_start_ff <= '0';
+        end if;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- TEMPERATURE(18) - DONE - This field is set to '1' when the measure is done and ready to be read
+-- access: ro, hardware: i
+-----------------------
+
+csr_temperature_rdata(18) <= csr_temperature_done_ff;
+
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_temperature_done_ff <= '0'; -- 0x0
+elsif rising_edge(clk) then
+            csr_temperature_done_ff <= csr_temperature_done_in;
+end if;
+end process;
+
+
+
+--------------------------------------------------------------------------------
+-- CSR:
+-- [0xc] - RING - Ring-oscillator enable register (enable bits are active at '1')
 --------------------------------------------------------------------------------
 
-csr_ring_wen <= wen when (waddr = std_logic_vector(to_unsigned(8, ADDR_W))) else '0'; -- 0x8
+csr_ring_wen <= wen when (waddr = std_logic_vector(to_unsigned(12, ADDR_W))) else '0'; -- 0xc
 
-csr_ring_ren <= ren when (raddr = std_logic_vector(to_unsigned(8, ADDR_W))) else '0'; -- 0x8
+csr_ring_ren <= ren when (raddr = std_logic_vector(to_unsigned(12, ADDR_W))) else '0'; -- 0xc
 process (clk, rst) begin
 if (rst = '1') then
     csr_ring_ren_ff <= '0'; -- 0x0
@@ -358,13 +483,13 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0xc] - FREQCTRL - Frequency counter control register
+-- [0x10] - FREQCTRL - Frequency counter control register
 --------------------------------------------------------------------------------
 csr_freqctrl_rdata(30 downto 8) <= (others => '0');
 
-csr_freqctrl_wen <= wen when (waddr = std_logic_vector(to_unsigned(12, ADDR_W))) else '0'; -- 0xc
+csr_freqctrl_wen <= wen when (waddr = std_logic_vector(to_unsigned(16, ADDR_W))) else '0'; -- 0x10
 
-csr_freqctrl_ren <= ren when (raddr = std_logic_vector(to_unsigned(12, ADDR_W))) else '0'; -- 0xc
+csr_freqctrl_ren <= ren when (raddr = std_logic_vector(to_unsigned(16, ADDR_W))) else '0'; -- 0x10
 process (clk, rst) begin
 if (rst = '1') then
     csr_freqctrl_ren_ff <= '0'; -- 0x0
@@ -491,11 +616,11 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x10] - FREQVALUE - Frequency counter register for reading the measured value
+-- [0x14] - FREQVALUE - Frequency counter register for reading the measured value
 --------------------------------------------------------------------------------
 
 
-csr_freqvalue_ren <= ren when (raddr = std_logic_vector(to_unsigned(16, ADDR_W))) else '0'; -- 0x10
+csr_freqvalue_ren <= ren when (raddr = std_logic_vector(to_unsigned(20, ADDR_W))) else '0'; -- 0x14
 process (clk, rst) begin
 if (rst = '1') then
     csr_freqvalue_ren_ff <= '0'; -- 0x0
@@ -525,12 +650,12 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x14] - FREQDIVIDER - Clock divider register, applies on oscillator RO0
+-- [0x18] - FREQDIVIDER - Clock divider register, applies on oscillator RO0
 --------------------------------------------------------------------------------
 
-csr_freqdivider_wen <= wen when (waddr = std_logic_vector(to_unsigned(20, ADDR_W))) else '0'; -- 0x14
+csr_freqdivider_wen <= wen when (waddr = std_logic_vector(to_unsigned(24, ADDR_W))) else '0'; -- 0x18
 
-csr_freqdivider_ren <= ren when (raddr = std_logic_vector(to_unsigned(20, ADDR_W))) else '0'; -- 0x14
+csr_freqdivider_ren <= ren when (raddr = std_logic_vector(to_unsigned(24, ADDR_W))) else '0'; -- 0x18
 process (clk, rst) begin
 if (rst = '1') then
     csr_freqdivider_ren_ff <= '0'; -- 0x0
@@ -577,13 +702,13 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x18] - MONITORING - Register for monitoring the total failure alarm and the online tests
+-- [0x1c] - MONITORING - Register for monitoring the total failure alarm and the online tests
 --------------------------------------------------------------------------------
 csr_monitoring_rdata(31 downto 3) <= (others => '0');
 
-csr_monitoring_wen <= wen when (waddr = std_logic_vector(to_unsigned(24, ADDR_W))) else '0'; -- 0x18
+csr_monitoring_wen <= wen when (waddr = std_logic_vector(to_unsigned(28, ADDR_W))) else '0'; -- 0x1c
 
-csr_monitoring_ren <= ren when (raddr = std_logic_vector(to_unsigned(24, ADDR_W))) else '0'; -- 0x18
+csr_monitoring_ren <= ren when (raddr = std_logic_vector(to_unsigned(28, ADDR_W))) else '0'; -- 0x1c
 process (clk, rst) begin
 if (rst = '1') then
     csr_monitoring_ren_ff <= '0'; -- 0x0
@@ -661,12 +786,12 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x1c] - ALARM - Register for configuring the total failure alarm
+-- [0x20] - ALARM - Register for configuring the total failure alarm
 --------------------------------------------------------------------------------
 
-csr_alarm_wen <= wen when (waddr = std_logic_vector(to_unsigned(28, ADDR_W))) else '0'; -- 0x1c
+csr_alarm_wen <= wen when (waddr = std_logic_vector(to_unsigned(32, ADDR_W))) else '0'; -- 0x20
 
-csr_alarm_ren <= ren when (raddr = std_logic_vector(to_unsigned(28, ADDR_W))) else '0'; -- 0x1c
+csr_alarm_ren <= ren when (raddr = std_logic_vector(to_unsigned(32, ADDR_W))) else '0'; -- 0x20
 process (clk, rst) begin
 if (rst = '1') then
     csr_alarm_ren_ff <= '0'; -- 0x0
@@ -712,12 +837,12 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x20] - ONLINETEST - Register for configuring the online test
+-- [0x24] - ONLINETEST - Register for configuring the online test
 --------------------------------------------------------------------------------
 
-csr_onlinetest_wen <= wen when (waddr = std_logic_vector(to_unsigned(32, ADDR_W))) else '0'; -- 0x20
+csr_onlinetest_wen <= wen when (waddr = std_logic_vector(to_unsigned(36, ADDR_W))) else '0'; -- 0x24
 
-csr_onlinetest_ren <= ren when (raddr = std_logic_vector(to_unsigned(32, ADDR_W))) else '0'; -- 0x20
+csr_onlinetest_ren <= ren when (raddr = std_logic_vector(to_unsigned(36, ADDR_W))) else '0'; -- 0x24
 process (clk, rst) begin
 if (rst = '1') then
     csr_onlinetest_ren_ff <= '0'; -- 0x0
@@ -786,13 +911,13 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x24] - FIFOCTRL - Control register for the FIFO, into read the PTRNG random data output
+-- [0x28] - FIFOCTRL - Control register for the FIFO, into read the PTRNG random data output
 --------------------------------------------------------------------------------
 csr_fifoctrl_rdata(31 downto 23) <= (others => '0');
 
-csr_fifoctrl_wen <= wen when (waddr = std_logic_vector(to_unsigned(36, ADDR_W))) else '0'; -- 0x24
+csr_fifoctrl_wen <= wen when (waddr = std_logic_vector(to_unsigned(40, ADDR_W))) else '0'; -- 0x28
 
-csr_fifoctrl_ren <= ren when (raddr = std_logic_vector(to_unsigned(36, ADDR_W))) else '0'; -- 0x24
+csr_fifoctrl_ren <= ren when (raddr = std_logic_vector(to_unsigned(40, ADDR_W))) else '0'; -- 0x28
 process (clk, rst) begin
 if (rst = '1') then
     csr_fifoctrl_ren_ff <= '0'; -- 0x0
@@ -969,11 +1094,11 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x28] - FIFODATA - Data register for the FIFO to read the PTRNG random data output
+-- [0x2c] - FIFODATA - Data register for the FIFO to read the PTRNG random data output
 --------------------------------------------------------------------------------
 
 
-csr_fifodata_ren <= ren when (raddr = std_logic_vector(to_unsigned(40, ADDR_W))) else '0'; -- 0x28
+csr_fifodata_ren <= ren when (raddr = std_logic_vector(to_unsigned(44, ADDR_W))) else '0'; -- 0x2c
 process (clk, rst) begin
 if (rst = '1') then
     csr_fifodata_ren_ff <= '0'; -- 0x0
@@ -1029,22 +1154,24 @@ elsif rising_edge(clk) then
         elsif raddr = std_logic_vector(to_unsigned(4, ADDR_W)) then -- 0x4
             rdata_ff <= csr_control_rdata;
         elsif raddr = std_logic_vector(to_unsigned(8, ADDR_W)) then -- 0x8
-            rdata_ff <= csr_ring_rdata;
+            rdata_ff <= csr_temperature_rdata;
         elsif raddr = std_logic_vector(to_unsigned(12, ADDR_W)) then -- 0xc
-            rdata_ff <= csr_freqctrl_rdata;
+            rdata_ff <= csr_ring_rdata;
         elsif raddr = std_logic_vector(to_unsigned(16, ADDR_W)) then -- 0x10
-            rdata_ff <= csr_freqvalue_rdata;
+            rdata_ff <= csr_freqctrl_rdata;
         elsif raddr = std_logic_vector(to_unsigned(20, ADDR_W)) then -- 0x14
-            rdata_ff <= csr_freqdivider_rdata;
+            rdata_ff <= csr_freqvalue_rdata;
         elsif raddr = std_logic_vector(to_unsigned(24, ADDR_W)) then -- 0x18
-            rdata_ff <= csr_monitoring_rdata;
+            rdata_ff <= csr_freqdivider_rdata;
         elsif raddr = std_logic_vector(to_unsigned(28, ADDR_W)) then -- 0x1c
-            rdata_ff <= csr_alarm_rdata;
+            rdata_ff <= csr_monitoring_rdata;
         elsif raddr = std_logic_vector(to_unsigned(32, ADDR_W)) then -- 0x20
-            rdata_ff <= csr_onlinetest_rdata;
+            rdata_ff <= csr_alarm_rdata;
         elsif raddr = std_logic_vector(to_unsigned(36, ADDR_W)) then -- 0x24
-            rdata_ff <= csr_fifoctrl_rdata;
+            rdata_ff <= csr_onlinetest_rdata;
         elsif raddr = std_logic_vector(to_unsigned(40, ADDR_W)) then -- 0x28
+            rdata_ff <= csr_fifoctrl_rdata;
+        elsif raddr = std_logic_vector(to_unsigned(44, ADDR_W)) then -- 0x2c
             rdata_ff <= csr_fifodata_rdata;
         else 
             rdata_ff <= "10111010101011011011111011101111"; -- 0xbaadbeef

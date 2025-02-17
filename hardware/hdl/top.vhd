@@ -51,6 +51,10 @@ architecture rtl of top is
 
 	-- Register map
 	signal ptrng_reset: std_logic;
+	signal temperature_en: std_logic;
+	signal temperature_start: std_logic;
+	signal temperature_done: std_logic;
+	signal temperature_value: std_logic_vector (15 downto 0);
 	signal ring_en: std_logic_vector (DATA_WIDTH-1 downto 0);
 	signal freqcount_en: std_logic;
 	signal freqcount_start: std_logic;
@@ -147,6 +151,10 @@ begin
 		-- Registers for the user
 		csr_control_reset_out => ptrng_reset,
 		csr_control_conditioning_out => conditioning,
+		csr_temperature_value_in => temperature_value,
+		csr_temperature_en_out => temperature_en,
+		csr_temperature_start_out => temperature_start,
+		csr_temperature_done_in => temperature_done,
 		csr_ring_en_out => ring_en,
 		csr_freqctrl_en_out => freqcount_en,
 		csr_freqctrl_start_out => freqcount_start,
@@ -173,6 +181,18 @@ begin
 		csr_fifodata_data_rvalid => '1', -- Useless since rvalid is not used
 		csr_fifodata_data_ren => fifo_read_en,
 		csr_fifodata_data_in => fifo_data_read
+	);
+
+	-- Internal temperature sensor
+	temperature: entity work.temperature
+	port map (
+		clk => clk,
+		reset => hw_reset,
+		clear => ptrng_reset,
+		enable => temperature_en,
+		start => temperature_start,
+		done => temperature_done,
+		result => temperature_value
 	);
 
 	-- Physical True Random Number Generator wrapped on the register map

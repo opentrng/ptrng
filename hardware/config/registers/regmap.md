@@ -24,15 +24,16 @@ Base address: 0x00000000
 | :---                     | :---       | :---        |
 | [ID](#id)                | 0x0000     | OpenTRNG's PTRNG identification register for UID and revision number. |
 | [CONTROL](#control)      | 0x0004     | Global control register for the OpenTRNG's PTRNG |
-| [RING](#ring)            | 0x0008     | Ring-oscillator enable register (enable bits are active at '1') |
-| [FREQCTRL](#freqctrl)    | 0x000c     | Frequency counter control register |
-| [FREQVALUE](#freqvalue)  | 0x0010     | Frequency counter register for reading the measured value |
-| [FREQDIVIDER](#freqdivider) | 0x0014     | Clock divider register, applies on oscillator RO0 |
-| [MONITORING](#monitoring) | 0x0018     | Register for monitoring the total failure alarm and the online tests |
-| [ALARM](#alarm)          | 0x001c     | Register for configuring the total failure alarm |
-| [ONLINETEST](#onlinetest) | 0x0020     | Register for configuring the online test |
-| [FIFOCTRL](#fifoctrl)    | 0x0024     | Control register for the FIFO, into read the PTRNG random data output |
-| [FIFODATA](#fifodata)    | 0x0028     | Data register for the FIFO to read the PTRNG random data output |
+| [TEMPERATURE](#temperature) | 0x0008     | Register for controling temperature measurement bloc |
+| [RING](#ring)            | 0x000c     | Ring-oscillator enable register (enable bits are active at '1') |
+| [FREQCTRL](#freqctrl)    | 0x0010     | Frequency counter control register |
+| [FREQVALUE](#freqvalue)  | 0x0014     | Frequency counter register for reading the measured value |
+| [FREQDIVIDER](#freqdivider) | 0x0018     | Clock divider register, applies on oscillator RO0 |
+| [MONITORING](#monitoring) | 0x001c     | Register for monitoring the total failure alarm and the online tests |
+| [ALARM](#alarm)          | 0x0020     | Register for configuring the total failure alarm |
+| [ONLINETEST](#onlinetest) | 0x0024     | Register for configuring the online test |
+| [FIFOCTRL](#fifoctrl)    | 0x0028     | Control register for the FIFO, into read the PTRNG random data output |
+| [FIFODATA](#fifodata)    | 0x002c     | Data register for the FIFO to read the PTRNG random data output |
 
 ## ID
 
@@ -67,11 +68,30 @@ Reset value: 0x00000000
 
 Back to [Register map](#register-map-summary).
 
+## TEMPERATURE
+
+Register for controling temperature measurement bloc
+
+Address offset: 0x0008
+
+Reset value: 0x00000000
+
+
+| Name             | Bits   | Mode            | Reset      | Description |
+| :---             | :---   | :---            | :---       | :---        |
+| -                | 31:19  | -               | 0x000      | Reserved |
+| DONE             | 18     | ro              | 0x0        | This field is set to '1' when the measure is done and ready to be read |
+| START            | 17     | wosc            | 0x0        | Write '1' to start the temperature measure |
+| EN               | 16     | rw              | 0x0        | Enable the temperature measurement bloc |
+| VALUE            | 15:0   | ro              | 0x0000     | Measured temperature value |
+
+Back to [Register map](#register-map-summary).
+
 ## RING
 
 Ring-oscillator enable register (enable bits are active at '1')
 
-Address offset: 0x0008
+Address offset: 0x000c
 
 Reset value: 0x00000000
 
@@ -86,7 +106,7 @@ Back to [Register map](#register-map-summary).
 
 Frequency counter control register
 
-Address offset: 0x000c
+Address offset: 0x0010
 
 Reset value: 0x00000000
 
@@ -106,7 +126,7 @@ Back to [Register map](#register-map-summary).
 
 Frequency counter register for reading the measured value
 
-Address offset: 0x0010
+Address offset: 0x0014
 
 Reset value: 0x00000000
 
@@ -121,7 +141,7 @@ Back to [Register map](#register-map-summary).
 
 Clock divider register, applies on oscillator RO0
 
-Address offset: 0x0014
+Address offset: 0x0018
 
 Reset value: 0x00000000
 
@@ -136,7 +156,7 @@ Back to [Register map](#register-map-summary).
 
 Register for monitoring the total failure alarm and the online tests
 
-Address offset: 0x0018
+Address offset: 0x001c
 
 Reset value: 0x00000000
 
@@ -154,7 +174,7 @@ Back to [Register map](#register-map-summary).
 
 Register for configuring the total failure alarm
 
-Address offset: 0x001c
+Address offset: 0x0020
 
 Reset value: 0x00000000
 
@@ -169,7 +189,7 @@ Back to [Register map](#register-map-summary).
 
 Register for configuring the online test
 
-Address offset: 0x0020
+Address offset: 0x0024
 
 Reset value: 0x00000000
 
@@ -185,7 +205,7 @@ Back to [Register map](#register-map-summary).
 
 Control register for the FIFO, into read the PTRNG random data output
 
-Address offset: 0x0024
+Address offset: 0x0028
 
 Reset value: 0x00000000
 
@@ -208,7 +228,7 @@ Back to [Register map](#register-map-summary).
 
 Data register for the FIFO to read the PTRNG random data output
 
-Address offset: 0x0028
+Address offset: 0x002c
 
 Reset value: 0x00000000
 
