@@ -32,33 +32,27 @@ regmap:
         lsb: 1
         access: rw
         hardware: o
--   name: TEMPERATURE
-    description: Register for controling temperature measurement bloc
+-   name: ANALOG
+    description: Control register for analog measurements (temperature and voltage)
     bitfields:
-    -   name: VALUE
-        description: Measured temperature value
-        width: 16
+    -   name: TEMPERATURE
+        description: Measured temperature
+        width: 12
         lsb: 0
         access: ro
         hardware: i
-    -   name: EN
-        description: Enable the temperature measurement bloc
-        width: 1
-        lsb: 16
-        access: rw
-        hardware: o
-    -   name: START
-        description: Write '1' to start the temperature measure
-        width: 1
-        lsb: 17
-        access: wosc
-        hardware: o
-    -   name: DONE
-        description: This field is set to '1' when the measure is done and ready to be read
-        width: 1
-        lsb: 18
+    -   name: VOLTAGE
+        description: Measured voltage
+        width: 12
+        lsb: 12
         access: ro
         hardware: i
+    -   name: EN
+        description: Enable continuous temperature and voltage measurements
+        width: 1
+        lsb: 31
+        access: rw
+        hardware: o
 -   name: RING
     description: Ring-oscillator enable register (enable bits are active at '1')
     bitfields:

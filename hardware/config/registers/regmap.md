@@ -24,7 +24,7 @@ Base address: 0x00000000
 | :---                     | :---       | :---        |
 | [ID](#id)                | 0x0000     | OpenTRNG's PTRNG identification register for UID and revision number. |
 | [CONTROL](#control)      | 0x0004     | Global control register for the OpenTRNG's PTRNG |
-| [TEMPERATURE](#temperature) | 0x0008     | Register for controling temperature measurement bloc |
+| [ANALOG](#analog)        | 0x0008     | Control register for analog measurements (temperature and voltage) |
 | [RING](#ring)            | 0x000c     | Ring-oscillator enable register (enable bits are active at '1') |
 | [FREQCTRL](#freqctrl)    | 0x0010     | Frequency counter control register |
 | [FREQVALUE](#freqvalue)  | 0x0014     | Frequency counter register for reading the measured value |
@@ -68,9 +68,9 @@ Reset value: 0x00000000
 
 Back to [Register map](#register-map-summary).
 
-## TEMPERATURE
+## ANALOG
 
-Register for controling temperature measurement bloc
+Control register for analog measurements (temperature and voltage)
 
 Address offset: 0x0008
 
@@ -79,11 +79,10 @@ Reset value: 0x00000000
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
-| -                | 31:19  | -               | 0x000      | Reserved |
-| DONE             | 18     | ro              | 0x0        | This field is set to '1' when the measure is done and ready to be read |
-| START            | 17     | wosc            | 0x0        | Write '1' to start the temperature measure |
-| EN               | 16     | rw              | 0x0        | Enable the temperature measurement bloc |
-| VALUE            | 15:0   | ro              | 0x0000     | Measured temperature value |
+| EN               | 31     | rw              | 0x0        | Enable continuous temperature and voltage measurements |
+| -                | 30:24  | -               | 0x0        | Reserved |
+| VOLTAGE          | 23:12  | ro              | 0x000      | Measured voltage |
+| TEMPERATURE      | 11:0   | ro              | 0x000      | Measured temperature |
 
 Back to [Register map](#register-map-summary).
 

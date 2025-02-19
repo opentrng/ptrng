@@ -25,7 +25,7 @@ lappend hdl_files [list "work" [file normalize "${hardware}/hdl/top.vhd"]]
 
 # Add required utility sources files
 lappend hdl_files [list "work" [file normalize "${hardware}/config/registers/regmap.vhd"]]
-lappend hdl_files [list "work" [file normalize "${hardware}/hdl/temperature.vhd"]]
+lappend hdl_files [list "work" [file normalize "${hardware}/hdl/analog.vhd"]]
 
 # Add required HDL sources files from libraries
 lappend hdl_files [list "work" [file normalize "${hardware}/lib/fluart/fluart.vhdl"]]

@@ -23,14 +23,12 @@ port(
     -- CONTROL.CONDITIONING
     csr_control_conditioning_out : out std_logic;
 
-    -- TEMPERATURE.VALUE
-    csr_temperature_value_in : in std_logic_vector(15 downto 0);
-    -- TEMPERATURE.EN
-    csr_temperature_en_out : out std_logic;
-    -- TEMPERATURE.START
-    csr_temperature_start_out : out std_logic;
-    -- TEMPERATURE.DONE
-    csr_temperature_done_in : in std_logic;
+    -- ANALOG.TEMPERATURE
+    csr_analog_temperature_in : in std_logic_vector(11 downto 0);
+    -- ANALOG.VOLTAGE
+    csr_analog_voltage_in : in std_logic_vector(11 downto 0);
+    -- ANALOG.EN
+    csr_analog_en_out : out std_logic;
 
     -- RING.EN
     csr_ring_en_out : out std_logic_vector(31 downto 0);
@@ -118,14 +116,13 @@ signal csr_control_ren_ff : std_logic;
 signal csr_control_reset_ff : std_logic;
 signal csr_control_conditioning_ff : std_logic;
 
-signal csr_temperature_rdata : std_logic_vector(31 downto 0);
-signal csr_temperature_wen : std_logic;
-signal csr_temperature_ren : std_logic;
-signal csr_temperature_ren_ff : std_logic;
-signal csr_temperature_value_ff : std_logic_vector(15 downto 0);
-signal csr_temperature_en_ff : std_logic;
-signal csr_temperature_start_ff : std_logic;
-signal csr_temperature_done_ff : std_logic;
+signal csr_analog_rdata : std_logic_vector(31 downto 0);
+signal csr_analog_wen : std_logic;
+signal csr_analog_ren : std_logic;
+signal csr_analog_ren_ff : std_logic;
+signal csr_analog_temperature_ff : std_logic_vector(11 downto 0);
+signal csr_analog_voltage_ff : std_logic_vector(11 downto 0);
+signal csr_analog_en_ff : std_logic;
 
 signal csr_ring_rdata : std_logic_vector(31 downto 0);
 signal csr_ring_wen : std_logic;
@@ -325,35 +322,35 @@ end process;
 
 --------------------------------------------------------------------------------
 -- CSR:
--- [0x8] - TEMPERATURE - Register for controling temperature measurement bloc
+-- [0x8] - ANALOG - Control register for analog measurements (temperature and voltage)
 --------------------------------------------------------------------------------
-csr_temperature_rdata(31 downto 19) <= (others => '0');
+csr_analog_rdata(30 downto 24) <= (others => '0');
 
-csr_temperature_wen <= wen when (waddr = std_logic_vector(to_unsigned(8, ADDR_W))) else '0'; -- 0x8
+csr_analog_wen <= wen when (waddr = std_logic_vector(to_unsigned(8, ADDR_W))) else '0'; -- 0x8
 
-csr_temperature_ren <= ren when (raddr = std_logic_vector(to_unsigned(8, ADDR_W))) else '0'; -- 0x8
+csr_analog_ren <= ren when (raddr = std_logic_vector(to_unsigned(8, ADDR_W))) else '0'; -- 0x8
 process (clk, rst) begin
 if (rst = '1') then
-    csr_temperature_ren_ff <= '0'; -- 0x0
+    csr_analog_ren_ff <= '0'; -- 0x0
 elsif rising_edge(clk) then
-        csr_temperature_ren_ff <= csr_temperature_ren;
+        csr_analog_ren_ff <= csr_analog_ren;
 end if;
 end process;
 
 -----------------------
 -- Bit field:
--- TEMPERATURE(15 downto 0) - VALUE - Measured temperature value
+-- ANALOG(11 downto 0) - TEMPERATURE - Measured temperature
 -- access: ro, hardware: i
 -----------------------
 
-csr_temperature_rdata(15 downto 0) <= csr_temperature_value_ff;
+csr_analog_rdata(11 downto 0) <= csr_analog_temperature_ff;
 
 
 process (clk, rst) begin
 if (rst = '1') then
-    csr_temperature_value_ff <= "0000000000000000"; -- 0x0
+    csr_analog_temperature_ff <= "000000000000"; -- 0x0
 elsif rising_edge(clk) then
-            csr_temperature_value_ff <= csr_temperature_value_in;
+            csr_analog_temperature_ff <= csr_analog_temperature_in;
 end if;
 end process;
 
@@ -361,70 +358,44 @@ end process;
 
 -----------------------
 -- Bit field:
--- TEMPERATURE(16) - EN - Enable the temperature measurement bloc
+-- ANALOG(23 downto 12) - VOLTAGE - Measured voltage
+-- access: ro, hardware: i
+-----------------------
+
+csr_analog_rdata(23 downto 12) <= csr_analog_voltage_ff;
+
+
+process (clk, rst) begin
+if (rst = '1') then
+    csr_analog_voltage_ff <= "000000000000"; -- 0x0
+elsif rising_edge(clk) then
+            csr_analog_voltage_ff <= csr_analog_voltage_in;
+end if;
+end process;
+
+
+
+-----------------------
+-- Bit field:
+-- ANALOG(31) - EN - Enable continuous temperature and voltage measurements
 -- access: rw, hardware: o
 -----------------------
 
-csr_temperature_rdata(16) <= csr_temperature_en_ff;
+csr_analog_rdata(31) <= csr_analog_en_ff;
 
-csr_temperature_en_out <= csr_temperature_en_ff;
+csr_analog_en_out <= csr_analog_en_ff;
 
 process (clk, rst) begin
 if (rst = '1') then
-    csr_temperature_en_ff <= '0'; -- 0x0
+    csr_analog_en_ff <= '0'; -- 0x0
 elsif rising_edge(clk) then
-        if (csr_temperature_wen = '1') then
-            if (wstrb(2) = '1') then
-                csr_temperature_en_ff <= wdata(16);
+        if (csr_analog_wen = '1') then
+            if (wstrb(3) = '1') then
+                csr_analog_en_ff <= wdata(31);
             end if;
         else
-            csr_temperature_en_ff <= csr_temperature_en_ff;
+            csr_analog_en_ff <= csr_analog_en_ff;
         end if;
-end if;
-end process;
-
-
-
------------------------
--- Bit field:
--- TEMPERATURE(17) - START - Write '1' to start the temperature measure
--- access: wosc, hardware: o
------------------------
-
-csr_temperature_rdata(17) <= '0';
-
-csr_temperature_start_out <= csr_temperature_start_ff;
-
-process (clk, rst) begin
-if (rst = '1') then
-    csr_temperature_start_ff <= '0'; -- 0x0
-elsif rising_edge(clk) then
-        if (csr_temperature_wen = '1') then
-            if (wstrb(2) = '1') then
-                csr_temperature_start_ff <= wdata(17);
-            end if;
-        else
-            csr_temperature_start_ff <= '0';
-        end if;
-end if;
-end process;
-
-
-
------------------------
--- Bit field:
--- TEMPERATURE(18) - DONE - This field is set to '1' when the measure is done and ready to be read
--- access: ro, hardware: i
------------------------
-
-csr_temperature_rdata(18) <= csr_temperature_done_ff;
-
-
-process (clk, rst) begin
-if (rst = '1') then
-    csr_temperature_done_ff <= '0'; -- 0x0
-elsif rising_edge(clk) then
-            csr_temperature_done_ff <= csr_temperature_done_in;
 end if;
 end process;
 
@@ -1154,7 +1125,7 @@ elsif rising_edge(clk) then
         elsif raddr = std_logic_vector(to_unsigned(4, ADDR_W)) then -- 0x4
             rdata_ff <= csr_control_rdata;
         elsif raddr = std_logic_vector(to_unsigned(8, ADDR_W)) then -- 0x8
-            rdata_ff <= csr_temperature_rdata;
+            rdata_ff <= csr_analog_rdata;
         elsif raddr = std_logic_vector(to_unsigned(12, ADDR_W)) then -- 0xc
             rdata_ff <= csr_ring_rdata;
         elsif raddr = std_logic_vector(to_unsigned(16, ADDR_W)) then -- 0x10

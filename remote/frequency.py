@@ -1,10 +1,11 @@
 import regmap as OpenTRNG
 import fluart as Fluart
 import argparse
-from temperature import read_temperature
+import analog
+import time
 
 # Function for reading the frequency
-def read_frequency(reg, index):
+def read(reg, index):
 
 	# Select the ring and start the measurement
 	reg.freqctrl_bf.select = index
@@ -39,9 +40,9 @@ if __name__ == '__main__':
 	# Enable the RO
 	reg.ring_bf.en = 1 << args.index
 
-	# Enable the frequency counter and the temperature sensor
+	# Enable the frequency counter and analog sensors
 	reg.freqctrl_bf.en = 1
-	reg.temperature_bf.en = 1
+	reg.analog_bf.en = 1
 
 	# Read the results
 	count = 0
@@ -49,15 +50,17 @@ if __name__ == '__main__':
 		count += 1
 
 		# Read RO frequency and die temperature
-		freq = read_frequency(reg, args.index)
-		temp = read_temperature(reg)
+		frequency = read(reg, args.index)
+		temperature, voltage = analog.read(reg)
 
 		# Print the result
 		if not args.quiet:
-			print("Measured frequency for RO{:d}: {:f}MHz (overflow {:})".format(args.index, freq, reg.freqctrl_bf.overflow==1 if True else False))
-			print("Measured die temperature {:f}°C".format(temp))
+			print("Measured frequency for RO{:d}: {:f}MHz (overflow {:})".format(args.index, frequency, reg.freqctrl_bf.overflow==1 if True else False))
+			print("Temperature {:f}°C".format(temperature))
+			print("Voltage {:f}V".format(voltage))
 		else:
-			print(freq, temp)
+			print(time.time(), frequency, temperature, voltage)
 
 	# Disable all the ROs
 	reg.ring_bf.en = 0x00000000
+

@@ -54,46 +54,34 @@ class _RegControl:
         self._rmap._if.write(self._rmap.CONTROL_ADDR, rdata)
 
 
-class _RegTemperature:
+class _RegAnalog:
     def __init__(self, rmap):
         self._rmap = rmap
 
     @property
-    def value(self):
-        """Measured temperature value"""
-        rdata = self._rmap._if.read(self._rmap.TEMPERATURE_ADDR)
-        return (rdata >> self._rmap.TEMPERATURE_VALUE_POS) & self._rmap.TEMPERATURE_VALUE_MSK
+    def temperature(self):
+        """Measured temperature"""
+        rdata = self._rmap._if.read(self._rmap.ANALOG_ADDR)
+        return (rdata >> self._rmap.ANALOG_TEMPERATURE_POS) & self._rmap.ANALOG_TEMPERATURE_MSK
+
+    @property
+    def voltage(self):
+        """Measured voltage"""
+        rdata = self._rmap._if.read(self._rmap.ANALOG_ADDR)
+        return (rdata >> self._rmap.ANALOG_VOLTAGE_POS) & self._rmap.ANALOG_VOLTAGE_MSK
 
     @property
     def en(self):
-        """Enable the temperature measurement bloc"""
-        rdata = self._rmap._if.read(self._rmap.TEMPERATURE_ADDR)
-        return (rdata >> self._rmap.TEMPERATURE_EN_POS) & self._rmap.TEMPERATURE_EN_MSK
+        """Enable continuous temperature and voltage measurements"""
+        rdata = self._rmap._if.read(self._rmap.ANALOG_ADDR)
+        return (rdata >> self._rmap.ANALOG_EN_POS) & self._rmap.ANALOG_EN_MSK
 
     @en.setter
     def en(self, val):
-        rdata = self._rmap._if.read(self._rmap.TEMPERATURE_ADDR)
-        rdata = rdata & (~(self._rmap.TEMPERATURE_EN_MSK << self._rmap.TEMPERATURE_EN_POS))
-        rdata = rdata | (val << self._rmap.TEMPERATURE_EN_POS)
-        self._rmap._if.write(self._rmap.TEMPERATURE_ADDR, rdata)
-
-    @property
-    def start(self):
-        """Write '1' to start the temperature measure"""
-        return 0
-
-    @start.setter
-    def start(self, val):
-        rdata = self._rmap._if.read(self._rmap.TEMPERATURE_ADDR)
-        rdata = rdata & (~(self._rmap.TEMPERATURE_START_MSK << self._rmap.TEMPERATURE_START_POS))
-        rdata = rdata | (val << self._rmap.TEMPERATURE_START_POS)
-        self._rmap._if.write(self._rmap.TEMPERATURE_ADDR, rdata)
-
-    @property
-    def done(self):
-        """This field is set to '1' when the measure is done and ready to be read"""
-        rdata = self._rmap._if.read(self._rmap.TEMPERATURE_ADDR)
-        return (rdata >> self._rmap.TEMPERATURE_DONE_POS) & self._rmap.TEMPERATURE_DONE_MSK
+        rdata = self._rmap._if.read(self._rmap.ANALOG_ADDR)
+        rdata = rdata & (~(self._rmap.ANALOG_EN_MSK << self._rmap.ANALOG_EN_POS))
+        rdata = rdata | (val << self._rmap.ANALOG_EN_POS)
+        self._rmap._if.write(self._rmap.ANALOG_ADDR, rdata)
 
 
 class _RegRing:
@@ -370,16 +358,14 @@ class RegMap:
     CONTROL_CONDITIONING_POS = 1
     CONTROL_CONDITIONING_MSK = 0x1
 
-    # TEMPERATURE - Register for controling temperature measurement bloc
-    TEMPERATURE_ADDR = 0x0008
-    TEMPERATURE_VALUE_POS = 0
-    TEMPERATURE_VALUE_MSK = 0xffff
-    TEMPERATURE_EN_POS = 16
-    TEMPERATURE_EN_MSK = 0x1
-    TEMPERATURE_START_POS = 17
-    TEMPERATURE_START_MSK = 0x1
-    TEMPERATURE_DONE_POS = 18
-    TEMPERATURE_DONE_MSK = 0x1
+    # ANALOG - Control register for analog measurements (temperature and voltage)
+    ANALOG_ADDR = 0x0008
+    ANALOG_TEMPERATURE_POS = 0
+    ANALOG_TEMPERATURE_MSK = 0xfff
+    ANALOG_VOLTAGE_POS = 12
+    ANALOG_VOLTAGE_MSK = 0xfff
+    ANALOG_EN_POS = 31
+    ANALOG_EN_MSK = 0x1
 
     # RING - Ring-oscillator enable register (enable bits are active at '1')
     RING_ADDR = 0x000c
@@ -480,17 +466,17 @@ class RegMap:
         return _RegControl(self)
 
     @property
-    def temperature(self):
-        """Register for controling temperature measurement bloc"""
-        return self._if.read(self.TEMPERATURE_ADDR)
+    def analog(self):
+        """Control register for analog measurements (temperature and voltage)"""
+        return self._if.read(self.ANALOG_ADDR)
 
-    @temperature.setter
-    def temperature(self, val):
-        self._if.write(self.TEMPERATURE_ADDR, val)
+    @analog.setter
+    def analog(self, val):
+        self._if.write(self.ANALOG_ADDR, val)
 
     @property
-    def temperature_bf(self):
-        return _RegTemperature(self)
+    def analog_bf(self):
+        return _RegAnalog(self)
 
     @property
     def ring(self):
