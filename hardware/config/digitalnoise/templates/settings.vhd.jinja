@@ -9,6 +9,10 @@ use opentrng.constants.all;
 -- For more information look into the directory 'hardware/config/digitalnoise'.
 package settings is
 
+	-- System clock settings
+	constant SYSCLK_VCO: boolean := True;
+	constant SYSCLK_FREQ: natural := 100_000_000;
+	
 	-- Ring-oscillators settings
 	constant T: natural := {{ rings|length-1 }};
 	type len_array is array (0 to T) of natural;

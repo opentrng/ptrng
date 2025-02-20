@@ -13,7 +13,7 @@ set_false_path -to [get_ports uart_rxd_out]
 
 ## Clock signal
 set_property -dict { PACKAGE_PIN E3    IOSTANDARD LVCMOS33 } [get_ports { CLK100MHZ }]; #IO_L12P_T1_MRCC_35 Sch=gclk[100]
-create_clock -name sys_clk -period 10.00 -waveform {0 5} -add [get_ports { CLK100MHZ }]
+create_clock -name sys_clk -period 10.00 -waveform {0 5} -add [get_ports { CLK100MHZ, jb[2] }]
 
 ## Switches
 #set_property -dict { PACKAGE_PIN A8    IOSTANDARD LVCMOS33 } [get_ports { sw[0] }]; #IO_L12N_T1_MRCC_16 Sch=sw[0]
