@@ -73,17 +73,26 @@ begin
 				count <= (others => '0');
 			else
 				if wr = '1' and rd = '1' and count > 0 and count <= MAX_SIZE then
-					ram_block(conv_integer(write_address)) <= data_in;
 					write_address <= write_address + 1;
 					read_address <= read_address + 1;
 				elsif wr = '1' and count < MAX_SIZE then
-					ram_block(conv_integer(write_address)) <= data_in;
 					write_address <= write_address + 1;
 					count <= count + 1;
 				elsif rd = '1' and count > 0 then
 					read_address <= read_address + 1;
 					count <= count - 1;
 				end if;
+			end if;
+		end if;
+	end process;
+	
+	data: process (clk)
+	begin
+		if rising_edge(clk) then
+			if wr = '1' and rd = '1' and count > 0 and count <= MAX_SIZE then
+				ram_block(conv_integer(write_address)) <= data_in;
+			elsif wr = '1' and count < MAX_SIZE then
+				ram_block(conv_integer(write_address)) <= data_in;
 			end if;
 		end if;
 	end process;

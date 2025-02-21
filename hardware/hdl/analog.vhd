@@ -34,6 +34,8 @@ begin
 	begin
 		if reset = '1' then
 			den <= '0';
+			temperature <= (others => '0');
+			voltage <= (others => '0');
 		elsif rising_edge(clk) then
 			if enable = '1' then
 				den <= eoc;
@@ -45,9 +47,9 @@ begin
 					end if;
 				end if;
 			else
+				den <= '0';
 				temperature <= (others => '0');
 				voltage <= (others => '0');
-				den <= '0';
 			end if;
 		end if;
 	end process;

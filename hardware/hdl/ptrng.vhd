@@ -153,7 +153,19 @@ begin
 		conditioned_valid => conditioned_valid
 	);
 
-	-- Bypass the conditioner if disabled
+	-- Data to bypass the conditioner if disabled
+	process (clk)
+	begin
+		if rising_edge(clk) then
+			if conditioning = '1' then
+				intermediate_random_number <=  conditioned_number;
+			else
+				intermediate_random_number <= raw_random_number;
+			end if;
+		end if;
+	end process;
+	
+	-- Valid signal to bypass the conditioner if disabled
 	process (clk, reset)
 	begin
 		if reset = '1' then
@@ -163,10 +175,8 @@ begin
 				intermediate_random_valid <= '0';
 			else
 				if conditioning = '1' then
-					intermediate_random_number <=  conditioned_number;
 					intermediate_random_valid <= conditioned_valid;
 				else
-					intermediate_random_number <= raw_random_number;
 					intermediate_random_valid <= raw_random_valid;
 				end if;
 			end if;
@@ -188,7 +198,19 @@ begin
 		valid_out => packed_valid
 	);
 
-	-- Output selection
+	-- Data output selection
+	process (clk)
+	begin
+		if rising_edge(clk) then
+			if nopacking = '1' then
+				data <= intermediate_random_number;
+			else
+				data <=  packed_data;
+			end if;
+		end if;
+	end process;
+	
+	-- Valid output selection
 	process (clk, reset)
 	begin
 		if reset = '1' then
@@ -198,10 +220,8 @@ begin
 				valid <= '0';
 			else
 				if nopacking = '1' then
-					data <= intermediate_random_number;
 					valid <= intermediate_random_valid;
 				else
-					data <=  packed_data;
 					valid <= packed_valid;
 				end if;
 			end if;

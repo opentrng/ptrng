@@ -46,8 +46,18 @@ begin
 			digit_clk_tap <= digit_clk_tap(digit_clk_tap'Length-2 downto 0) & (clk_from and data_in_en);
 		end if;
 	end process;
-
+	
 	-- Sampling the data input
+	process (clk_to)
+	begin
+		if rising_edge(clk_to) then
+			if digit_clk_tap(1) = '0' and digit_clk_tap(0) = '1' then
+				data <= data_in;
+			end if;
+		end if;
+	end process;
+	
+	-- Generating an input valid signal
 	process (clk_to, reset)
 	begin
 		if reset = '1' then
@@ -57,7 +67,6 @@ begin
 				valid <= '0';
 			else
 				if digit_clk_tap(1) = '0' and digit_clk_tap(0) = '1' then
-					data <= data_in;
 					valid <= '1';
 				else
 					valid <= '0';

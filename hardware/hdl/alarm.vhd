@@ -46,9 +46,11 @@ begin
 	begin
 		if reset = '1' then
 			counter <= (others => '0');
+			value <= (others => '0');
 		elsif rising_edge(clk) then
 			if clear = '1' then
 				counter <= (others => '0');
+				value <= (others => '0');
 			else
 				-- In test mode increase the counter each RRN
 				if digitizer = TEST then

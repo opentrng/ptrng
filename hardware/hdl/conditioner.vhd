@@ -42,7 +42,7 @@ begin
 			previous <= (others => '0');
 			evenodd <= '0';
 			conditioned_valid <= '0';
-			
+			conditioned_number <= (others => '0');
 		elsif rising_edge(clk) then
 			if clear = '1' then
 				previous <= (others => '0');

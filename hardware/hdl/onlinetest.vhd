@@ -57,6 +57,7 @@ begin
 			cumsum_valid <= '0';
 		elsif rising_edge(clk) then
 			if clear = '1' then
+				cumsum_value <= (others => '0');
 				cumsum_valid <= '0';
 			else
 				if raw_random_valid = '1' then

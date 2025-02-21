@@ -45,6 +45,7 @@ begin
 			pipe <= '0';
 		elsif rising_edge(clk) then
 			if clear = '1' then
+				counter <= (others => '0');
 				pipe <= '0';
 			else
 				if valid_in = '1' then
@@ -75,6 +76,7 @@ begin
 	process (clk, reset)
 	begin
 		if reset = '1' then
+			data_out <= (others => '0');
 			valid_out <= '0';
 		elsif rising_edge(clk) then
 			if clear = '1' then

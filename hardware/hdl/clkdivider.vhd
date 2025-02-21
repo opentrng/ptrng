@@ -36,7 +36,7 @@ begin
 	begin
 		if reset = '1' then
 			divider <= (others => '0');
-		elsif changed = '1' then
+		elsif rising_edge(changed) then
 			divider <= factor;
 		end if;
 	end process;
