@@ -108,6 +108,8 @@ begin
 			data => digit_data(15 downto 0),
 			valid => digit_valid
 		);
+		
+		digit_data(RAND_WIDTH-1 downto 16) <= (others => '0');
 
 	-- Stub for inactive digitizer
 	else generate
