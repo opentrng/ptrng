@@ -35,6 +35,8 @@ reg.control_bf.conditioning = 0
 # Disable the bit packer for 'lsb' and 'word' mode
 if args.mode == 'lsb' or args.mode == 'word':
 	reg.fifoctrl_bf.nopacking = 1
+else:
+	reg.fifoctrl_bf.nopacking = 0
 
 # Set default read burst size
 if not args.single:
