@@ -47,7 +47,7 @@ begin
 		port map (
 			reset => reset,
 			original => osc(0),
-			factor => freqdivider_value,
+			divider => freqdivider_value,
 			changed => freqdivider_en,
 			divided => digit_clk
 		);

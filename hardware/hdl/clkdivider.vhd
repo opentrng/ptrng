@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
--- This entity is a simple linear clock divider. The 'factor' input can be in another clock domain than 'original' clock.
+-- This entity is a simple linear clock divider. The 'factor' input can be in another clock domain than 'original' clock but must be stable when 'changed' is low.
 entity clkdivider is
 	generic (
 		-- Maximum division factor width (default 32 bits)
@@ -14,7 +14,7 @@ entity clkdivider is
 		-- Input clock to be divided
 		original: in std_logic;
 		-- Division factor (1: no division, 2: division by 2,...)
-		factor: in std_logic_vector (FACTOR_WIDTH-1 downto 0);
+		divider: in std_logic_vector (FACTOR_WIDTH-1 downto 0);
 		-- Enable strobed when divisor factor changes
 		changed: in std_logic;
 		-- Divided output clock
@@ -25,26 +25,15 @@ end entity;
 -- The pulse divider can divide the clock by factors in interval [1, 2^FACTOR_WIDTH[ with a non balanced duty cycle.
 architecture pulse of clkdivider is
 
-	signal divider: std_logic_vector (FACTOR_WIDTH-1 downto 0);
 	signal counter: std_logic_vector (FACTOR_WIDTH-1 downto 0);
 	signal pulse: std_logic;
 
 begin
 
-	-- Latch the division factor when reset of changed
-	process (reset, changed)
-	begin
-		if reset = '1' then
-			divider <= (others => '0');
-		elsif rising_edge(changed) then
-			divider <= factor;
-		end if;
-	end process;
-
 	-- Create the pulse when counter is equal to 1
-	process (original, reset)
+	process (original, reset, changed)
 	begin
-		if reset = '1' then
+		if reset = '1' or changed = '1' then
 			counter <= (others => '0');
 			pulse <= '0';
 		elsif rising_edge(original) then

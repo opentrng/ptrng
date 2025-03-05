@@ -47,7 +47,7 @@ begin
 	port map (
 		reset => reset,
 		original => ro0,
-		factor => divider,
+		divider => divider,
 		changed => changed,
 		divided => ro0_div
 	);
