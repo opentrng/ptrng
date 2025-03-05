@@ -113,7 +113,7 @@ begin
 	else generate
 		digit_clk <= '0';
 		digit_data <= (others => '0');
-		digit_valid <= '1';
+		digit_valid <= '0';
 	end generate;
 
 end architecture;

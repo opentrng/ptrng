@@ -131,7 +131,7 @@ begin
 	);
 
 	-- Register map
-	regmap: entity work.regmap
+	regmap: entity opentrng.regmap
 	port map (
 		clk => clk,
 		rst => hw_reset,
@@ -182,7 +182,7 @@ begin
 	);
 
 	-- Internal temperature and voltage sensor
-	analog: entity work.analog
+	analog: entity opentrng.analog
 	port map (
 		clk => clk,
 		reset => hw_reset,

@@ -73,7 +73,7 @@ while count < args.count or args.count == -1:
 			file.write("{:d}\n".format(word))
 			count += 1
 	if reg.fifoctrl_bf.full == 1:
-		print("WARNING: FIFO full, data are not contiguous!")
+		print("WARNING: FIFO has become full!")
 
 # Disable all ring oscillators
 reg.ring_bf.en = 0x00000000

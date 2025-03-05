@@ -205,7 +205,7 @@ begin
 			if nopacking = '1' then
 				data <= intermediate_random_number;
 			else
-				data <=  packed_data;
+				data <= packed_data;
 			end if;
 		end if;
 	end process;
