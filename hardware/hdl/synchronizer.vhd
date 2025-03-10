@@ -56,21 +56,23 @@ begin
 	);
 	
 	ready <= not almost_empty;
+	
+	-- Generate a sychronizer error when FIFO is full
 
 	-- Read the FIFO is there is any available data
 	process (clk_to, reset)
 	begin
 		if reset = '1' then
 			read_en <= '0';
-			data_out_en <= '0';
 		elsif rising_edge(clk_to) then
 			if ready = '1' then
 				read_en <= '1';
 			else
 				read_en <= '0';
 			end if;
-			data_out_en <= read_en;
 		end if;
 	end process;
+	
+	data_out_en <= read_en;
 
 end architecture;

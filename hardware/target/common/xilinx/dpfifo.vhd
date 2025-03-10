@@ -7,7 +7,7 @@ use UNISIM.vcomponents.all;
 library UNIMACRO;
 use unimacro.Vcomponents.all;
 
--- Dual port FIFO for Xilinx series 7.
+-- Show ahead Dual port FIFO for Xilinx series 7. Show ahead means that first data is always available on the output port, read fetches next.
 entity dpfifo is
 	generic (
 		-- With of data ports
@@ -66,12 +66,12 @@ begin
 
 	FIFO_DUALCLOCK_MACRO_inst : FIFO_DUALCLOCK_MACRO
 	generic map (
-		DEVICE => "7SERIES",            -- Target Device: "VIRTEX5", "VIRTEX6", "7SERIES"
-		ALMOST_FULL_OFFSET => X"0008",  -- Sets almost full threshold
-		ALMOST_EMPTY_OFFSET => X"0008", -- Sets the almost empty threshold
-		DATA_WIDTH => DATA_WIDTH,       -- Valid values are 1-72 (37-72 only valid when FIFO_SIZE="36Kb")
-		FIFO_SIZE => "36Kb",            -- Target BRAM, "18Kb" or "36Kb"
-		FIRST_WORD_FALL_THROUGH => FALSE) -- Sets the FIFO FWFT to TRUE or FALSE
+		DEVICE => "7SERIES",             -- Target Device: "VIRTEX5", "VIRTEX6", "7SERIES"
+		ALMOST_FULL_OFFSET => X"0008",   -- Sets almost full threshold
+		ALMOST_EMPTY_OFFSET => X"0008",  -- Sets the almost empty threshold
+		DATA_WIDTH => DATA_WIDTH,        -- Valid values are 1-72 (37-72 only valid when FIFO_SIZE="36Kb")
+		FIFO_SIZE => "36Kb",             -- Target BRAM, "18Kb" or "36Kb"
+		FIRST_WORD_FALL_THROUGH => TRUE) -- Sets the FIFO FWFT to TRUE or FALSE
 	port map (
 		ALMOSTEMPTY => almost_empty,  -- 1-bit output almost empty
 		ALMOSTFULL => almost_full,    -- 1-bit output almost full
