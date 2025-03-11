@@ -26,8 +26,7 @@ end entity;
 -- This architecture implements the RTL version of COSO measuring full period of beat signal with counter reset on beat signal rising edges.
 architecture rtl of coso is
 
-	signal beat: std_logic := '0';
-	signal prev: std_logic := '0';
+	signal beat_d0, beat_d1: std_logic := '0';
 	constant MAX: std_logic_vector (DATA_WIDTH-1 downto 0) := (others => '1');
 	signal counter: std_logic_vector (DATA_WIDTH-1 downto 0);
 	signal value: std_logic_vector (DATA_WIDTH-1 downto 0);
@@ -38,8 +37,8 @@ begin
 	process (ro0)
 	begin
 		if rising_edge(ro0) then
-			beat <= ro1;
-			prev <= beat;
+			beat_d0 <= ro1;
+			beat_d1 <= beat_d0;
 		end if;
 	end process;
 
@@ -47,7 +46,7 @@ begin
 	process (ro0)
 	begin
 		if rising_edge(ro0) then
-			if beat = '1' and prev = '0' then
+			if beat_d0 = '1' and beat_d1 = '0' then
 				counter <= (others => '0');
 			else
 				if counter < MAX then
@@ -58,15 +57,17 @@ begin
 	end process;
 
 	-- Resample the value of the counter
-	process (beat)
+	process (ro0)
 	begin
-		if rising_edge(beat) then
-			value <= counter;
+		if rising_edge(ro0) then
+			if beat_d0 = '1' and beat_d1 = '0' then
+				value <= counter;
+			end if;
 		end if;
 	end process;
 	
 	-- Output LSB and raw signals synchronized to the beat
-	clk <= beat;
+	clk <= beat_d0;
 	lsb <= value(0);
 	data <= value;
 	valid <= '1';
