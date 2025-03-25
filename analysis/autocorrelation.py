@@ -5,7 +5,7 @@ import math
 import binutils
 
 # Compute the autocorrelation on the signal
-def autocorr(samples, depth):
+def compute(samples, depth):
 	assert depth <= samples.size/2
 	lags = range(1, depth)
 	result = np.array([np.count_nonzero(np.equal(samples, np.roll(samples, lag)) == True)/samples.size for lag in lags])
@@ -28,7 +28,7 @@ if __name__ == '__main__':
 	bits = np.unpackbits(data)
 
 	# Compute the autocorrelation
-	lags, acf = autocorr(binutils.to_words(bits, args.n), args.depth)
+	lags, acf = compute(binutils.to_words(bits, args.n), args.depth)
 
 	# Plot the autocorrelation
 	plt.title(args.title)
