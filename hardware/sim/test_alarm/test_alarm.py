@@ -58,7 +58,7 @@ async def coso_failure(dut):
 	dut.digitizer.value = 3
 	dut.threshold.value = 10
 	dut.raw_random_number.value = 0
-	dut.raw_random_valid.value = 1
+	dut.raw_random_valid.value = 0
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
 	await Signal.PulseBit(dut.clear, dut.clk)

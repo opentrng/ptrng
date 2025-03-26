@@ -57,7 +57,7 @@ begin
 	
 	ready <= not almost_empty;
 	
-	-- Generate a sychronizer error when FIFO is full
+	-- TODO generate a sychronizer error when FIFO is full
 
 	-- Read the FIFO is there is any available data
 	process (clk_to, reset)

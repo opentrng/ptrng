@@ -6,7 +6,7 @@ import signaltools as Signal
 @cocotb.test()
 async def test_division_by_zero(dut):
 	cycles = 1000
-	dut.factor.value = 0
+	dut.divider.value = 0
 	await cocotb.start(Clock(dut.original, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
 	await Signal.PulseBit(dut.changed, dut.original)
@@ -18,7 +18,7 @@ async def do_division_by_n(dut, n):
 	original_period = 10
 	wait = 5
 	cycles = 1000
-	dut.factor.value = n
+	dut.divider.value = n
 	await cocotb.start(Clock(dut.original, original_period, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")
 	await Signal.PulseBit(dut.changed, dut.original)
