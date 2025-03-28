@@ -16,7 +16,7 @@ def read(reg, index):
 		True
 
 	# Return the measured frequency
-	return reg.freqvalue_bf.value / 200_000
+	return reg.freqvalue_bf.value / 100_000
 
 # Execute when the module is not initialized from an import statement
 if __name__ == '__main__':
