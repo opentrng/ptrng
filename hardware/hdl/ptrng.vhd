@@ -37,6 +37,8 @@ entity ptrng is
 		freqdivider_value: in std_logic_vector (REG_WIDTH-1 downto 0);
 		-- Enable strobing when frequency divider changes
 		freqdivider_en: in std_logic;
+		-- Clear the synchronizer data pipeline
+		synchronizer_clear: in std_logic;
 		-- Threshold for triggering the total failure alarm
 		alarm_threshold: in std_logic_vector(REG_WIDTH-1 downto 0);
 		-- Total failure alarm, risen to '1' when total failure event is detected
@@ -98,6 +100,7 @@ begin
 		freqcount_value => freqcount_value,
 		freqdivider_value => freqdivider_value,
 		freqdivider_en => freqdivider_en,
+		synchronizer_clear => synchronizer_clear,
 		data => raw_random_number,
 		valid => raw_random_valid
 	);

@@ -210,6 +210,7 @@ begin
 		freqcount_value => freqcount_value,
 		freqdivider_value => freqdivider_value,
 		freqdivider_en => freqdivider_en,
+		synchronizer_clear => fifo_clear,
 		alarm_threshold => alarm_threshold,
 		alarm_detected => alarm_detected,
 		onlinetest_clear => onlinetest_clear,
