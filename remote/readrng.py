@@ -9,6 +9,7 @@ parser.add_argument("-d", dest="div", required=False, type=int, default=1, help=
 parser.add_argument("-c", dest="count", required=False, type=int, default=-1, help="number of data to read (-1 is infinite, default)")
 parser.add_argument("-m", dest="mode", required=True, type=str, choices=['lsb', 'bits', 'word'], help="read mode for FIFO data")
 parser.add_argument("-s", "--single", action='store_true', default=False, help="do not read data in burst mode")
+parser.add_argument("-q", "--quiet", action='store_true', help="quiet mode, do not display warning messages")
 parser.add_argument("file", type=str, help="output data file (text)")
 args=parser.parse_args()
 
@@ -72,7 +73,7 @@ while count < args.count or args.count == -1:
 		else:
 			file.write("{:d}\n".format(word))
 			count += 1
-	if reg.fifoctrl_bf.full == 1:
+	if not args.quiet and reg.fifoctrl_bf.full == 1:
 		print("WARNING: FIFO has become full!")
 
 # Disable all ring oscillators
