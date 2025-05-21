@@ -44,9 +44,11 @@ if not args.single:
 	burstsize = reg.fifoctrl_bf.burstsize
 	print("Burst size: {:d} words (32bit)".format(burstsize))
 
-# Clear the FIFO and enable all ring oscillators
-reg.fifoctrl_bf.clear = 1
+# Enable all ring oscillators
 reg.ring_bf.en = 0xFFFFFFFF
+
+# Clear the FIFO
+reg.fifoctrl_bf.clear = 1
 
 # Read words
 count = 0

@@ -38,8 +38,6 @@ entity digitalnoise is
 		freqdivider_value: in std_logic_vector (REG_WIDTH-1 downto 0);
 		-- Enable strobing when frequency divider changes
 		freqdivider_en: in std_logic;
-		-- Clear the synchronizer data pipeline
-		synchronizer_clear: in std_logic;
 		-- Raw Random Number output data (RRN)
 		data: out std_logic_vector (RAND_WIDTH-1 downto 0);
 		-- RRN data output valid
@@ -126,6 +124,7 @@ begin
 	)
 	port map (
 		reset => reset,
+		clear => clear,
 		osc => osc,
 		freqdivider_value => freqdivider_value,
 		freqdivider_en => freqdivider_en,
@@ -146,7 +145,7 @@ begin
 		data_in => digit_data,
 		data_in_en => digit_valid,
 		clk_to => clk,
-		clear => clear or synchronizer_clear,
+		clear => clear,
 		data_out => data,
 		data_out_en => valid
 	);

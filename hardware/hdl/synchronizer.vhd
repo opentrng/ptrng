@@ -33,8 +33,8 @@ end entity;
 -- RTL implemenation of the resynchronizer for a vector.
 architecture rtl of synchronizer is
 
+	signal empty: std_logic;
 	signal almost_empty: std_logic;
-	signal ready: std_logic;
 	signal read_en: std_logic;
 
 begin
@@ -52,10 +52,9 @@ begin
 		rd_clk => clk_to,
 		rd_data => data_out,
 		rd_en => read_en,
+		empty => empty,
 		almost_empty => almost_empty
 	);
-	
-	ready <= not almost_empty;
 	
 	-- TODO generate a sychronizer error when FIFO is full
 
@@ -65,10 +64,14 @@ begin
 		if reset = '1' then
 			read_en <= '0';
 		elsif rising_edge(clk_to) then
-			if ready = '1' then
-				read_en <= '1';
-			else
+			if clear = '1' then
 				read_en <= '0';
+			else
+				if empty = '0' and almost_empty = '0' then
+					read_en <= '1';
+				else
+					read_en <= '0';
+				end if;
 			end if;
 		end if;
 	end process;

@@ -17,6 +17,8 @@ entity digitizer is
 	port (
 		-- Asynchronous reset
 		reset: in std_logic;
+		-- Synchronous clear active to '1'
+		clear: in std_logic;
 		-- Ring-oscillator inputs
 		osc: in std_logic_vector (T downto 0);
 		-- Sampling clock divider value (applies on RO0 for ERO and MURO)
@@ -51,9 +53,11 @@ begin
 			changed => freqdivider_en,
 			divided => digit_clk
 		);
-		process (digit_clk)
+		process (reset, clear, digit_clk)
 		begin
-			if rising_edge(digit_clk) then
+			if reset = '1' or clear = '1' then
+				counter <= (others => '0');
+			elsif rising_edge(digit_clk) then
 				counter <= counter + 1;
 			end if;
 		end process;
