@@ -1,9 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
-
-library opentrng;
-use opentrng.settings.all;
+use work.settings.all;
 
 -- Wrapper entity for top on target board Digilent Arty A7 35T.
 entity target is

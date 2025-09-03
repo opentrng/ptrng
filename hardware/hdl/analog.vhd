@@ -55,7 +55,7 @@ begin
 	end process;
 
 	-- Instantiate the ADC for temperature and voltage measurements
-	adc: entity opentrng.adc
+	adc: entity work.adc
 	port map (
 		dclk_in => clk,
 		reset_in => reset,

@@ -23,9 +23,9 @@ set custom "${hardware}/lib/custom"
 # Set VHDL source files into a list
 source "${hardware}/target/fpga/hdl_files.tcl"
 lappend hdl_files [list "work" [file normalize "${boardname}/target.vhd"]]
-lappend hdl_files [list "opentrng" [file normalize "${hardware}/target/common/xilinx/adc.vhd"]]
-lappend hdl_files [list "opentrng" [file normalize "${hardware}/target/common/xilinx/ring.vhd"]]
-lappend hdl_files [list "opentrng" [file normalize "${hardware}/target/common/xilinx/dpfifo.vhd"]]
+lappend hdl_files [list "work" [file normalize "${hardware}/target/common/xilinx/adc.vhd"]]
+lappend hdl_files [list "work" [file normalize "${hardware}/target/common/xilinx/ring.vhd"]]
+lappend hdl_files [list "work" [file normalize "${hardware}/target/common/xilinx/dpfifo.vhd"]]
 
 # If custom HDL files exist add them to the list
 if { [file exists "${custom}/hdl_files.tcl"] == 1} {

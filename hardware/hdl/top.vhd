@@ -129,7 +129,7 @@ begin
 	);
 
 	-- Register map
-	regmap: entity opentrng.regmap
+	regmap: entity work.regmap
 	port map (
 		clk => clk,
 		rst => hw_reset,
@@ -180,7 +180,7 @@ begin
 	);
 
 	-- Internal temperature and voltage sensor
-	analog: entity opentrng.analog
+	analog: entity work.analog
 	port map (
 		clk => clk,
 		reset => hw_reset,
@@ -190,7 +190,7 @@ begin
 	);
 
 	-- Physical True Random Number Generator wrapped on the register map
-	ptrng: entity opentrng.ptrng
+	ptrng: entity work.ptrng
 	generic map (
 		REG_WIDTH => DATA_WIDTH,
 		RAND_WIDTH => DATA_WIDTH
@@ -221,7 +221,7 @@ begin
 	);
 
 	-- FIFO
-	fifo_to_uart: entity opentrng.fifo
+	fifo_to_uart: entity work.fifo
 	generic map (
 		SIZE => FIFO_SIZE,
 		ALMOST_EMPTY_SIZE => BURST_SIZE,

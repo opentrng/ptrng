@@ -38,7 +38,7 @@ architecture rtl of synchronizer is
 begin
 
 	-- Dual port FIFO
-	dpfifo: entity opentrng.dpfifo
+	dpfifo: entity work.dpfifo
 	generic map (
 		DATA_WIDTH => DATA_WIDTH
 	)
