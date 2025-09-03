@@ -1,4 +1,4 @@
-VHDL_SOURCES_opentrng += ../../hdl/ero.vhd ../../hdl/clkdivider.vhd
+VHDL_SOURCES += ../../hdl/ptrng/ero.vhd ../../hdl/ptrng/clkdivider.vhd
 TOPLEVEL = ero
 MODULE = test_ero
 

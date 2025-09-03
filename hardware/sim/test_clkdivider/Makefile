@@ -1,4 +1,4 @@
-VHDL_SOURCES_opentrng += ../../hdl/clkdivider.vhd
+VHDL_SOURCES += ../../hdl/ptrng/clkdivider.vhd
 TOPLEVEL = clkdivider
 MODULE = test_clkdivider
 

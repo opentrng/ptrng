@@ -2,8 +2,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
-library opentrng;
-
 -- Read analog temperature and voltage from an ADC (many FPGA have internal sensors).
 entity analog is
 	port (

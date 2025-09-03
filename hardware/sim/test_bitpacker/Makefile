@@ -1,4 +1,4 @@
-VHDL_SOURCES_opentrng += ../../hdl/bitpacker.vhd
+VHDL_SOURCES += ../../hdl/ptrng/bitpacker.vhd
 TOPLEVEL = bitpacker
 MODULE = test_bitpacker
 

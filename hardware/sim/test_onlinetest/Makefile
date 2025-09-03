@@ -1,4 +1,4 @@
-VHDL_SOURCES += ../../hdl/onlinetest.vhd ../../target/common/generic/fifo.vhd
+VHDL_SOURCES += ../../hdl/ptrng/onlinetest.vhd ../../target/common/generic/fifo.vhd
 
 TOPLEVEL = onlinetest
 MODULE = test_onlinetest

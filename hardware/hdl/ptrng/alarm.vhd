@@ -1,9 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
-
-library opentrng;
-use opentrng.constants.all;
+use work.constants.all;
 
 -- Total failure alarm on RRN. The total failure detection method depends on the digitizer type, the detection it triggered when the internal counter is greater or equal than the input threshold parameter.
 entity alarm is

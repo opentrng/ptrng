@@ -2,8 +2,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
-library opentrng;
-
 -- Vector clock domain crossing. Resynchronize a vector from source clock to destination clock with an dual port FIFO.
 entity synchronizer is
 	generic (

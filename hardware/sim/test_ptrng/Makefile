@@ -1,6 +1,4 @@
-VHDL_SOURCES += ../../hdl/ptrng.vhd
-VHDL_SOURCES_opentrng += digitalnoise_stub.vhd
-VHDL_SOURCES_opentrng +=  ../../target/common/generic/fifo.vhd ../../hdl/bitpacker.vhd ../../hdl/alarm.vhd ../../hdl/onlinetest.vhd ../../hdl/conditioner.vhd ../../config/digitalnoise/constants.vhd ../../config/digitalnoise/settings.vhd
+VHDL_SOURCES += ../../hdl/ptrng/ptrng.vhd digitalnoise_stub.vhd ../../target/common/generic/fifo.vhd ../../hdl/ptrng/bitpacker.vhd ../../hdl/ptrng/alarm.vhd ../../hdl/ptrng/onlinetest.vhd ../../hdl/ptrng/conditioner.vhd ../../config/digitalnoise/constants.vhd ../../config/digitalnoise/settings.vhd
 
 TOPLEVEL = ptrng
 MODULE = test_ptrng

@@ -2,8 +2,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library opentrng;
-
 -- Top for testing the PTRNG by writing configuration registers and reading data into a FIFO through an UART.
 entity top is
 	generic (

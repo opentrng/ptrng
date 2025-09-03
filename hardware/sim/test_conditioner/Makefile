@@ -1,4 +1,4 @@
-VHDL_SOURCES_opentrng += ../../hdl/conditioner.vhd
+VHDL_SOURCES += ../../hdl/ptrng/conditioner.vhd
 TOPLEVEL = conditioner
 MODULE = test_conditioner
 

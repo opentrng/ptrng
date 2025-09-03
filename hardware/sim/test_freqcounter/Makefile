@@ -1,4 +1,4 @@
-VHDL_SOURCES_opentrng += ../../hdl/freqcounter.vhd
+VHDL_SOURCES += ../../hdl/ptrng/freqcounter.vhd
 TOPLEVEL = freqcounter
 MODULE = test_freqcounter
 

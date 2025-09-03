@@ -1,9 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
-
-library opentrng;
-use opentrng.settings.all;
+use work.settings.all;
 
 -- The digital noise block generates the raw random numbers (RRN). This block contains the ring-oscillators, their sampling architecture and the clock domain crossing to the system clock in order the RRN to be used in the upper design.
 entity digitalnoise is
@@ -70,7 +68,7 @@ begin
 	bank: for I in 0 to T generate
 	
 		-- Each RO of the bank (or system clock bypass for tests)
-		ring: entity opentrng.ring
+		ring: entity work.ring
 		generic map (
 			N => RO_LEN(I)
 		)
@@ -97,7 +95,7 @@ begin
 	end generate;
 
 	-- One frequency counter for all ROs
-	freqcounter: entity opentrng.freqcounter
+	freqcounter: entity work.freqcounter
 	generic map (
 		REG_WIDTH => REG_WIDTH,
 		N => 10_000_000
@@ -117,7 +115,7 @@ begin
 	selected_mon <= mon(conv_integer(freqcount_select));
 
 	-- Digitizer 
-	digitizer: entity opentrng.digitizer
+	digitizer: entity work.digitizer
 	generic map (
 		REG_WIDTH => REG_WIDTH,
 		RAND_WIDTH => RAND_WIDTH
@@ -135,7 +133,7 @@ begin
 	);
 
 	-- Clock domain crossing from osc(0) to system clock (clk)
-	cdc: entity opentrng.synchronizer
+	cdc: entity work.synchronizer
 	generic map (
 		DATA_WIDTH => RAND_WIDTH
 	)

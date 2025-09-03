@@ -1,4 +1,4 @@
-VHDL_SOURCES_opentrng += ../../hdl/coso.vhd
+VHDL_SOURCES += ../../hdl/ptrng/coso.vhd
 TOPLEVEL = coso
 MODULE = test_coso
 

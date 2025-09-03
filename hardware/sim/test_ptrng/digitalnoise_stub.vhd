@@ -20,7 +20,6 @@ entity digitalnoise is
 		freqcount_value: out std_logic_vector (REG_WIDTH-1 downto 0);
 		freqdivider_value: in std_logic_vector (REG_WIDTH-1 downto 0);
 		freqdivider_en: in std_logic;
-		synchronizer_clear: in std_logic;
 		data: out std_logic_vector (RAND_WIDTH-1 downto 0);
 		valid: out std_logic
 	);
