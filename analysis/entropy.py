@@ -30,7 +30,8 @@ def markov(bits):
 	P = np.zeros((2, 2))
 	for i in range(1, bits.size):
 		P[bits[i-1], bits[i]] += 1
-	P /= bits.size/2
+	P[0,:] /= counts[0] if bits[0] == 0 else counts[0]-1
+	P[1,:] /= counts[1] if bits[0] == 1 else counts[1]-1
 	probabilities = np.array([
 		P0*P[0,0]**127,
 		P0*P[0,1]**64*P[1,0]**63,
