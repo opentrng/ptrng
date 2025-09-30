@@ -27,7 +27,7 @@ entity dpfifo is
 		-- Ouput data, sync to 'rd_clk'
 		rd_data: out std_logic_vector (DATA_WIDTH-1 downto 0);
 		-- Read enable
-		rd_en: out std_logic;
+		rd_en: in std_logic;
 		-- Empty flag
 		empty: out std_logic;
 		-- Full flag
