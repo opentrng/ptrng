@@ -24,7 +24,7 @@ entity adc is
 		vp_in           : in  STD_LOGIC;                         -- Dedicated Analog Input Pair
 		vn_in           : in  STD_LOGIC
 	);
-end;
+end entity;
 
 architecture xilinx of adc is
 
@@ -142,5 +142,5 @@ begin
 		VP                  => vp_in
 	);
 
-end;
+end architecture;
 

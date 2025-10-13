@@ -17,6 +17,7 @@ async def test_count_frequency(dut):
 	await Signal.PulseBit(dut.clear, dut.clk)
 	await Signal.PulseBit(dut.start, dut.clk)
 	await RisingEdge(dut.done)
+	await RisingEdge(dut.clk)
 	assert dut.result.value == 30, "Wrong measured frequency, result should be 30"
 	await Signal.Skip(dut.clk, 10)
 
@@ -32,6 +33,7 @@ async def test_counter_overflow(dut):
 	await Signal.Skip(dut.clk, 100)
 	dut.counter.value = Deposit((2**24)-1)
 	await RisingEdge(dut.done)
+	await RisingEdge(dut.clk)
 	assert dut.overflow.value == 1, "The counter overflow has not been detected"
 	dut.counter.value = Deposit(0)
 	await Signal.Skip(dut.clk, 10)
@@ -48,6 +50,7 @@ async def test_duration_overflow(dut):
 	await Signal.Skip(dut.clk, 100)
 	dut.duration.value = Deposit(1001)
 	await RisingEdge(dut.done)
+	await RisingEdge(dut.clk)
 	assert dut.overflow.value == 1, "The duration overflow has not been detected"
 	dut.duration.value = Deposit(0)
 	await Signal.Skip(dut.clk, 10)

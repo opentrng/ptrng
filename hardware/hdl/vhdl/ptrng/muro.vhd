@@ -32,7 +32,7 @@ end entity;
 -- This architecture implements the RTL version of the MURO.
 architecture rtl of muro is
 
-	signal ro0_div: std_logic := '0';
+	signal ro0_div: std_logic;
 	signal sampled: std_logic_vector (t downto 1);
 
 begin

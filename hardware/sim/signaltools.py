@@ -26,6 +26,6 @@ async def NoisyClock(signal, frequency):
 		for period in periods:
 			half = int(period / 2)
 			signal.value = 1
-			await Timer(half, units="fs")
+			await Timer(half, units="ps")
 			signal.value = 0
-			await Timer(period-half, units="fs")
+			await Timer(period-half, units="ps")

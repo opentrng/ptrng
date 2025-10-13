@@ -78,6 +78,8 @@ begin
 			data => digit_data(0),
 			valid => digit_valid
 		);
+		
+		digit_data(RAND_WIDTH-1 downto 1) <= (others => '0');
 
 	-- Instantiate the MURO
 	elsif DIGITIZER_GEN = MURO generate
@@ -96,6 +98,8 @@ begin
 			data => digit_data(0),
 			valid => digit_valid
 		);
+		
+		digit_data(RAND_WIDTH-1 downto 1) <= (others => '0');
 
 	-- Instantiate the COSO
 	elsif DIGITIZER_GEN = COSO generate

@@ -1,0 +1,7 @@
+# Modify the $PRODUCT path to target the right directory
+
+export PRODUCT="~/design/opentrng/trunk/ptrng/"
+export DESIGN_NAME="ptrng"
+fm_shell -f $PRODUCT/hardware/hdl/proof/tools/fm.tcl | tee fm_rtl_vhdl2rtl_verilog.log
+export DESIGN_NAME="ring"
+fm_shell -f $PRODUCT/hardware/hdl/proof/tools/fm.tcl | tee fm_ring_rtl_vhdl2rtl_verilog.log

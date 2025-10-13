@@ -1,0 +1,70 @@
+**************************************************
+Report         : unread_endpoints
+                 -all 
+
+Reference      : r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32
+Implementation : i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32
+Version        : V-2023.12-SP4
+Date           : Wed Sep 17 14:35:37 2025
+**************************************************
+
+Following 56 blocking objects identified in the fanout:
+
+    (Pin )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/source/cdc/dpfifo/almost_full  (no reader)
+    (Pin )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/source/cdc/dpfifo/full  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[10]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[11]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[12]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[13]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[14]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[15]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[16]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[17]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[18]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[19]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[20]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[21]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[22]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[23]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[24]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[25]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[26]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[27]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[28]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[29]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[30]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[31]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[6]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[7]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[8]  (no reader)
+    (Net )  r:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[9]  (no reader)
+    (Pin )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/i_digitalnoise/i_synchronizer/i_dpfifo/almost_full  (no reader)
+    (Pin )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/i_digitalnoise/i_synchronizer/i_dpfifo/full  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[10]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[11]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[12]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[13]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[14]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[15]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[16]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[17]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[18]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[19]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[20]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[21]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[22]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[23]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[24]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[25]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[26]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[27]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[28]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[29]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[30]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[31]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[6]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[7]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[8]  (no reader)
+    (Net )  i:/WORK/ptrng_REG_WIDTH32_RAND_WIDTH32/ring_en[9]  (no reader)
+
+

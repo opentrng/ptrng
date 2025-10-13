@@ -5,7 +5,7 @@ import signaltools as Signal
 
 @cocotb.test()
 async def default_failure(dut):
-	dut.digitizer.value = -1
+	dut.digitizer.value = (2**31)-1
 	dut.threshold.value = 0
 	await cocotb.start(Clock(dut.clk, 10, units="ns").start())
 	await Signal.SetBitDuring(dut.reset, 5, units="ns")

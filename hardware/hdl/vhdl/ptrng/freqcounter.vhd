@@ -36,10 +36,10 @@ end entity;
 architecture rtl of freqcounter is
 
 	constant MAX: std_logic_vector (REG_WIDTH-1 downto 0) := (others => '1');
-	signal counting: std_logic := '0';
+	signal counting: std_logic;
 	signal counter: std_logic_vector (REG_WIDTH-1 downto 0);
-	signal busy: std_logic := '0';
-	signal finished: std_logic := '0';
+	signal busy: std_logic;
+	signal finished: std_logic;
 	signal duration: std_logic_vector (REG_WIDTH-1 downto 0);
 
 begin

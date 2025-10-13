@@ -1,0 +1,1 @@
+Note: To select which design architecture is used (vhdl or verilog) when a python cocotb test is lauched, you should modify the "SIM" and "TOPLEVEL_LANG" variable environement in the "config.mk" file.
