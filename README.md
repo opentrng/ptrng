@@ -14,7 +14,7 @@ With **OpenTRNG**, you can:
 Find more about OpenTRNG on [opentrng.org](https://opentrng.org) and read the [documentation](https://opentrng.org/docs).
 
 > [!WARNING]
-> The OpenTRNG project provides reference TRNG/PTRNG implementations as described in scientific literature. The source code is released for academic and research purposes only. Compliance with verification or certification standards is not guaranteed, and the code must not be used as is in products. Any misuse or unintended application is beyond the responsibility of CEA.
+> The OpenTRNG project provides reference TRNG/PTRNG implementations as described in scientific literature. The source code is released for academic and research purposes only. Compliance with verification or certification standards is not guaranteed, and the code must not be used as is in products. Any misuse or unintended application is beyond the responsibility of contributors.
 
 If you plan to integrate a Random Number Generator (RNG) into a product, feel free to [contact us](https://opentrng.org/contact).
 
@@ -22,6 +22,6 @@ If you plan to integrate a Random Number Generator (RNG) into a product, feel fr
 
 The **OpenTRNG** project is distributed under the MIT license.
 
-Contributions and pull requests are welcome! All submissions will be reviewed before being merged, please note that no specific integration timelines can be guaranteed. The project is actively maintained by [CEA](https://www.cea.fr/english)-[Leti](https://www.leti-cea.com/cea-tech/leti/english/Pages/Applied-Research/Facilities/cyber-security-platform.aspx).
+[Contributions](https://opentrng.org/contributors) and pull requests are welcome! All submissions will be reviewed before being merged, please note that no specific integration timelines can be guaranteed. The project is actively maintained by [CEA](https://www.cea.fr/english)-[Leti](https://www.leti-cea.com/cea-tech/leti/english/Pages/Applied-Research/Facilities/cyber-security-platform.aspx).
 
 Your feedback, ideas, and improvements are highly appreciated to help grow the **OpenTRNG** community!
