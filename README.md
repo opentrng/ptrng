@@ -14,7 +14,7 @@ With **OpenTRNG**, you can:
 Find more about OpenTRNG on [opentrng.org](https://opentrng.org) and read the [documentation](https://opentrng.org/docs).
 
 > [!WARNING]
-> The OpenTRNG project provides reference TRNG/PTRNG implementations as described in scientific literature. The source code is released for academic and research purposes only. Compliance with verification or certification standards is not guaranteed, and the code must not be used as is in products. Any misuse or unintended application is beyond the responsibility of CEA.
+> The OpenTRNG project provides reference TRNG/PTRNG implementations as described in scientific literature. The source code is released for academic and research purposes only. Compliance with verification or certification standards is not guaranteed, and the code must not be used as is in products. Any misuse or unintended application is beyond the responsibility of contributors.
 
 If you plan to integrate a Random Number Generator (RNG) into a product, feel free to [contact us](https://opentrng.org/contact).
 
