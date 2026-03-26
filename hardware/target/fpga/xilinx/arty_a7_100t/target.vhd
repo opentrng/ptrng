@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use work.settings.all;
 
--- Wrapper entity for top on target board Digilent Arty A7 35T.
+-- Wrapper entity for top on target board Digilent Arty A7 100T.
 entity target is
 	port (
 		-- Main oscillator at 100MHz
@@ -21,7 +21,7 @@ entity target is
 	);
 end;
 
--- RTL architecture of A7-35T top
+-- RTL architecture of A7-100T top
 architecture rtl of target is
 
 	signal clk: std_logic;
